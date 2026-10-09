@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QCity Bitcoin Terminal v18</title>
+<title>QCity Bitcoin Terminal v19</title>
 <style>
 :root{--acc:#00ff41;--acc2:#00a82d;--dim:#005f18;--warn:#ffcc00;--err:#ff2b4e;--cy:#00d9ff;--vi:#b26bff;--panel:rgba(0,20,8,.9)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -23,7 +23,8 @@ h3{font-size:10px;color:var(--acc2);letter-spacing:2px;text-transform:uppercase;
 .kv:last-child{border-bottom:none}
 .kv .k{color:var(--acc2);flex-shrink:0}
 .kv .v{color:var(--acc);font-weight:600;text-align:right;word-break:break-all;font-family:monospace}
-.kv .v.ok{color:var(--acc)}.kv .v.er{color:var(--err)}.kv .v.wa{color:var(--warn)}.kv .v.cy{color:var(--cy)}
+.kv .v.ok{color:var(--acc)}.kv .v.er{color:var(--err)}.kv .v.wa{color:var(--warn)}.kv .v.cy{color:var(--cy)}.kv .v.dm{color:var(--dim);font-weight:400;font-size:10px}
+.kv .v.big{font-size:22px;line-height:1;padding:2px 0}
 input,textarea,select{width:100%;background:#000;border:1px solid var(--acc2);color:var(--acc);padding:7px 9px;border-radius:5px;font-family:inherit;font-size:11px;outline:none;margin-bottom:6px}
 input:focus,textarea:focus{border-color:var(--acc)}
 textarea{min-height:60px;resize:vertical;font-family:monospace}
@@ -44,6 +45,8 @@ textarea{min-height:60px;resize:vertical;font-family:monospace}
 .pane.on{display:block}
 .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
 .col{flex:1;min-width:180px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:700px){.mgrid{grid-template-columns:1fr}}
 .wbtn{width:100%;background:var(--panel);border:1px solid var(--acc2);border-radius:7px;padding:8px 10px;margin-bottom:5px;cursor:pointer;color:var(--acc);font-family:inherit;font-size:11px;display:flex;gap:9px;align-items:center;text-align:left}
 .wbtn:hover{border-color:var(--acc)}
 .wbtn .ic{width:24px;height:24px;border:1px solid var(--acc2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:var(--acc)}
@@ -56,19 +59,12 @@ textarea{min-height:60px;resize:vertical;font-family:monospace}
 #term .ok{color:var(--acc)}#term .er{color:var(--err)}#term .wa{color:var(--warn)}#term .if{color:var(--cy)}#term .dm{color:var(--dim)}
 .cinput{display:flex;gap:6px}
 .cinput input{flex:1;margin-bottom:0}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:700px){.mgrid{grid-template-columns:1fr}}
 #errorBox{display:none;background:#2a0000;border:1px solid var(--err);color:var(--err);padding:8px;border-radius:6px;margin-bottom:8px;font-size:10px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto}
 .hint{color:var(--warn);font-size:9px;line-height:1.55;margin-top:4px}
-.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;margin-right:4px;border:1px solid}
-.tag.ok{color:var(--acc);border-color:var(--acc);background:rgba(0,255,65,.12)}
-.tag.er{color:var(--err);border-color:var(--err);background:rgba(255,43,78,.12)}
-.tag.wa{color:var(--warn);border-color:var(--warn);background:rgba(255,204,0,.12)}
 .addrrow{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px dashed rgba(0,255,65,.12);font-size:10px;align-items:center}
 .addrrow:last-child{border-bottom:none}
 .addrrow .ak{color:var(--acc2);flex-shrink:0;width:120px;font-size:9px}
 .addrrow .av{color:var(--acc);font-family:monospace;font-size:10px;word-break:break-all;text-align:right;cursor:pointer;flex:1}
-.addrrow .av:hover{text-shadow:0 0 8px var(--acc)}
 table.dt{width:100%;border-collapse:collapse;font-size:10px}
 table.dt th{color:var(--acc2);text-align:left;padding:3px 5px;border-bottom:1px solid var(--dim);font-size:9px}
 table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var(--acc);font-family:monospace;word-break:break-all;font-size:10px}
@@ -86,13 +82,25 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 .fee .fu{font-size:7px;color:var(--dim)}
 .bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden;margin:4px 0}
 .bar .fill{height:100%;background:var(--acc);transition:width .2s}
+.flag{font-size:28px;line-height:1;display:inline-block;vertical-align:middle}
+.ping-bar{height:12px;background:#000;border:1px solid var(--dim);border-radius:3px;margin-top:2px;overflow:hidden}
+.ping-bar .fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--warn));transition:width .3s;box-shadow:0 0 6px var(--acc)}
+.ping-row{display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:5px 0;border-bottom:1px dashed rgba(0,255,65,.12);align-items:center;flex-wrap:wrap}
+.ping-row:last-child{border-bottom:none}
+.ping-row .nm{color:var(--acc2);flex:0 0 140px;font-size:10px}
+.ping-row .ms{color:var(--acc);font-weight:700;flex:0 0 60px;text-align:right}
+.ping-row .wrap{flex:1;min-width:120px}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;border:1px solid var(--acc)}
+.pill.on{color:#000;background:var(--acc)}
+.pill.off{color:var(--err);border-color:var(--err)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
 </style>
 </head>
 <body>
 <div id="toasts"></div>
 <div id="app">
 <h1>QCITY BITCOIN <span>&#x2B22;</span></h1>
-<div class="sub">[ v18 &middot; REAL CRYPTO &middot; SELF-VERIFIED &middot; LIVE CHAIN ]</div>
+<div class="sub">[ v19 &middot; REAL CRYPTO &middot; SELF-VERIFIED &middot; LIVE CHAIN &middot; LIVE INTERNET INTEL ]</div>
 
 <div id="errorBox"></div>
 
@@ -114,9 +122,99 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 <button class="tab" data-tab="config">CONFIG</button>
 </div>
 
-<!-- DASH -->
+<!-- ============================================================
+     DASHBOARD
+     ============================================================ -->
 <div class="pane on" id="pane-dash">
-<h2>Self-Test (all verified against known vectors)</h2>
+
+<h2>Live Internet Intel</h2>
+<div class="mgrid">
+<div class="card">
+<h3>&#9670; Identity &amp; Location</h3>
+<div class="kv"><span class="k">FLAG</span><span class="v"><span class="flag" id="dash-flag">&#127987;&#65039;</span></span></div>
+<div class="kv"><span class="k">PUBLIC IPv4</span><span class="v" id="dash-ip-v4">resolving...</span></div>
+<div class="kv"><span class="k">PUBLIC IPv6</span><span class="v cy" id="dash-ip-v6">checking...</span></div>
+<div class="kv"><span class="k">COUNTRY</span><span class="v" id="dash-country">-</span></div>
+<div class="kv"><span class="k">REGION</span><span class="v" id="dash-region">-</span></div>
+<div class="kv"><span class="k">CITY</span><span class="v" id="dash-city">-</span></div>
+<div class="kv"><span class="k">POSTAL</span><span class="v" id="dash-postal">-</span></div>
+<div class="kv"><span class="k">COORDINATES</span><span class="v" id="dash-coords">-</span></div>
+<div class="kv"><span class="k">MAP</span><span class="v" id="dash-map-cell"><a id="dash-map-link" href="#" target="_blank" rel="noopener" style="color:var(--cy);text-decoration:none">-</a></span></div>
+</div>
+<div class="card">
+<h3>&#9670; Network &amp; Time</h3>
+<div class="kv"><span class="k">ISP</span><span class="v" id="dash-isp">-</span></div>
+<div class="kv"><span class="k">ORGANIZATION</span><span class="v" id="dash-org">-</span></div>
+<div class="kv"><span class="k">ASN</span><span class="v cy" id="dash-asn">-</span></div>
+<div class="kv"><span class="k">TIMEZONE</span><span class="v" id="dash-tz">-</span></div>
+<div class="kv"><span class="k">LOCAL TIME</span><span class="v wa" id="dash-local-time">-</span></div>
+<div class="kv"><span class="k">UTC TIME</span><span class="v" id="dash-utc-time">-</span></div>
+<div class="kv"><span class="k">IP VERIFY</span><span class="v" id="dash-verify">-</span></div>
+<div class="kv"><span class="k">PROVIDER</span><span class="v dm" id="dash-provider">-</span></div>
+<div class="kv"><span class="k">LAST UPDATE</span><span class="v dm" id="dash-last-update">-</span></div>
+<button class="btn sm" onclick="runInternetIntel()" style="margin-top:5px">REFRESH INTEL</button>
+</div>
+</div>
+
+<h2>Cloudflare Edge (your nearest PoP)</h2>
+<div class="mgrid">
+<div class="card">
+<h3>&#9670; Edge Datacenter</h3>
+<div class="kv"><span class="k">COLO</span><span class="v cy" id="cf-colo">-</span></div>
+<div class="kv"><span class="k">COLO CITY</span><span class="v" id="cf-colo-city">-</span></div>
+<div class="kv"><span class="k">HTTP PROTOCOL</span><span class="v" id="cf-http">-</span></div>
+<div class="kv"><span class="k">TLS VERSION</span><span class="v" id="cf-tls">-</span></div>
+<div class="kv"><span class="k">KEY EXCHANGE</span><span class="v" id="cf-kex">-</span></div>
+<div class="kv"><span class="k">SNI</span><span class="v" id="cf-sni">-</span></div>
+</div>
+<div class="card">
+<h3>&#9670; WARP / Gateway / Edge IP</h3>
+<div class="kv"><span class="k">WARP</span><span class="v" id="cf-warp">-</span></div>
+<div class="kv"><span class="k">GATEWAY</span><span class="v" id="cf-gateway">-</span></div>
+<div class="kv"><span class="k">EDGE-SEEN IP</span><span class="v cy" id="cf-ip">-</span></div>
+<div class="kv"><span class="k">EDGE LOCATION</span><span class="v" id="cf-loc">-</span></div>
+<div class="kv"><span class="k">TLS CIPHER</span><span class="v dm" id="cf-cipher">not exposed by browser</span></div>
+<button class="btn sm" onclick="fetchCloudflareTrace()" style="margin-top:5px">REFRESH EDGE</button>
+</div>
+</div>
+
+<h2>Connection Quality (live)</h2>
+<div class="mgrid">
+<div class="card">
+<h3>&#9670; Browser-Reported</h3>
+<div class="kv"><span class="k">STATE</span><span class="v" id="conn-state">-</span></div>
+<div class="kv"><span class="k">EFFECTIVE TYPE</span><span class="v" id="conn-type">-</span></div>
+<div class="kv"><span class="k">DOWNLINK</span><span class="v" id="conn-down">-</span></div>
+<div class="kv"><span class="k">RTT (browser)</span><span class="v" id="conn-rtt">-</span></div>
+<div class="kv"><span class="k">SAVE DATA</span><span class="v" id="conn-save">-</span></div>
+<div class="kv"><span class="k">ONLINE SINCE</span><span class="v wa" id="conn-since">-</span></div>
+</div>
+<div class="card">
+<h3>&#9670; Latency to Public Endpoints</h3>
+<div id="ping-result" style="min-height:60px">
+<div class="ping-row"><span class="nm">click TEST to measure</span></div>
+</div>
+<button class="btn sm" onclick="runLatencyTest()">TEST LATENCY</button>
+<button class="btn sm b" onclick="runBandwidthTest()">BANDWIDTH PROBE</button>
+</div>
+</div>
+
+<h2>Device &amp; Browser</h2>
+<div class="card">
+<div class="kv"><span class="k">BROWSER</span><span class="v" id="dev-browser">-</span></div>
+<div class="kv"><span class="k">OPERATING SYSTEM</span><span class="v" id="dev-os">-</span></div>
+<div class="kv"><span class="k">PLATFORM</span><span class="v" id="dev-plat">-</span></div>
+<div class="kv"><span class="k">LANGUAGE</span><span class="v" id="dev-lang">-</span></div>
+<div class="kv"><span class="k">SCREEN</span><span class="v" id="dev-screen">-</span></div>
+<div class="kv"><span class="k">PIXEL RATIO</span><span class="v" id="dev-dpr">-</span></div>
+<div class="kv"><span class="k">COLOR DEPTH</span><span class="v" id="dev-color">-</span></div>
+<div class="kv"><span class="k">CPU CORES</span><span class="v" id="dev-cores">-</span></div>
+<div class="kv"><span class="k">MEMORY</span><span class="v" id="dev-mem">-</span></div>
+<div class="kv"><span class="k">WEBCRYPTO</span><span class="v" id="dev-wc">-</span></div>
+<div class="kv"><span class="k">USER AGENT</span><span class="v dm" id="dev-ua" style="font-size:9px">-</span></div>
+</div>
+
+<h2>Self-Test (verified against known vectors)</h2>
 <div class="card">
 <div class="kv"><span class="k">SHA-256("abc")</span><span class="v" id="t-sha256">waiting</span></div>
 <div class="kv"><span class="k">SHA-512("abc")</span><span class="v" id="t-sha512">waiting</span></div>
@@ -127,22 +225,24 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 <div class="kv"><span class="k">secp256k1 G</span><span class="v" id="t-secp">waiting</span></div>
 <div class="kv"><span class="k">Bech32</span><span class="v" id="t-bech32">waiting</span></div>
 <div class="kv"><span class="k">Base58Check</span><span class="v" id="t-b58">waiting</span></div>
-<button class="btn" onclick="runSelfTest()" style="margin-top:6px">RUN SELF-TEST</button>
+<button class="btn sm" onclick="runSelfTest()" style="margin-top:6px">RUN SELF-TEST</button>
 </div>
-<h2>Quick Status</h2>
+
+<h2>Live Chain Snapshot</h2>
 <div class="card">
-<div class="kv"><span class="k">WebCrypto</span><span class="v" id="st-wc">-</span></div>
-<div class="kv"><span class="k">Secure context</span><span class="v" id="st-sc">-</span></div>
-<div class="kv"><span class="k">CPU cores</span><span class="v" id="st-cpu">-</span></div>
-<div class="kv"><span class="k">Chain height</span><span class="v" id="st-h">-</span></div>
-<div class="kv"><span class="k">Fast fee</span><span class="v" id="st-fee">-</span></div>
-<div class="kv"><span class="k">BTC/USD</span><span class="v" id="st-btc">-</span></div>
+<div class="kv"><span class="k">CHAIN HEIGHT</span><span class="v" id="st-h">-</span></div>
+<div class="kv"><span class="k">FAST FEE</span><span class="v" id="st-fee">-</span></div>
+<div class="kv"><span class="k">BTC / USD</span><span class="v" id="st-btc">-</span></div>
+<div class="kv"><span class="k">HALVING ETA</span><span class="v wa" id="st-halving">-</span></div>
+<div class="bar"><div class="fill" id="st-halving-bar" style="width:0%"></div></div>
 </div>
-<h2>Reference Info</h2>
+
+<h2>Reference</h2>
 <div class="card">
-<div class="kv"><span class="k">App version</span><span class="v cy">18.0</span></div>
-<div class="kv"><span class="k">Crypto</span><span class="v cy">SHA-1/256/512, SHA3-256, Keccak-256, RIPEMD-160, HMAC-SHA256/512, PBKDF2, Base58Check, Bech32/Bech32m, secp256k1, ECDSA RFC6979, Schnorr BIP340, BIP32/39/44/49/84/86</span></div>
-<div class="kv"><span class="k">Live APIs</span><span class="v cy">mempool.space, blockchain.info, Binance, alternative.me, Cloudflare DoH, ipwho.is</span></div>
+<div class="kv"><span class="k">App version</span><span class="v cy">19.0</span></div>
+<div class="kv"><span class="k">Crypto</span><span class="v dm">SHA-1/256/512, SHA3-256, Keccak-256, RIPEMD-160, HMAC, PBKDF2, Base58Check, Bech32/m, secp256k1, ECDSA RFC6979, Schnorr BIP340, Ed25519, BIP32/39/44/49/84/86</span></div>
+<div class="kv"><span class="k">Intel APIs</span><span class="v dm">ipwho.is, ipapi.co, ipify (v4+v6), Cloudflare trace, icanhazip</span></div>
+<div class="kv"><span class="k">Chain APIs</span><span class="v dm">mempool.space, blockchain.info, Binance, alternative.me</span></div>
 </div>
 </div>
 
@@ -224,7 +324,7 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 <button class="btn r" onclick="vanityStop()">STOP</button>
 <div class="bar"><div class="fill" id="vanBar" style="width:0%"></div></div>
 <div class="out" id="vanOut">-</div>
-<div class="hint">Real incremental secp256k1. Difficulty ~ 58^len or 32^len. Each char multiplies time by that factor.</div>
+<div class="hint">Real incremental secp256k1. Difficulty ~ 58^len or 32^len.</div>
 </div>
 
 <!-- SEED -->
@@ -402,7 +502,7 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 </div>
 <canvas id="chart" width="600" height="200"></canvas>
 <div class="row" style="margin-top:6px">
-<button class="btn sm tfBtn" data-tf="1h" onclick="setTF(this)">1H</button>
+<button class="btn sm tfBtn on" data-tf="1h" onclick="setTF(this)">1H</button>
 <button class="btn sm tfBtn" data-tf="4h" onclick="setTF(this)">4H</button>
 <button class="btn sm tfBtn" data-tf="1d" onclick="setTF(this)">1D</button>
 <button class="btn sm tfBtn" data-tf="1w" onclick="setTF(this)">1W</button>
@@ -465,7 +565,7 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 <div class="kv"><span class="k">hash dhash sha512 ripemd h160</span><span class="v">hashing</span></div>
 <div class="kv"><span class="k">wif unwif b58 b58d</span><span class="v">encoding</span></div>
 <div class="kv"><span class="k">derive sign schnorr</span><span class="v">crypto</span></div>
-<div class="kv"><span class="k">dns tx version clear panic</span><span class="v">misc</span></div>
+<div class="kv"><span class="k">dns whoami myip tx version clear</span><span class="v">misc</span></div>
 </div>
 </div>
 
@@ -491,17 +591,17 @@ table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var
 <h2>About</h2>
 <div class="card">
 <div class="kv"><span class="k">App</span><span class="v">QCity Bitcoin Terminal</span></div>
-<div class="kv"><span class="k">Version</span><span class="v">18.0</span></div>
+<div class="kv"><span class="k">Version</span><span class="v">19.0</span></div>
 <div class="kv"><span class="k">Offline</span><span class="v">all crypto computed locally</span></div>
 <div class="kv"><span class="k">Network</span><span class="v">only what you click</span></div>
 </div>
 <h2>Notes</h2>
 <div class="card" style="font-size:11px;color:var(--acc2);line-height:1.7">
-All cryptography runs locally. Nothing is uploaded. Live data is fetched directly from public APIs only when you click. This tool never stores or transmits private keys.
+All cryptography runs locally. Nothing is uploaded. Live internet intel and chain data are fetched directly from public APIs only when you click. This tool never stores or transmits private keys.
 </div>
 </div>
 
-<div style="text-align:center;font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:14px;padding:6px">QCITY BITCOIN v18</div>
+<div style="text-align:center;font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:14px;padding:6px">QCITY BITCOIN v19</div>
 </div>
 
 <script>
@@ -521,15 +621,14 @@ window.onerror = function(msg, src, line, col, err){
    UTILITIES
    ============================================================ */
 var HEXC = '0123456789abcdef';
-function rHex(n){var s='';for(var i=0;i<n;i++)s+=HEXC[Math.floor(Math.random()*16)];return s;}
-function $(id){return document.getElementById(id);}
+function $(id){ return document.getElementById(id); }
 var TE = new TextEncoder();
 var TD = new TextDecoder();
 function h2b(h){
-  h = String(h).replace(/[^0-9a-f]/gi,'');
+  h = String(h).replace(/[^0-9a-f]/gi, '');
   if(h.length % 2) h = '0' + h;
-  var o = new Uint8Array(h.length/2);
-  for(var i=0;i<o.length;i++) o[i] = parseInt(h.substr(i*2,2),16);
+  var o = new Uint8Array(h.length / 2);
+  for(var i=0;i<o.length;i++) o[i] = parseInt(h.substr(i*2, 2), 16);
   return o;
 }
 function b2h(a){
@@ -551,7 +650,7 @@ function cat(){
   }
   return o;
 }
-function eqA(a,b){
+function eqA(a, b){
   if(a.length !== b.length) return false;
   for(var i=0;i<a.length;i++) if(a[i] !== b[i]) return false;
   return true;
@@ -560,7 +659,7 @@ function bytesToBig(b){
   if(!b.length) return 0n;
   return BigInt('0x' + (b2h(b) || '0'));
 }
-function bigToBytes(n,len){
+function bigToBytes(n, len){
   var o = new Uint8Array(len);
   for(var i=len-1;i>=0;i--){
     o[i] = Number(n & 255n);
@@ -570,7 +669,7 @@ function bigToBytes(n,len){
 }
 function toasts(m, cls){
   var d = document.createElement('div');
-  d.className = 'toast ' + (cls||'');
+  d.className = 'toast ' + (cls || '');
   d.textContent = m;
   var el = $('toasts');
   if(!el) return;
@@ -579,23 +678,23 @@ function toasts(m, cls){
   setTimeout(function(){
     d.style.opacity = '0';
     d.style.transition = 'opacity .3s';
-    setTimeout(function(){d.remove();},300);
+    setTimeout(function(){ d.remove(); }, 300);
   }, 3200);
 }
 function copyEl(id){
   var t = $(id).textContent;
   if(!t || t === '-') return;
   navigator.clipboard.writeText(t).then(function(){
-    toasts('copied','ok');
+    toasts('copied', 'ok');
   }).catch(function(){
-    toasts('clipboard blocked','er');
+    toasts('clipboard blocked', 'er');
   });
 }
 function log(m, cls){
   var t1 = $('term');
   if(t1){
     var d = document.createElement('div');
-    d.className = 'ln ' + (cls||'ok');
+    d.className = 'ln ' + (cls || 'ok');
     d.textContent = m;
     t1.appendChild(d);
     while(t1.children.length > 250) t1.removeChild(t1.firstChild);
@@ -604,7 +703,7 @@ function log(m, cls){
   var t2 = $('term2');
   if(t2){
     var e = document.createElement('div');
-    e.className = 'ln ' + (cls||'ok');
+    e.className = 'ln ' + (cls || 'ok');
     e.textContent = m;
     t2.appendChild(e);
     while(t2.children.length > 250) t2.removeChild(t2.firstChild);
@@ -622,8 +721,7 @@ function filterLog(){
 }
 
 /* ============================================================
-   SHA-256 - standard 32-bit implementation
-   Verified: SHA-256("abc") = ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+   SHA-256
    ============================================================ */
 var _K256 = new Uint32Array([
   0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
@@ -675,8 +773,7 @@ function sha256JS(data){
 }
 
 /* ============================================================
-   SHA-512 - using BigInt for the 64-bit math
-   Verified: SHA-512("abc") = ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f
+   SHA-512 (BigInt)
    ============================================================ */
 var _K512 = [
   0x428a2f98d728ae22n,0x7137449123ef65cdn,0xb5c0fbcfec4d3b2fn,0xe9b5dba58189dbbcn,
@@ -701,12 +798,8 @@ var _K512 = [
   0x4cc5d4becb3e42b6n,0x597f299cfc657e2an,0x5fcb6fab3ad6faecn,0x6c44198c4a475817n
 ];
 var _MASK64 = 0xFFFFFFFFFFFFFFFFn;
-function _rotr64(x, n){
-  return ((x >> BigInt(n)) | (x << BigInt(64-n))) & _MASK64;
-}
-function _shr64(x, n){
-  return x >> BigInt(n);
-}
+function _rotr64(x, n){ return ((x >> BigInt(n)) | (x << BigInt(64-n))) & _MASK64; }
+function _shr64(x, n){ return x >> BigInt(n); }
 function sha512JS(data){
   if(typeof data === 'string') data = TE.encode(data);
   var H = [
@@ -763,10 +856,9 @@ function sha512JS(data){
 }
 
 /* ============================================================
-   SHA-1 - standard
-   Verified: SHA-1("abc") = a9993e364706816aba3e25717850c26c9cd0d89d
+   SHA-1
    ============================================================ */
-function _rol32(x,n){return ((x<<n)|(x>>>(32-n)))>>>0;}
+function _rol32(x, n){ return ((x << n) | (x >>> (32-n))) >>> 0; }
 function sha1JS(data){
   if(typeof data === 'string') data = TE.encode(data);
   var h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
@@ -803,8 +895,7 @@ function sha1JS(data){
 }
 
 /* ============================================================
-   RIPEMD-160 - standard
-   Verified: RIPEMD-160("abc") = 8eb208f7e05d987a9b044a8e98c6b087f15a0bfc
+   RIPEMD-160
    ============================================================ */
 var _RL1 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
 var _RL2 = [5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];
@@ -820,11 +911,9 @@ function ripemd160(data){
   buf[l] = 0x80;
   var dv = new DataView(buf.buffer);
   var bitlen = l * 8;
-  for(var k=0;k<8;k++){
-    dv.setUint8(paddedLen - 8 + k, (bitlen / Math.pow(256, k)) & 0xff);
-  }
+  for(var k=0;k<8;k++) dv.setUint8(paddedLen - 8 + k, (bitlen / Math.pow(256, k)) & 0xff);
   var X = new Uint32Array(16);
-  function ff(j,x,y,z){
+  function ff(j, x, y, z){
     if(j<16) return x ^ y ^ z;
     if(j<32) return (x & y) | ((~x) & z);
     if(j<48) return (x | (~y)) ^ z;
@@ -835,12 +924,12 @@ function ripemd160(data){
   var K2 = [0x50a28be6, 0x5c4dd124, 0x6d703ef3, 0x7a6d76e9, 0x00000000];
   for(var b=0;b<paddedLen;b+=64){
     for(var i=0;i<16;i++) X[i] = dv.getUint32(b + i*4, true);
-    var A1 = h0, B1 = h1, C1 = h2, D1 = h3, E1 = h4;
-    var A2 = h0, B2 = h1, C2 = h2, D2 = h3, E2 = h4;
+    var A1=h0, B1=h1, C1=h2, D1=h3, E1=h4;
+    var A2=h0, B2=h1, C2=h2, D2=h3, E2=h4;
     for(var j=0;j<80;j++){
-      var t = (_rol32((A1 + ff(j,B1,C1,D1) + X[_RL1[j]] + K1[(j/16)|0]) >>> 0, _SH1[j]) + E1) >>> 0;
+      var t = (_rol32((A1 + ff(j, B1, C1, D1) + X[_RL1[j]] + K1[(j/16)|0]) >>> 0, _SH1[j]) + E1) >>> 0;
       A1 = E1; E1 = D1; D1 = _rol32(C1, 10); C1 = B1; B1 = t;
-      t = (_rol32((A2 + ff(79-j,B2,C2,D2) + X[_RL2[j]] + K2[(j/16)|0]) >>> 0, _SH2[j]) + E2) >>> 0;
+      t = (_rol32((A2 + ff(79-j, B2, C2, D2) + X[_RL2[j]] + K2[(j/16)|0]) >>> 0, _SH2[j]) + E2) >>> 0;
       A2 = E2; E2 = D2; D2 = _rol32(C2, 10); C2 = B2; B2 = t;
     }
     var tt = (h1 + C1 + D2) >>> 0;
@@ -858,49 +947,38 @@ function ripemd160(data){
 }
 
 /* ============================================================
-   SHA3-256 / Keccak-256 using BigInt
-   Verified: SHA3-256("") = a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a
-   Verified: Keccak-256("") = c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
+   SHA3-256 / Keccak-256
    ============================================================ */
 var _KRC = [
-  0x0000000000000001n,0x0000000000008082n,0x800000000000808an,0x8000000080008000n,
-  0x000000000000808bn,0x0000000080000001n,0x8000000080008081n,0x8000000000008009n,
-  0x000000000000008an,0x0000000000000088n,0x0000000080008009n,0x000000008000000an,
-  0x000000008000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,
-  0x8000000000008002n,0x8000000000000080n,0x000000000000800an,0x800000008000000an,
-  0x8000000080008081n,0x8000000000008080n,0x0000000080000001n,0x8000000080008008n
+  0x0000000000000001n, 0x0000000000008082n, 0x800000000000808an, 0x8000000080008000n,
+  0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+  0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+  0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+  0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+  0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
 ];
 var _KROT = [1,3,6,10,15,21,28,36,45,55,2,14,27,41,56,8,25,43,62,18,39,61,20,44];
-function _rotl64(x, n){
-  return ((x << BigInt(n)) | (x >> BigInt(64-n))) & _MASK64;
-}
+function _rotl64(x, n){ return ((x << BigInt(n)) | (x >> BigInt(64-n))) & _MASK64; }
 function _keccakF(st){
   for(var r=0;r<24;r++){
-    var C = [st[0]^st[5]^st[10]^st[15]^st[20],
-             st[1]^st[6]^st[11]^st[16]^st[21],
-             st[2]^st[7]^st[12]^st[17]^st[22],
-             st[3]^st[8]^st[13]^st[18]^st[23],
-             st[4]^st[9]^st[14]^st[19]^st[24]];
-    var D = [C[4]^_rotl64(C[1],1), C[0]^_rotl64(C[2],1), C[1]^_rotl64(C[3],1),
-             C[2]^_rotl64(C[4],1), C[3]^_rotl64(C[0],1)];
-    for(var x=0;x<5;x++){
-      for(var y=0;y<5;y++){
-        st[x + 5*y] = (st[x + 5*y] ^ D[x]) & _MASK64;
-      }
-    }
+    var C = [
+      st[0]^st[5]^st[10]^st[15]^st[20],
+      st[1]^st[6]^st[11]^st[16]^st[21],
+      st[2]^st[7]^st[12]^st[17]^st[22],
+      st[3]^st[8]^st[13]^st[18]^st[23],
+      st[4]^st[9]^st[14]^st[19]^st[24]
+    ];
+    var D = [C[4]^_rotl64(C[1],1), C[0]^_rotl64(C[2],1), C[1]^_rotl64(C[3],1), C[2]^_rotl64(C[4],1), C[3]^_rotl64(C[0],1)];
+    for(var x=0;x<5;x++) for(var y=0;y<5;y++) st[x + 5*y] = (st[x + 5*y] ^ D[x]) & _MASK64;
     var B = new Array(25);
-    for(var x2=0;x2<5;x2++){
-      for(var y2=0;y2<5;y2++){
-        var idx = x2 + 5*y2;
-        var newIdx = y2 + 5*((2*x2 + 3*y2) % 5);
-        B[newIdx] = _rotl64(st[idx], _KROT[idx]);
-      }
+    for(var x2=0;x2<5;x2++) for(var y2=0;y2<5;y2++){
+      var idx = x2 + 5*y2;
+      var newIdx = y2 + 5*((2*x2 + 3*y2) % 5);
+      B[newIdx] = _rotl64(st[idx], _KROT[idx]);
     }
-    for(var x3=0;x3<5;x3++){
-      for(var y3=0;y3<5;y3++){
-        var i3 = x3 + 5*y3;
-        st[i3] = (B[i3] ^ ((~B[(x3+1)%5 + 5*y3]) & B[(x3+2)%5 + 5*y3])) & _MASK64;
-      }
+    for(var x3=0;x3<5;x3++) for(var y3=0;y3<5;y3++){
+      var i3 = x3 + 5*y3;
+      st[i3] = (B[i3] ^ ((~B[(x3+1)%5 + 5*y3]) & B[(x3+2)%5 + 5*y3])) & _MASK64;
     }
     st[0] = (st[0] ^ _KRC[r]) & _MASK64;
   }
@@ -961,23 +1039,7 @@ function hmacSha512JS(key, msg){
 }
 
 /* ============================================================
-   Async wrappers preferring WebCrypto
-   ============================================================ */
-async function sha256(d){
-  if(crypto.subtle && self.isSecureContext){
-    try{
-      var buf = (typeof d === 'string') ? TE.encode(d) : d;
-      return new Uint8Array(await crypto.subtle.digest('SHA-256', buf));
-    }catch(e){}
-  }
-  return sha256JS(d);
-}
-async function sha256hex(m){ return b2h(await sha256(m)); }
-async function dsha256(d){ return sha256(await sha256(d)); }
-async function hash160(d){ return ripemd160(await sha256(d)); }
-
-/* ============================================================
-   Base58Check / Bech32 / Base32 / Base64
+   Base58Check / Bech32
    ============================================================ */
 var _B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 function b58enc(bytes){
@@ -985,10 +1047,7 @@ function b58enc(bytes){
   for(var i=0;i<bytes.length;i++) n = n * 256n + BigInt(bytes[i]);
   var s = '';
   while(n > 0n){ s = _B58[Number(n % 58n)] + s; n = n / 58n; }
-  for(var k=0;k<bytes.length;k++){
-    if(bytes[k] === 0) s = '1' + s;
-    else break;
-  }
+  for(var k=0;k<bytes.length;k++){ if(bytes[k] === 0) s = '1' + s; else break; }
   return s;
 }
 function b58dec(str){
@@ -1000,26 +1059,18 @@ function b58dec(str){
   }
   var out = [];
   while(n > 0n){ out.unshift(Number(n % 256n)); n = n / 256n; }
-  for(var k=0;k<str.length;k++){
-    if(str[k] === '1') out.unshift(0);
-    else break;
-  }
+  for(var k=0;k<str.length;k++){ if(str[k] === '1') out.unshift(0); else break; }
   return new Uint8Array(out);
 }
-async function b58check(payload){
-  var chk = (await dsha256(payload)).slice(0,4);
-  return b58enc(cat(payload, chk));
-}
 function b58checkSync(payload){
-  var chk = sha256JS(sha256JS(payload)).slice(0,4);
+  var chk = sha256JS(sha256JS(payload)).slice(0, 4);
   return b58enc(cat(payload, chk));
 }
-async function b58checkDecode(str){
+function b58checkDecodeSync(str){
   var b = b58dec(str);
   if(b.length < 5) throw new Error('too short');
-  var pay = b.slice(0, -4);
-  var chk = b.slice(-4);
-  var exp = (await dsha256(pay)).slice(0, 4);
+  var pay = b.slice(0, -4), chk = b.slice(-4);
+  var exp = sha256JS(sha256JS(pay)).slice(0, 4);
   if(!eqA(chk, exp)) throw new Error('checksum mismatch');
   return pay;
 }
@@ -1030,9 +1081,7 @@ function _b32poly(v){
   for(var i=0;i<v.length;i++){
     var t = c >>> 25;
     c = ((c & 0x1ffffff) << 5) ^ v[i];
-    for(var j=0;j<5;j++){
-      if((t >>> j) & 1) c ^= G[j];
-    }
+    for(var j=0;j<5;j++) if((t >>> j) & 1) c ^= G[j];
   }
   return c;
 }
@@ -1050,10 +1099,7 @@ function _convertBits(d, from, to, pad){
   for(var i=0;i<d.length;i++){
     a = (a << from) | d[i];
     b += from;
-    while(b >= to){
-      b -= to;
-      o.push((a >>> b) & max);
-    }
+    while(b >= to){ b -= to; o.push((a >>> b) & max); }
   }
   if(pad && b > 0) o.push((a << (to - b)) & max);
   return o;
@@ -1102,7 +1148,7 @@ function b64dec(str){
 }
 
 /* ============================================================
-   secp256k1 (BigInt)
+   secp256k1
    ============================================================ */
 var SECP_P = 2n**256n - 2n**32n - 977n;
 var SECP_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n;
@@ -1113,13 +1159,8 @@ var SECP_G = {
 function modP(a){ var r = a % SECP_P; return r < 0n ? r + SECP_P : r; }
 function modN(a){ var r = a % SECP_N; return r < 0n ? r + SECP_N : r; }
 function powMod(b, e, m){
-  var r = 1n;
-  b = b % m;
-  while(e > 0n){
-    if(e & 1n) r = r * b % m;
-    b = b * b % m;
-    e >>= 1n;
-  }
+  var r = 1n; b = b % m;
+  while(e > 0n){ if(e & 1n) r = r * b % m; b = b * b % m; e >>= 1n; }
   return r;
 }
 function invP(a){ return powMod(modP(a), SECP_P - 2n, SECP_P); }
@@ -1164,9 +1205,7 @@ function pubLift(x, odd){
   return { x: x, y: y };
 }
 function pubDecompress(bytes){
-  if(bytes[0] === 0x04){
-    return { x: bytesToBig(bytes.slice(1, 33)), y: bytesToBig(bytes.slice(33, 65)) };
-  }
+  if(bytes[0] === 0x04) return { x: bytesToBig(bytes.slice(1, 33)), y: bytesToBig(bytes.slice(33, 65)) };
   var odd = bytes[0] === 0x03;
   return pubLift(bytesToBig(bytes.slice(1, 33)), odd);
 }
@@ -1186,7 +1225,7 @@ function taggedHash(tag, msg){
 }
 
 /* ============================================================
-   ECDSA RFC 6979
+   ECDSA / Schnorr / Ed25519
    ============================================================ */
 function rfc6979(k, h1){
   var x = bytesToBig(k);
@@ -1205,10 +1244,7 @@ function rfc6979(k, h1){
   V = hmacSha256JS(K, V);
   while(true){
     var T = new Uint8Array(0);
-    while(T.length < hlen){
-      V = hmacSha256JS(K, V);
-      T = cat(T, V);
-    }
+    while(T.length < hlen){ V = hmacSha256JS(K, V); T = cat(T, V); }
     var kc = bytesToBig(T.slice(0, hlen));
     if(kc > 0n && kc < SECP_N) return kc;
     K = hmacSha256JS(K, cat(V, new Uint8Array([0])));
@@ -1217,10 +1253,8 @@ function rfc6979(k, h1){
 }
 function derEncode(r, s){
   var rb = bigToBytes(r, 32), sb = bigToBytes(s, 32);
-  var rT = 0;
-  while(rT < rb.length - 1 && rb[rT] === 0) rT++;
-  var sT = 0;
-  while(sT < sb.length - 1 && sb[sT] === 0) sT++;
+  var rT = 0; while(rT < rb.length - 1 && rb[rT] === 0) rT++;
+  var sT = 0; while(sT < sb.length - 1 && sb[sT] === 0) sT++;
   var rA = rb.slice(rT), sA = sb.slice(sT);
   if(rA[0] & 0x80) rA = cat(new Uint8Array([0]), rA);
   if(sA[0] & 0x80) sA = cat(new Uint8Array([0]), sA);
@@ -1243,9 +1277,7 @@ function ecdsaSign(privHex, msgBytes){
   return { r: r, s: s, recid: recid, hash: h };
 }
 function ecdsaVerify(pubBytesIn, msgBytes, sig){
-  var Q;
-  if(typeof pubBytesIn === 'string') Q = pubDecompress(h2b(pubBytesIn));
-  else Q = pubDecompress(pubBytesIn);
+  var Q = (typeof pubBytesIn === 'string') ? pubDecompress(h2b(pubBytesIn)) : pubDecompress(pubBytesIn);
   var z = bytesToBig(sha256JS(msgBytes));
   var w = invN(sig.s);
   var u1 = modN(z * w);
@@ -1264,10 +1296,6 @@ function ecdsaRecover(msgBytes, sig, recid){
   var u2 = modN(sig.s * rInv);
   return ptAdd(ptMul(u1), ptMul(u2, R));
 }
-
-/* ============================================================
-   Schnorr BIP340
-   ============================================================ */
 function schnorrSign(sk32, msg32, aux32){
   var d0 = bytesToBig(sk32);
   if(d0 <= 0n || d0 >= SECP_N) throw new Error('invalid seckey');
@@ -1300,10 +1328,6 @@ function schnorrVerify(px32, msg32, sig64){
   if(R.x !== r) return false;
   return true;
 }
-
-/* ============================================================
-   Ed25519 (RFC 8032)
-   ============================================================ */
 var ED_P = 2n**255n - 19n;
 var ED_L = 2n**252n + 27742317777372353535851937790883648493n;
 function modEd(a){ var r = a % ED_P; return r < 0n ? r + ED_P : r; }
@@ -1361,7 +1385,7 @@ function ed25519Sign(seed32, msg){
 }
 
 /* ============================================================
-   BIP32 HD Wallet
+   BIP32 / addresses / WIF
    ============================================================ */
 function bip32Master(seed){
   var I = hmacSha512JS(TE.encode('Bitcoin seed'), seed);
@@ -1412,10 +1436,6 @@ function bip32Serialize(node, isPrivate){
   var chk = sha256JS(sha256JS(buf)).slice(0, 4);
   return b58enc(cat(buf, chk));
 }
-
-/* ============================================================
-   Address derivation
-   ============================================================ */
 function p2pkhFromPub(pub, mainnet){
   var h = ripemd160(sha256JS(pub));
   return b58checkSync(cat(new Uint8Array([mainnet ? 0x00 : 0x6f]), h));
@@ -1449,10 +1469,6 @@ function addressesFromPriv(privHex, mainnet){
     p2tr: p2trFromPriv(privHex, mainnet)
   };
 }
-
-/* ============================================================
-   WIF
-   ============================================================ */
 function toWIF(privHex, compressed, testnet){
   var prefix = testnet ? 0xef : 0x80;
   var pay;
@@ -1493,27 +1509,23 @@ function loadWordlist(){
       if(el){ el.textContent = '2048 words loaded'; el.className = 'v ok'; }
       var src = $('wlSrc');
       if(src) src.textContent = WL_SRC;
-      log('> BIP39 wordlist loaded (2048 words)','ok');
+      log('> BIP39 wordlist loaded (2048 words)', 'ok');
       return true;
     })
     .catch(function(e){
       if(el){ el.textContent = 'FAILED: ' + e.message; el.className = 'v er'; }
-      log('> BIP39 wordlist unavailable: ' + e.message,'er');
+      log('> BIP39 wordlist unavailable: ' + e.message, 'er');
       return false;
     });
 }
 function genMnemonic(n){
-  if(!WL){ toasts('wordlist not loaded','er'); return; }
+  if(!WL){ toasts('wordlist not loaded', 'er'); return; }
   var entBits = {12:128, 15:160, 18:192, 21:224, 24:256}[n];
   var ent = crypto.getRandomValues(new Uint8Array(entBits / 8));
   var hash = sha256JS(ent);
   var entB = [], hashB = [];
-  for(var i=0;i<ent.length;i++){
-    for(var j=7;j>=0;j--) entB.push((ent[i] >> j) & 1);
-  }
-  for(var i2=0;i2<hash.length;i2++){
-    for(var j2=7;j2>=0;j2--) hashB.push((hash[i2] >> j2) & 1);
-  }
+  for(var i=0;i<ent.length;i++) for(var j=7;j>=0;j--) entB.push((ent[i] >> j) & 1);
+  for(var i2=0;i2<hash.length;i2++) for(var j2=7;j2>=0;j2--) hashB.push((hash[i2] >> j2) & 1);
   var bits = entB.concat(hashB.slice(0, entBits / 32));
   var words = [];
   for(var k=0;k<n;k++){
@@ -1523,7 +1535,7 @@ function genMnemonic(n){
   }
   $('mnOut').textContent = words.join(' ');
   $('mnMeta').textContent = 'entropy: ' + b2h(ent) + '\nchecksum: ' + (entBits/32) + ' bits, total ' + (entBits + entBits/32) + ' bits';
-  log('> ' + n + '-word mnemonic generated','ok');
+  log('> ' + n + '-word mnemonic generated', 'ok');
 }
 function validateMn(){
   var out = $('valOut');
@@ -1549,21 +1561,17 @@ function validateMn(){
   var hash = sha256JS(ent);
   var csLen = allBits.length - entBits;
   var hashB = [];
-  for(var i4=0;i4<hash.length;i4++){
-    for(var j4=7;j4>=0;j4--) hashB.push((hash[i4] >> j4) & 1);
-  }
+  for(var i4=0;i4<hash.length;i4++) for(var j4=7;j4>=0;j4--) hashB.push((hash[i4] >> j4) & 1);
   var ok = true;
-  for(var i5=0;i5<csLen;i5++){
-    if(hashB[i5] !== allBits[entBits + i5]){ ok = false; break; }
-  }
+  for(var i5=0;i5<csLen;i5++) if(hashB[i5] !== allBits[entBits + i5]){ ok = false; break; }
   out.textContent = (ok ? 'VALID BIP39' : 'CHECKSUM MISMATCH') + '\nentropy: ' + b2h(ent) + '\nchecksum bits: ' + csLen;
 }
 function seedFromMnemonic(mn, pass){
   var norm = function(s){ return s.normalize('NFKD'); };
   if(!crypto.subtle) return Promise.reject(new Error('BIP39 seed requires WebCrypto'));
-  return crypto.subtle.importKey('raw', TE.encode(norm(mn)), {name:'PBKDF2'}, false, ['deriveBits'])
+  return crypto.subtle.importKey('raw', TE.encode(norm(mn)), { name: 'PBKDF2' }, false, ['deriveBits'])
     .then(function(k){
-      return crypto.subtle.deriveBits({name:'PBKDF2', salt: TE.encode(norm('mnemonic' + pass)), iterations: 2048, hash: 'SHA-512'}, k, 512);
+      return crypto.subtle.deriveBits({ name: 'PBKDF2', salt: TE.encode(norm('mnemonic' + pass)), iterations: 2048, hash: 'SHA-512' }, k, 512);
     })
     .then(function(bits){ return new Uint8Array(bits); });
 }
@@ -1573,14 +1581,12 @@ function mnToSeed(){
   if(!mn){ $('seedOut').textContent = 'no mnemonic'; return; }
   seedFromMnemonic(mn, pass).then(function(seed){
     $('seedOut').textContent = b2h(seed);
-    log('> BIP39 seed derived','ok');
-  }).catch(function(e){
-    $('seedOut').textContent = 'error: ' + e.message;
-  });
+    log('> BIP39 seed derived', 'ok');
+  }).catch(function(e){ $('seedOut').textContent = 'error: ' + e.message; });
 }
 
 /* ============================================================
-   Transaction
+   TX helpers
    ============================================================ */
 function rdVar(dv, off){
   var b = dv.getUint8(off);
@@ -1612,104 +1618,41 @@ function parseTx(hex){
   var buf = h2b(hex);
   var dv = new DataView(buf.buffer);
   var off = 0;
-  var version = dv.getUint32(off, true);
-  off += 4;
+  var version = dv.getUint32(off, true); off += 4;
   var segwit = false;
   if(buf[off] === 0x00 && buf[off+1] === 0x01){ segwit = true; off += 2; }
-  var r1 = rdVar(dv, off);
-  var nIn = r1[0];
-  off = r1[1];
+  var r1 = rdVar(dv, off); var nIn = r1[0]; off = r1[1];
   var inputs = [];
   for(var i=0;i<nIn;i++){
-    var txid = b2h(buf.slice(off, off+32).reverse());
-    off += 32;
-    var vout = dv.getUint32(off, true);
-    off += 4;
-    var r2 = rdVar(dv, off);
-    var slen = r2[0];
-    off = r2[1];
-    var script = buf.slice(off, off+slen);
-    off += slen;
-    var seq = dv.getUint32(off, true);
-    off += 4;
+    var txid = b2h(buf.slice(off, off+32).reverse()); off += 32;
+    var vout = dv.getUint32(off, true); off += 4;
+    var r2 = rdVar(dv, off); var slen = r2[0]; off = r2[1];
+    var script = buf.slice(off, off+slen); off += slen;
+    var seq = dv.getUint32(off, true); off += 4;
     inputs.push({ txid: txid, vout: vout, script: b2h(script), sequence: seq });
   }
-  var r3 = rdVar(dv, off);
-  var nOut = r3[0];
-  off = r3[1];
+  var r3 = rdVar(dv, off); var nOut = r3[0]; off = r3[1];
   var outputs = [];
   for(var j=0;j<nOut;j++){
-    var value = dv.getBigUint64(off, true);
-    off += 8;
-    var r4 = rdVar(dv, off);
-    var slen2 = r4[0];
-    off = r4[1];
-    var script2 = buf.slice(off, off+slen2);
-    off += slen2;
+    var value = dv.getBigUint64(off, true); off += 8;
+    var r4 = rdVar(dv, off); var slen2 = r4[0]; off = r4[1];
+    var script2 = buf.slice(off, off+slen2); off += slen2;
     outputs.push({ value: Number(value), script: b2h(script2) });
   }
   var witnesses = [];
   if(segwit){
     for(var w=0;w<nIn;w++){
-      var r5 = rdVar(dv, off);
-      var cn = r5[0];
-      off = r5[1];
+      var r5 = rdVar(dv, off); var cn = r5[0]; off = r5[1];
       var items = [];
       for(var k=0;k<cn;k++){
-        var r6 = rdVar(dv, off);
-        var len = r6[0];
-        off = r6[1];
-        items.push(b2h(buf.slice(off, off+len)));
-        off += len;
+        var r6 = rdVar(dv, off); var len = r6[0]; off = r6[1];
+        items.push(b2h(buf.slice(off, off+len))); off += len;
       }
       witnesses.push(items);
     }
   }
   var locktime = dv.getUint32(off, true);
   return { version: version, segwit: segwit, locktime: locktime, inputs: inputs, outputs: outputs, witnesses: witnesses, size: buf.length };
-}
-function serializeTx(tx){
-  var parts = [];
-  var v = new Uint8Array(4);
-  new DataView(v.buffer).setUint32(0, tx.version, true);
-  parts.push(v);
-  if(tx.segwit) parts.push(new Uint8Array([0, 1]));
-  parts.push(varint(tx.inputs.length));
-  for(var i=0;i<tx.inputs.length;i++){
-    var inp = tx.inputs[i];
-    parts.push(h2b(inp.txid).reverse());
-    var vo = new Uint8Array(4);
-    new DataView(vo.buffer).setUint32(0, inp.vout, true);
-    parts.push(vo);
-    var sc = h2b(inp.script || '');
-    parts.push(varint(sc.length), sc);
-    var sq = new Uint8Array(4);
-    new DataView(sq.buffer).setUint32(0, inp.sequence, true);
-    parts.push(sq);
-  }
-  parts.push(varint(tx.outputs.length));
-  for(var j=0;j<tx.outputs.length;j++){
-    var out = tx.outputs[j];
-    var vv = new Uint8Array(8);
-    new DataView(vv.buffer).setBigUint64(0, BigInt(out.value), true);
-    parts.push(vv);
-    var sc2 = h2b(out.script);
-    parts.push(varint(sc2.length), sc2);
-  }
-  if(tx.segwit){
-    for(var w=0;w<tx.witnesses.length;w++){
-      var wit = tx.witnesses[w] || [];
-      parts.push(varint(wit.length));
-      for(var k=0;k<wit.length;k++){
-        var ib = h2b(wit[k]);
-        parts.push(varint(ib.length), ib);
-      }
-    }
-  }
-  var lt = new Uint8Array(4);
-  new DataView(lt.buffer).setUint32(0, tx.locktime, true);
-  parts.push(lt);
-  return cat.apply(null, parts);
 }
 function scriptPubKeyFromAddress(addr){
   if(/^1/.test(addr)){
@@ -1728,123 +1671,15 @@ function scriptPubKeyFromAddress(addr){
   if(d.ver === 1 && d.prog.length === 32) return '5120' + b2h(d.prog);
   throw new Error('unsupported witness');
 }
-function pushData(b){
-  if(b.length < 0x4c) return cat(new Uint8Array([b.length]), b);
-  if(b.length <= 0xff) return cat(new Uint8Array([0x4c, b.length]), b);
-  throw new Error('push too large');
-}
-function legacySighashPreimage(tx, inIdx, scriptCode, sighashType){
-  var t = { version: tx.version, segwit: false, locktime: tx.locktime, inputs: [], outputs: tx.outputs, witnesses: [] };
-  for(var i=0;i<tx.inputs.length;i++){
-    t.inputs.push({
-      txid: tx.inputs[i].txid,
-      vout: tx.inputs[i].vout,
-      script: i === inIdx ? b2h(scriptCode) : '',
-      sequence: tx.inputs[i].sequence
-    });
-  }
-  var ser = serializeTx(t);
-  var st = new Uint8Array(4);
-  new DataView(st.buffer).setUint32(0, sighashType, true);
-  return cat(ser, st);
-}
-function bip143Sighash(tx, inIdx, scriptCode, amountSat, sighashType){
-  var prevouts = [];
-  for(var i=0;i<tx.inputs.length;i++){
-    var v = new Uint8Array(4);
-    new DataView(v.buffer).setUint32(0, tx.inputs[i].vout, true);
-    prevouts.push(cat(h2b(tx.inputs[i].txid).reverse(), v));
-  }
-  var hashPrevouts = sha256JS(sha256JS(cat.apply(null, prevouts)));
-  var seqs = [];
-  for(var j=0;j<tx.inputs.length;j++){
-    var b = new Uint8Array(4);
-    new DataView(b.buffer).setUint32(0, tx.inputs[j].sequence, true);
-    seqs.push(b);
-  }
-  var hashSequence = sha256JS(sha256JS(cat.apply(null, seqs)));
-  var outs = [];
-  for(var k=0;k<tx.outputs.length;k++){
-    var v2 = new Uint8Array(8);
-    new DataView(v2.buffer).setBigUint64(0, BigInt(tx.outputs[k].value), true);
-    var s = h2b(tx.outputs[k].script);
-    outs.push(cat(v2, varint(s.length), s));
-  }
-  var hashOutputs = sha256JS(sha256JS(cat.apply(null, outs)));
-  var inp = tx.inputs[inIdx];
-  var inV = new Uint8Array(4);
-  new DataView(inV.buffer).setUint32(0, inp.vout, true);
-  var inSeq = new Uint8Array(4);
-  new DataView(inSeq.buffer).setUint32(0, inp.sequence, true);
-  var inAmt = new Uint8Array(8);
-  new DataView(inAmt.buffer).setBigUint64(0, BigInt(amountSat), true);
-  var ver = new Uint8Array(4);
-  new DataView(ver.buffer).setUint32(0, tx.version, true);
-  var lock = new Uint8Array(4);
-  new DataView(lock.buffer).setUint32(0, tx.locktime, true);
-  var sht = new Uint8Array(4);
-  new DataView(sht.buffer).setUint32(0, sighashType, true);
-  var pre = cat(ver, hashPrevouts, hashSequence, cat(h2b(inp.txid).reverse(), inV), scriptCode, inAmt, inSeq, hashOutputs, lock, sht);
-  return sha256JS(sha256JS(pre));
-}
-function signInput(tx, inIdx, input, sighashType){
-  var wifInfo = fromWIF(input.wif);
-  var d = BigInt('0x' + wifInfo.keyHex);
-  var pubC = pubBytes(d, true);
-  var spk = h2b(input.spk);
-  if(spk.length === 22 && spk[0] === 0x00 && spk[1] === 0x14){
-    var h = spk.slice(2);
-    var scriptCode = cat(new Uint8Array([0x19, 0x76, 0xa9, 0x14]), h, new Uint8Array([0x88, 0xac]));
-    var sigHash = bip143Sighash(tx, inIdx, scriptCode, input.value, sighashType);
-    tx.segwit = true;
-    var r = ecdsaSign(wifInfo.keyHex, sigHash);
-    var sigDER = derEncode(r.r, r.s);
-    var sigWithHash = cat(sigDER, new Uint8Array([sighashType]));
-    tx.witnesses[inIdx] = [b2h(sigWithHash), b2h(pubC)];
-    tx.inputs[inIdx].script = '';
-    return tx;
-  }
-  if(spk.length === 25 && spk[0] === 0x76 && spk[1] === 0xa9 && spk[2] === 0x14){
-    var pre = legacySighashPreimage(tx, inIdx, spk, sighashType);
-    var sigHash2 = sha256JS(sha256JS(pre));
-    var r2 = ecdsaSign(wifInfo.keyHex, sigHash2);
-    var sigDER2 = derEncode(r2.r, r2.s);
-    var sigWithHash2 = cat(sigDER2, new Uint8Array([sighashType]));
-    tx.inputs[inIdx].script = b2h(cat(pushData(sigWithHash2), pushData(pubC)));
-    return tx;
-  }
-  if(spk.length === 22 && spk[0] === 0xa9 && spk[1] === 0x14){
-    var h3 = spk.slice(2);
-    var redeem = cat(new Uint8Array([0x00, 0x14]), h3);
-    var scriptCode3 = cat(new Uint8Array([0x19, 0x76, 0xa9, 0x14]), h3, new Uint8Array([0x88, 0xac]));
-    var sigHash3 = bip143Sighash(tx, inIdx, scriptCode3, input.value, sighashType);
-    tx.segwit = true;
-    var r3 = ecdsaSign(wifInfo.keyHex, sigHash3);
-    var sigDER3 = derEncode(r3.r, r3.s);
-    var sigWithHash3 = cat(sigDER3, new Uint8Array([sighashType]));
-    tx.witnesses[inIdx] = [b2h(sigWithHash3), b2h(pubC)];
-    tx.inputs[inIdx].script = b2h(cat(varint(redeem.length), redeem));
-    return tx;
-  }
-  throw new Error('unsupported scriptPubKey: ' + b2h(spk));
-}
 var OPNAMES = {
   0x00:'OP_0', 0x4f:'OP_1NEGATE',
   0x51:'OP_1', 0x52:'OP_2', 0x53:'OP_3', 0x54:'OP_4', 0x55:'OP_5', 0x56:'OP_6',
   0x57:'OP_7', 0x58:'OP_8', 0x59:'OP_9', 0x5a:'OP_10', 0x5b:'OP_11', 0x5c:'OP_12',
   0x5d:'OP_13', 0x5e:'OP_14', 0x5f:'OP_15', 0x60:'OP_16',
   0x61:'OP_NOP', 0x63:'OP_IF', 0x64:'OP_NOTIF', 0x67:'OP_ELSE', 0x68:'OP_ENDIF',
-  0x69:'OP_VERIFY', 0x6a:'OP_RETURN', 0x6b:'OP_TOALTSTACK', 0x6c:'OP_FROMALTSTACK',
-  0x6d:'OP_2DROP', 0x6e:'OP_2DUP', 0x6f:'OP_3DUP', 0x70:'OP_2OVER', 0x71:'OP_2ROT',
-  0x72:'OP_2SWAP', 0x73:'OP_IFDUP', 0x74:'OP_DEPTH', 0x75:'OP_DROP', 0x76:'OP_DUP',
-  0x77:'OP_NIP', 0x78:'OP_OVER', 0x79:'OP_PICK', 0x7a:'OP_ROLL', 0x7b:'OP_ROT',
-  0x7c:'OP_SWAP', 0x7d:'OP_TUCK', 0x82:'OP_SIZE', 0x87:'OP_EQUAL', 0x88:'OP_EQUALVERIFY',
-  0x8b:'OP_1ADD', 0x8c:'OP_1SUB', 0x8f:'OP_NEGATE', 0x90:'OP_ABS', 0x91:'OP_NOT',
-  0x92:'OP_0NOTEQUAL', 0x93:'OP_ADD', 0x94:'OP_SUB', 0x9a:'OP_BOOLAND', 0x9b:'OP_BOOLOR',
-  0xa6:'OP_RIPEMD160', 0xa7:'OP_SHA1', 0xa8:'OP_SHA256', 0xa9:'OP_HASH160',
-  0xaa:'OP_HASH256', 0xab:'OP_CODESEPARATOR', 0xac:'OP_CHECKSIG', 0xad:'OP_CHECKSIGVERIFY',
-  0xae:'OP_CHECKMULTISIG', 0xaf:'OP_CHECKMULTISIGVERIFY',
-  0xb1:'OP_CHECKLOCKTIMEVERIFY', 0xb2:'OP_CHECKSEQUENCEVERIFY', 0xba:'OP_CHECKSIGADD'
+  0x69:'OP_VERIFY', 0x6a:'OP_RETURN', 0x76:'OP_DUP', 0x87:'OP_EQUAL',
+  0x88:'OP_EQUALVERIFY', 0xa8:'OP_SHA256', 0xa9:'OP_HASH160', 0xaa:'OP_HASH256',
+  0xac:'OP_CHECKSIG', 0xad:'OP_CHECKSIGVERIFY', 0xae:'OP_CHECKMULTISIG'
 };
 function disasmScript(hex){
   var b = h2b(hex);
@@ -1863,11 +1698,6 @@ function disasmScript(hex){
       var data2 = b.slice(i + 2, i + 2 + len2);
       out.push({ pc: i, name: 'OP_PUSHDATA1', data: b2h(data2) });
       i += 2 + len2;
-    } else if(op === 0x4d){
-      var len3 = b[i+1] | (b[i+2] << 8);
-      var data3 = b.slice(i + 3, i + 3 + len3);
-      out.push({ pc: i, name: 'OP_PUSHDATA2', data: b2h(data3) });
-      i += 3 + len3;
     } else {
       out.push({ pc: i, name: OPNAMES[op] || ('OP_UNKNOWN_0x' + op.toString(16)), data: '' });
       i++;
@@ -1877,10 +1707,10 @@ function disasmScript(hex){
 }
 
 /* ============================================================
-   Chain data loaders
+   Chain / market loaders
    ============================================================ */
 function loadChain(){
-  return fetch('https://mempool.space/api/blocks/tip/height')
+  fetch('https://mempool.space/api/blocks/tip/height')
     .then(function(r){ return r.text(); })
     .then(function(t){
       var h = parseInt(t);
@@ -1893,26 +1723,28 @@ function loadChain(){
       $('hvCur').textContent = h.toLocaleString();
       $('hvNext').textContent = next.toLocaleString();
       $('hvLeft').textContent = left.toLocaleString();
-      $('hvEta').textContent = eta.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+      $('hvEta').textContent = eta.toLocaleDateString('en-US', {year:'numeric', month:'short', day:'numeric'});
       $('hvBar').style.width = (((INTERVAL - left) / INTERVAL) * 100).toFixed(2) + '%';
+      $('st-halving').textContent = eta.toLocaleDateString('en-US', {year:'numeric', month:'short', day:'numeric'});
+      $('st-halving-bar').style.width = (((INTERVAL - left) / INTERVAL) * 100).toFixed(2) + '%';
     }).catch(function(){});
   fetch('https://mempool.space/api/v1/blocks')
     .then(function(r){ return r.json(); })
     .then(function(j){
       var html = '<table class="dt"><tr><th>height</th><th>time</th><th>txs</th><th>size</th></tr>';
-      for(var i=0;i<Math.min(8,j.length);i++){
-        html += '<tr><td>' + j[i].height + '</td><td>' + new Date(j[i].timestamp*1000).toISOString().slice(11,19) + '</td><td>' + j[i].tx_count + '</td><td>' + (j[i].size/1024).toFixed(1) + 'kB</td></tr>';
+      for(var i=0;i<Math.min(8, j.length);i++){
+        html += '<tr><td>' + j[i].height + '</td><td>' + new Date(j[i].timestamp*1000).toISOString().slice(11, 19) + '</td><td>' + j[i].tx_count + '</td><td>' + (j[i].size/1024).toFixed(1) + 'kB</td></tr>';
       }
       html += '</table>';
       $('cBlocks').innerHTML = html;
-      if(j[0]) $('cHash').textContent = j[0].id.slice(0,32) + '...';
+      if(j[0]) $('cHash').textContent = j[0].id.slice(0, 32) + '...';
     }).catch(function(){});
   fetch('https://blockchain.info/q/getdifficulty?cors=true')
     .then(function(r){ return r.text(); })
     .then(function(t){
       var d = parseFloat(t);
       $('cDiff').textContent = d.toExponential(4);
-      var hr = d * Math.pow(2,32) / 600;
+      var hr = d * Math.pow(2, 32) / 600;
       $('cHR').textContent = (hr / 1e18).toFixed(2) + ' EH/s';
     }).catch(function(){});
   fetch('https://mempool.space/api/v1/fees/recommended')
@@ -2030,7 +1862,7 @@ function drawGauge(v){
 }
 
 /* ============================================================
-   UI Actions
+   TAB SWITCH
    ============================================================ */
 function switchTab(name){
   var tabs = document.querySelectorAll('.tab');
@@ -2046,7 +1878,356 @@ function switchTab(name){
   if(name === 'market') loadMarket();
 }
 
-/* HASH actions */
+/* ============================================================
+   INTERNET INTEL - the new stuff
+   ============================================================ */
+var _ipwhoData = null;
+var _ipifyV4 = null;
+var _ipifyV6 = null;
+var _onlineSince = Date.now();
+
+function flagEmoji(cc){
+  if(!cc || cc.length !== 2) return '\uD83C\uDFF3\uFE0F';
+  var base = 0x1F1E6;
+  var a = cc.toUpperCase().charCodeAt(0) - 65;
+  var b = cc.toUpperCase().charCodeAt(1) - 65;
+  if(a < 0 || a > 25 || b < 0 || b > 25) return '\uD83C\uDFF3\uFE0F';
+  return String.fromCodePoint(base + a, base + b);
+}
+
+function detectBrowser(ua){
+  if(/Edg\//.test(ua)) return 'Edge ' + ((ua.match(/Edg\/([\d.]+)/) || [])[1] || '');
+  if(/OPR\//.test(ua)) return 'Opera ' + ((ua.match(/OPR\/([\d.]+)/) || [])[1] || '');
+  if(/Firefox\//.test(ua)) return 'Firefox ' + ((ua.match(/Firefox\/([\d.]+)/) || [])[1] || '');
+  if(/Chrome\//.test(ua)) return 'Chrome ' + ((ua.match(/Chrome\/([\d.]+)/) || [])[1] || '');
+  if(/Safari\//.test(ua)) return 'Safari ' + ((ua.match(/Version\/([\d.]+)/) || [])[1] || '');
+  return 'Unknown';
+}
+function detectOS(ua){
+  if(/Windows NT 10\.0/.test(ua)) return 'Windows 10/11';
+  if(/Windows NT 6\.3/.test(ua)) return 'Windows 8.1';
+  if(/Windows NT 6\.1/.test(ua)) return 'Windows 7';
+  if(/Windows NT/.test(ua)) return 'Windows';
+  if(/Android/.test(ua)) return 'Android ' + ((ua.match(/Android ([\d.]+)/) || [])[1] || '');
+  if(/iPhone|iPad|iPod/.test(ua)) return 'iOS ' + ((ua.match(/OS ([\d_]+)/) || [])[1] || '').replace(/_/g, '.');
+  if(/Mac OS X/.test(ua)) return 'macOS ' + ((ua.match(/Mac OS X ([\d_.]+)/) || [])[1] || '').replace(/_/g, '.');
+  if(/CrOS/.test(ua)) return 'ChromeOS';
+  if(/Linux/.test(ua)) return 'Linux';
+  return 'Unknown';
+}
+
+function updateDevice(){
+  var ua = navigator.userAgent;
+  $('dev-browser').textContent = detectBrowser(ua);
+  $('dev-os').textContent = detectOS(ua);
+  $('dev-plat').textContent = navigator.platform || 'unknown';
+  $('dev-lang').textContent = navigator.language + (navigator.languages && navigator.languages.length > 1 ? ' (' + navigator.languages.slice(0, 3).join(', ') + ')' : '');
+  $('dev-screen').textContent = screen.width + ' x ' + screen.height + ' (avail: ' + screen.availWidth + 'x' + screen.availHeight + ')';
+  $('dev-dpr').textContent = (window.devicePixelRatio || 1) + 'x' + (screen.width * (window.devicePixelRatio || 1) + ' x ' + screen.height * (window.devicePixelRatio || 1) + ' physical');
+  $('dev-color').textContent = (screen.colorDepth || '?') + '-bit';
+  $('dev-cores').textContent = (navigator.hardwareConcurrency || '?') + ' logical cores';
+  $('dev-mem').textContent = navigator.deviceMemory ? ('~' + navigator.deviceMemory + ' GB') : 'not exposed by browser';
+  $('dev-wc').textContent = (typeof crypto !== 'undefined' && crypto.subtle) ? 'available' : 'UNAVAILABLE';
+  $('dev-wc').className = 'v ' + ((crypto && crypto.subtle) ? 'ok' : 'er');
+  $('dev-ua').textContent = ua;
+}
+
+function updateConnection(){
+  var online = navigator.onLine;
+  $('conn-state').textContent = online ? 'ONLINE' : 'OFFLINE';
+  $('conn-state').className = 'v ' + (online ? 'ok' : 'er');
+
+  var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if(c){
+    $('conn-type').textContent = (c.effectiveType || '?').toUpperCase();
+    $('conn-down').textContent = c.downlink ? (c.downlink + ' Mbps') : 'unknown';
+    $('conn-rtt').textContent = c.rtt ? (c.rtt + ' ms') : 'unknown';
+    $('conn-save').textContent = c.saveData ? 'ENABLED (browser reducing data)' : 'off';
+  } else {
+    $('conn-type').textContent = 'not exposed by browser';
+    $('conn-down').textContent = 'not exposed by browser';
+    $('conn-rtt').textContent = 'not exposed by browser';
+    $('conn-save').textContent = 'not exposed by browser';
+  }
+  var secs = Math.floor((Date.now() - _onlineSince) / 1000);
+  var mins = Math.floor(secs / 60);
+  var hrs = Math.floor(mins / 60);
+  $('conn-since').textContent = (hrs > 0 ? hrs + 'h ' : '') + (mins % 60) + 'm ' + (secs % 60) + 's';
+}
+
+function updateClock(){
+  var d = new Date();
+  var pad = function(n){ return String(n).padStart(2, '0'); };
+  $('dash-local-time').textContent =
+    pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) +
+    '  ' + (d.getTimezoneOffset() > 0 ? '-' : '+') + Math.abs(d.getTimezoneOffset() / 60) +
+    '  ' + d.toDateString().slice(0, 3) + ' ' + d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  $('dash-utc-time').textContent =
+    pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) +
+    '  ' + d.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+}
+
+function fetchIpwho(){
+  fetch('https://ipwho.is/')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j.success === false) throw new Error('lookup failed');
+      _ipwhoData = j;
+      $('dash-ip-v4').textContent = j.ip || '-';
+      $('dash-country').textContent = (j.country || '-') + (j.country_code ? ' (' + j.country_code + ')' : '');
+      $('dash-region').textContent = j.region || '-';
+      $('dash-city').textContent = j.city || '-';
+      $('dash-postal').textContent = j.postal || '-';
+      if(j.latitude && j.longitude){
+        var lat = parseFloat(j.latitude).toFixed(4);
+        var lon = parseFloat(j.longitude).toFixed(4);
+        $('dash-coords').textContent = lat + ', ' + lon;
+        var link = $('dash-map-link');
+        link.textContent = 'open in OpenStreetMap \u2192';
+        link.href = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon + '#map=12/' + lat + '/' + lon;
+      } else {
+        $('dash-coords').textContent = 'not available';
+        $('dash-map-link').textContent = 'not available';
+        $('dash-map-link').removeAttribute('href');
+      }
+      if(j.connection){
+        $('dash-isp').textContent = j.connection.isp || '-';
+        $('dash-org').textContent = j.connection.org || '-';
+        $('dash-asn').textContent = j.connection.asn ? ('AS' + j.connection.asn) : '-';
+      }
+      if(j.timezone){
+        $('dash-tz').textContent = j.timezone.id + (j.timezone.utc ? ' (' + j.timezone.utc + ')' : '');
+      }
+      if(j.country_code){
+        $('dash-flag').textContent = flagEmoji(j.country_code);
+      }
+      $('dash-provider').textContent = 'ipwho.is';
+      $('dash-last-update').textContent = new Date().toLocaleTimeString();
+      updateVerify();
+      log('> internet intel loaded: ' + (j.ip || '?') + ' ' + (j.city || '') + ', ' + (j.country || ''), 'ok');
+    })
+    .catch(function(e){
+      $('dash-ip-v4').textContent = 'lookup failed';
+      $('dash-provider').textContent = 'ipwho.is FAILED - ' + e.message;
+      log('> IP lookup failed: ' + e.message, 'er');
+    });
+}
+
+function fetchIpifyV4(){
+  fetch('https://ipv4.icanhazip.com/')
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      _ipifyV4 = t.trim();
+      updateVerify();
+    })
+    .catch(function(){});
+}
+
+function fetchIpifyV6(){
+  fetch('https://ipv6.icanhazip.com/')
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      var ip = t.trim();
+      if(ip && ip.indexOf(':') >= 0){
+        _ipifyV6 = ip;
+        $('dash-ip-v6').textContent = ip;
+        $('dash-ip-v6').className = 'v cy';
+      } else {
+        $('dash-ip-v6').textContent = 'no IPv6 connectivity';
+        $('dash-ip-v6').className = 'v dm';
+      }
+    })
+    .catch(function(){
+      $('dash-ip-v6').textContent = 'no IPv6 connectivity';
+      $('dash-ip-v6').className = 'v dm';
+    });
+}
+
+function updateVerify(){
+  if(_ipwhoData && _ipifyV4){
+    if(_ipwhoData.ip === _ipifyV4){
+      $('dash-verify').textContent = 'VERIFIED across 2 providers';
+      $('dash-verify').className = 'v ok';
+    } else {
+      $('dash-verify').textContent = 'MISMATCH (VPN/proxy? ipwho=' + _ipwhoData.ip + ' icanhaz=' + _ipifyV4 + ')';
+      $('dash-verify').className = 'v wa';
+    }
+  } else if(_ipifyV4){
+    $('dash-verify').textContent = 'icanhazip: ' + _ipifyV4;
+    $('dash-verify').className = 'v cy';
+  }
+}
+
+function fetchCloudflareTrace(){
+  $('cf-colo').textContent = 'fetching...';
+  fetch('https://www.cloudflare.com/cdn-cgi/trace')
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      var data = {};
+      t.split('\n').forEach(function(line){
+        var eq = line.indexOf('=');
+        if(eq > 0){
+          var k = line.slice(0, eq);
+          var v = line.slice(eq + 1);
+          data[k] = v;
+        }
+      });
+      var coloCityMap = {
+        'AMS':'Amsterdam','LHR':'London','FRA':'Frankfurt','CDG':'Paris','MAD':'Madrid',
+        'MXP':'Milan','ARN':'Stockholm','HEL':'Helsinki','WAW':'Warsaw','VIE':'Vienna',
+        'ZRH':'Zurich','BRU':'Brussels','DUB':'Dublin','CPH':'Copenhagen','OSL':'Oslo',
+        'JFK':'New York','EWR':'Newark','IAD':'Washington DC','ORD':'Chicago','DFW':'Dallas',
+        'LAX':'Los Angeles','SEA':'Seattle','SJC':'San Jose','MIA':'Miami','ATL':'Atlanta',
+        'YYZ':'Toronto','YVR':'Vancouver','MEX':'Mexico City','GRU':'Sao Paulo','EZE':'Buenos Aires',
+        'SIN':'Singapore','HKG':'Hong Kong','NRT':'Tokyo','KIX':'Osaka','ICN':'Seoul',
+        'BOM':'Mumbai','DEL':'Delhi','BLR':'Bangalore','SYD':'Sydney','MEL':'Melbourne',
+        'AKL':'Auckland','DXB':'Dubai','TLV':'Tel Aviv','JNB':'Johannesburg','CAI':'Cairo',
+        'IST':'Istanbul','KHI':'Karachi','LHE':'Lahore','BKK':'Bangkok','KUL':'Kuala Lumpur'
+      };
+      $('cf-colo').textContent = data.colo || '-';
+      $('cf-colo-city').textContent = coloCityMap[data.colo] || 'unknown datacenter';
+      $('cf-http').textContent = data.http || '-';
+      $('cf-tls').textContent = data.tls || '-';
+      $('cf-kex').textContent = data.kex || '-';
+      $('cf-sni').textContent = data.sni || '-';
+      $('cf-warp').textContent = data.warp === 'on' ? 'ON' : (data.warp || '-');
+      $('cf-warp').className = 'v ' + (data.warp === 'on' ? 'ok' : '');
+      $('cf-gateway').textContent = data.gateway === 'on' ? 'ON' : (data.gateway || '-');
+      $('cf-ip').textContent = data.ip || '-';
+      $('cf-loc').textContent = data.loc || '-';
+      log('> Cloudflare edge: ' + (data.colo || '?') + ' ' + (coloCityMap[data.colo] || '') + ' | ' + (data.http || '?') + ' | ' + (data.tls || '?'), 'ok');
+    })
+    .catch(function(e){
+      $('cf-colo').textContent = 'fetch failed';
+      $('cf-colo-city').textContent = e.message;
+    });
+}
+
+function runLatencyTest(){
+  var endpoints = [
+    { name: 'Cloudflare 1.1.1.1', url: 'https://1.1.1.1/cdn-cgi/trace' },
+    { name: 'cloudflare.com', url: 'https://www.cloudflare.com/cdn-cgi/trace' },
+    { name: 'mempool.space', url: 'https://mempool.space/api/blocks/tip/height' },
+    { name: 'blockchain.info', url: 'https://blockchain.info/q/getblockcount?cors=true' },
+    { name: 'binance.com', url: 'https://api.binance.com/api/v3/time' },
+    { name: 'kraken.com', url: 'https://api.kraken.com/0/public/Time' },
+    { name: 'coinbase.com', url: 'https://api.coinbase.com/v2/time' }
+  ];
+  var results = [];
+  var el = $('ping-result');
+  el.innerHTML = '';
+  var pending = endpoints.length;
+
+  endpoints.forEach(function(ep){
+    var row = document.createElement('div');
+    row.className = 'ping-row';
+    row.innerHTML = '<span class="nm">' + ep.name + '</span><span class="ms" id="ping-ms-' + ep.name.replace(/\./g, '_') + '">...</span><span class="wrap"><div class="ping-bar"><div class="fill" id="ping-bar-' + ep.name.replace(/\./g, '_') + '" style="width:0%"></div></div></span>';
+    el.appendChild(row);
+  });
+
+  endpoints.forEach(function(ep){
+    var t0 = performance.now();
+    var ctl = new AbortController();
+    var tm = setTimeout(function(){ ctl.abort(); }, 5000);
+    fetch(ep.url, { method: 'GET', cache: 'no-store', signal: ctl.signal })
+      .then(function(r){ return r.text(); })
+      .then(function(){
+        clearTimeout(tm);
+        var dt = performance.now() - t0;
+        results.push({ name: ep.name, ms: dt });
+        recordPing(ep.name, dt);
+        pending--;
+        if(pending === 0) finishLatencyTest(results);
+      })
+      .catch(function(e){
+        clearTimeout(tm);
+        var dt = performance.now() - t0;
+        recordPing(ep.name, dt, true);
+        results.push({ name: ep.name, ms: dt, fail: true });
+        pending--;
+        if(pending === 0) finishLatencyTest(results);
+      });
+  });
+}
+
+function recordPing(name, ms, fail){
+  var key = name.replace(/\./g, '_');
+  var msEl = $('ping-ms-' + key);
+  var barEl = $('ping-bar-' + key);
+  if(!msEl) return;
+  if(fail){
+    msEl.textContent = 'FAIL';
+    msEl.style.color = 'var(--err)';
+    barEl.style.width = '100%';
+    barEl.style.background = 'var(--err)';
+    return;
+  }
+  msEl.textContent = ms.toFixed(0) + ' ms';
+  var pct = Math.min(100, ms / 5);
+  barEl.style.width = pct + '%';
+}
+
+function finishLatencyTest(results){
+  var ok = results.filter(function(r){ return !r.fail; });
+  if(!ok.length) return;
+  var sum = ok.reduce(function(a, b){ return a + b.ms; }, 0);
+  var avg = sum / ok.length;
+  var min = Math.min.apply(null, ok.map(function(r){ return r.ms; }));
+  var max = Math.max.apply(null, ok.map(function(r){ return r.ms; }));
+  var rating = avg < 50 ? 'EXCELLENT' : avg < 100 ? 'GOOD' : avg < 200 ? 'FAIR' : 'SLOW';
+  var row = document.createElement('div');
+  row.className = 'ping-row';
+  row.style.borderTop = '1px solid var(--dim)';
+  row.style.marginTop = '4px';
+  row.style.paddingTop = '6px';
+  row.innerHTML = '<span class="nm">AVG / MIN / MAX</span><span class="ms" style="color:var(--warn)">' + avg.toFixed(0) + ' / ' + min.toFixed(0) + ' / ' + max.toFixed(0) + ' ms</span><span class="wrap"><strong style="color:var(--acc)">' + rating + '</strong></span>';
+  $('ping-result').appendChild(row);
+  log('> latency: avg ' + avg.toFixed(0) + 'ms min ' + min.toFixed(0) + 'ms max ' + max.toFixed(0) + 'ms (' + rating + ')', 'ok');
+}
+
+function runBandwidthTest(){
+  var el = $('ping-result');
+  var row = document.createElement('div');
+  row.className = 'ping-row';
+  row.innerHTML = '<span class="nm">BANDWIDTH PROBE</span><span class="ms">...</span><span class="wrap">downloading ~2MB test payload</span>';
+  el.appendChild(row);
+
+  var bytes = 250000;
+  var t0 = performance.now();
+  fetch('https://speed.cloudflare.com/__down?bytes=' + bytes + '&t=' + Date.now())
+    .then(function(r){ return r.arrayBuffer(); })
+    .then(function(buf){
+      var dt = (performance.now() - t0) / 1000;
+      var bits = buf.byteLength * 8;
+      var mbps = (bits / dt / 1e6);
+      var row2 = document.createElement('div');
+      row2.className = 'ping-row';
+      row2.innerHTML = '<span class="nm">\u2192 measured</span><span class="ms">' + mbps.toFixed(2) + ' Mbps</span><span class="wrap">' + (buf.byteLength / 1024).toFixed(0) + ' KB in ' + dt.toFixed(2) + 's</span>';
+      el.appendChild(row2);
+      log('> bandwidth: ' + mbps.toFixed(2) + ' Mbps', 'ok');
+    })
+    .catch(function(e){
+      row.querySelector('.ms').textContent = 'FAIL';
+      row.querySelector('.wrap').textContent = e.message;
+    });
+}
+
+function runInternetIntel(){
+  log('> refreshing internet intel...', 'if');
+  _ipwhoData = null;
+  _ipifyV4 = null;
+  updateDevice();
+  updateConnection();
+  updateClock();
+  fetchIpwho();
+  fetchIpifyV4();
+  fetchIpifyV6();
+  fetchCloudflareTrace();
+}
+
+/* ============================================================
+   UI ACTIONS (kept from v18)
+   ============================================================ */
 function doHash(kind){
   var inp = $('hInput').value;
   var out = $('hOut');
@@ -2107,8 +2288,6 @@ function bech32EncodeUI(){
     $('b32Out').textContent = bech32Enc(hrp, ver, prog);
   } catch(e){ $('b32Out').textContent = 'error: ' + e.message; }
 }
-
-/* KEYS */
 function genKeyHex(){
   while(true){
     var b = crypto.getRandomValues(new Uint8Array(32));
@@ -2116,13 +2295,10 @@ function genKeyHex(){
     if(d > 0n && d < SECP_N) return b2h(b);
   }
 }
-function genPrivKey(){
-  $('pkOut').textContent = genKeyHex();
-  log('> private key generated','ok');
-}
+function genPrivKey(){ $('pkOut').textContent = genKeyHex(); log('> private key generated', 'ok'); }
 function deriveFromPk(){
   var k = $('pkOut').textContent.trim();
-  if(!/^[0-9a-f]{64}$/i.test(k)){ toasts('generate a key first','wa'); return; }
+  if(!/^[0-9a-f]{64}$/i.test(k)){ toasts('generate a key first', 'wa'); return; }
   try{
     var a = addressesFromPriv(k);
     switchTab('hd');
@@ -2134,11 +2310,11 @@ function deriveFromPk(){
       '\nP2SH-P2WPKH: ' + a.p2shP2wpkh +
       '\nP2WPKH:      ' + a.p2wpkh +
       '\nP2TR:        ' + a.p2tr;
-    log('> key derived','ok');
-  } catch(e){ toasts('derivation failed: ' + e.message,'er'); }
+    log('> key derived', 'ok');
+  } catch(e){ toasts('derivation failed: ' + e.message, 'er'); }
 }
 function wifEnc(compressed){
-  var h = $('wifIn').value.trim().replace(/[^0-9a-f]/gi,'');
+  var h = $('wifIn').value.trim().replace(/[^0-9a-f]/gi, '');
   if(h.length !== 64){ $('wifOut').textContent = 'need 64 hex chars'; return; }
   try{
     var w = toWIF(h, compressed);
@@ -2170,7 +2346,7 @@ function vanityStart(){
   if(vanRunning) return;
   var prefix = $('vanIn').value.trim();
   var type = $('vanType').value;
-  if(!prefix){ toasts('enter prefix','er'); return; }
+  if(!prefix){ toasts('enter prefix', 'er'); return; }
   vanRunning = true; vanCounter = 0;
   $('vanOut').textContent = 'searching for "' + prefix + '" (' + type + ')...';
   var k = bytesToBig(crypto.getRandomValues(new Uint8Array(32)));
@@ -2201,7 +2377,7 @@ function vanityStart(){
           $('vanOut').textContent = 'FOUND after ' + vanCounter.toLocaleString() + ' attempts in ' + ((performance.now() - t0) / 1000).toFixed(1) + 's\n\naddress: ' + addr + '\nWIF: ' + toWIF(privHex, true) + '\nprivkey: ' + privHex + '\n\nOther formats:\n' + a.p2pkh + '\n' + a.p2wpkh + '\n' + a.p2tr;
           $('vanBar').style.width = '100%';
           vanRunning = false;
-          log('> vanity found: ' + addr,'ok');
+          log('> vanity found: ' + addr, 'ok');
           return;
         }
       }
@@ -2214,11 +2390,9 @@ function vanityStart(){
   }
   step();
 }
-function vanityStop(){ vanRunning = false; $('vanBar').style.width = '0%'; toasts('stopped','wa'); }
-
-/* SEED / HD */
+function vanityStop(){ vanRunning = false; $('vanBar').style.width = '0%'; toasts('stopped', 'wa'); }
 function useMnemonic(){ $('hdIn').value = $('mnOut').textContent; switchTab('hd'); }
-function useSeed(){ $('hdIn').value = $('seedOut').textContent.replace(/[^0-9a-f]/gi,''); switchTab('hd'); }
+function useSeed(){ $('hdIn').value = $('seedOut').textContent.replace(/[^0-9a-f]/gi, ''); switchTab('hd'); }
 function resolveNode(input, pass){
   if(/^[0-9a-f]{64,128}$/i.test(input)) return Promise.resolve(bip32Master(h2b(input)));
   return seedFromMnemonic(input, pass).then(bip32Master);
@@ -2252,13 +2426,13 @@ function hdDerive(){
         'P2SH-P2WPKH: ' + a.p2shP2wpkh + '\n' +
         'P2WPKH:      ' + a.p2wpkh + '\n' +
         'P2TR:        ' + a.p2tr;
-      log('> BIP32 derived ' + path,'ok');
+      log('> BIP32 derived ' + path, 'ok');
     }).catch(function(e){ out.textContent = 'ERROR: ' + e.message; });
   } catch(e){ out.textContent = 'ERROR: ' + e.message; }
 }
 function hdDeriveAll(){
   var inp = $('hdIn').value.trim();
-  if(!inp){ toasts('provide mnemonic or seed','er'); return; }
+  if(!inp){ toasts('provide mnemonic or seed', 'er'); return; }
   resolveNode(inp, $('hdPass').value).then(function(master){
     var paths = ["m/44'/0'/0'/0/0", "m/49'/0'/0'/0/0", "m/84'/0'/0'/0/0", "m/86'/0'/0'/0/0"];
     var names = ['BIP44 P2PKH', 'BIP49 P2SH-P2WPKH', 'BIP84 P2WPKH', 'BIP86 Taproot'];
@@ -2275,7 +2449,7 @@ function hdDeriveAll(){
 }
 function hdBatch(){
   var inp = $('hdIn').value.trim();
-  if(!inp){ toasts('provide mnemonic or seed','er'); return; }
+  if(!inp){ toasts('provide mnemonic or seed', 'er'); return; }
   resolveNode(inp, $('hdPass').value).then(function(master){
     var html = '<table class="dt"><tr><th>i</th><th>path</th><th>P2WPKH</th></tr>';
     for(var i=0;i<10;i++){
@@ -2289,10 +2463,8 @@ function hdBatch(){
     $('hdBatchOut').innerHTML = html;
   }).catch(function(e){ $('hdBatchOut').textContent = 'ERROR: ' + e.message; });
 }
-
-/* SIGN */
 function ecdsaSignUI(){
-  var k = $('sgKey').value.trim().replace(/[^0-9a-f]/gi,'');
+  var k = $('sgKey').value.trim().replace(/[^0-9a-f]/gi, '');
   if(k.length !== 64){ $('sgOut').textContent = 'need 64 hex chars'; return; }
   try{
     var d = BigInt('0x' + k);
@@ -2311,11 +2483,11 @@ function ecdsaSignUI(){
       'recid:    ' + sig.recid + '\n\n' +
       'pubkey:   ' + b2h(pubC) + '\n\n' +
       'RFC 6979 deterministic. Low-S normalized.';
-    log('> ECDSA signature created','ok');
+    log('> ECDSA signature created', 'ok');
   } catch(e){ $('sgOut').textContent = 'error: ' + e.message; }
 }
 function ecdsaRecoverUI(){
-  var k = $('sgKey').value.trim().replace(/[^0-9a-f]/gi,'');
+  var k = $('sgKey').value.trim().replace(/[^0-9a-f]/gi, '');
   if(k.length !== 64){ $('sgOut').textContent = 'need 64 hex chars'; return; }
   try{
     var msg = $('sgMsg').value;
@@ -2346,31 +2518,26 @@ function ecdsaVerifyUI(){
 }
 function schnorrSignUI(){
   try{
-    var k = $('schKey').value.trim().replace(/[^0-9a-f]/gi,'');
+    var k = $('schKey').value.trim().replace(/[^0-9a-f]/gi, '');
     if(k.length !== 64) throw new Error('need 64 hex chars');
     var msg = $('schMsg').value;
     var msg32 = sha256JS(TE.encode(msg));
     var r = schnorrSign(h2b(k), msg32, null);
     $('schOut').textContent = 'message:  ' + msg + '\nmsg hash: ' + b2h(msg32) + '\n\npubkey x: ' + b2h(r.px) + '\nsignature: ' + r.sigHex + '\n\nSelf-verified: ' + (r.verified ? 'YES' : 'NO');
-    log('> Schnorr signature created','ok');
+    log('> Schnorr signature created', 'ok');
   } catch(e){ $('schOut').textContent = 'error: ' + e.message; }
 }
 function edSignUI(){
   try{
-    var k = $('edKey').value.trim().replace(/[^0-9a-f]/gi,'');
-    if(k.length !== 64){
-      k = b2h(crypto.getRandomValues(new Uint8Array(32)));
-      $('edKey').value = k;
-    }
+    var k = $('edKey').value.trim().replace(/[^0-9a-f]/gi, '');
+    if(k.length !== 64){ k = b2h(crypto.getRandomValues(new Uint8Array(32))); $('edKey').value = k; }
     var seed = h2b(k);
     var pub = ed25519Pub(seed);
     var sig = ed25519Sign(seed, TE.encode($('edMsg').value));
     $('edOut').textContent = 'seed:       ' + k + '\npublic key: ' + b2h(pub) + '\nsignature:  ' + b2h(sig) + '\n\nEd25519 (RFC 8032)';
-    log('> Ed25519 signature created','ok');
+    log('> Ed25519 signature created', 'ok');
   } catch(e){ $('edOut').textContent = 'error: ' + e.message; }
 }
-
-/* ADDRESS */
 function classify(addr){
   if(!addr) return null;
   if(/^1[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(addr)) return { type: 'P2PKH', net: 'mainnet', enc: 'Base58Check' };
@@ -2397,12 +2564,12 @@ function addrValidate(){
       if(!d.valid) throw new Error('checksum invalid');
       out.textContent = 'VALID\n\naddress: ' + a + '\ntype: ' + info.type + '\nnetwork: ' + info.net + '\nencoding: ' + d.spec + '\nhrp: ' + d.hrp + '\nwitness version: ' + d.ver + '\nprogram (' + d.prog.length + ' bytes): ' + b2h(d.prog);
     }
-    log('> address valid: ' + info.type,'ok');
-  } catch(e){ out.textContent = 'INVALID: ' + e.message; log('> address invalid: ' + e.message,'er'); }
+    log('> address valid: ' + info.type, 'ok');
+  } catch(e){ out.textContent = 'INVALID: ' + e.message; log('> address invalid: ' + e.message, 'er'); }
 }
 function addrBalance(){
   var a = $('aInput').value.trim();
-  if(!a){ toasts('enter address','er'); return; }
+  if(!a){ toasts('enter address', 'er'); return; }
   $('aOut').textContent = 'querying...';
   fetch('https://blockchain.info/q/addressbalance/' + a + '?cors=true')
     .then(function(r){ return r.text(); })
@@ -2413,7 +2580,7 @@ function addrBalance(){
 }
 function addrSummary(){
   var a = $('aInput').value.trim();
-  if(!a){ toasts('enter address','er'); return; }
+  if(!a){ toasts('enter address', 'er'); return; }
   $('aOut').textContent = 'fetching...';
   fetch('https://blockchain.info/rawaddr/' + a + '?limit=5&cors=true')
     .then(function(r){ return r.json(); })
@@ -2427,7 +2594,7 @@ function addrSummary(){
 }
 function addrUtxo(){
   var a = $('aInput').value.trim();
-  if(!a){ toasts('enter address','er'); return; }
+  if(!a){ toasts('enter address', 'er'); return; }
   $('aOut').textContent = 'fetching...';
   fetch('https://mempool.space/api/address/' + a + '/utxo')
     .then(function(r){ return r.json(); })
@@ -2445,7 +2612,7 @@ function addrUtxo(){
 }
 function addrSpk(){
   var a = $('aInput').value.trim();
-  if(!a){ toasts('enter address','er'); return; }
+  if(!a){ toasts('enter address', 'er'); return; }
   try{
     var spk = scriptPubKeyFromAddress(a);
     var sh = ripemd160(sha256JS(h2b(spk)));
@@ -2509,8 +2676,6 @@ function chainTxs(){
       $('chainOut').textContent = t;
     }).catch(function(e){ $('chainOut').textContent = 'failed: ' + e.message; });
 }
-
-/* TX */
 function decodeTxUI(){
   try{
     var tx = parseTx($('txRaw').value.trim());
@@ -2536,63 +2701,6 @@ function fetchTxUI(){
       decodeTxUI();
     }).catch(function(e){ $('txOut').textContent = 'failed: ' + e.message; });
 }
-function buildTxUI(){
-  var out = $('txBuildOut');
-  try{
-    var insRaw = $('txIns').value.trim();
-    var outsRaw = $('txOuts').value.trim();
-    if(!insRaw || !outsRaw){ out.textContent = 'need inputs and outputs'; return; }
-    var insLines = insRaw.split('\n').map(function(x){ return x.trim(); }).filter(Boolean);
-    var outsLines = outsRaw.split('\n').map(function(x){ return x.trim(); }).filter(Boolean);
-    var inputs = [];
-    for(var i=0;i<insLines.length;i++){
-      var parts = insLines[i].split(':');
-      if(parts.length < 4) throw new Error('input format: txid:vout:sats:WIF[:spk]');
-      var wifInfo = fromWIF(parts[3]);
-      var spk = parts[4];
-      if(!spk){
-        var pubC = pubBytes(BigInt('0x' + wifInfo.keyHex), true);
-        var h = ripemd160(sha256JS(pubC));
-        spk = '0014' + b2h(h);
-      }
-      inputs.push({ txid: parts[0], vout: parseInt(parts[1]), value: parseInt(parts[2]), wif: parts[3], spk: spk });
-    }
-    var outputs = [];
-    for(var j=0;j<outsLines.length;j++){
-      var parts2 = outsLines[j].split(':');
-      if(parts2.length !== 2) throw new Error('output format: address:sats');
-      outputs.push({ value: parseInt(parts2[1]), script: scriptPubKeyFromAddress(parts2[0]) });
-    }
-    var tx = { version: 2, segwit: false, locktime: 0, inputs: [], outputs: outputs, witnesses: [] };
-    for(var k=0;k<inputs.length;k++){
-      tx.inputs.push({ txid: inputs[k].txid, vout: inputs[k].vout, script: '', sequence: 0xfffffffd });
-    }
-    var shTypeVal = { all: 0x01, none: 0x02, single: 0x03 }[$('txSighash').value] || 0x01;
-    for(var m=0;m<inputs.length;m++){
-      signInput(tx, m, inputs[m], shTypeVal);
-    }
-    var hex = b2h(serializeTx(tx));
-    var txid = b2h(sha256JS(sha256JS(h2b(hex))).slice().reverse());
-    var totalIn = inputs.reduce(function(a, b){ return a + b.value; }, 0);
-    var totalOut = outputs.reduce(function(a, b){ return a + b.value; }, 0);
-    out.textContent = 'SIGNED\n\ntxid: ' + txid + '\nsize: ' + (hex.length/2) + ' bytes\ninputs: ' + tx.inputs.length + '\noutputs: ' + tx.outputs.length + '\ntotal in: ' + totalIn + ' sat\ntotal out: ' + totalOut + ' sat\nfee: ' + (totalIn - totalOut) + ' sat\n\nRAW HEX:\n' + hex;
-    window._lastTxHex = hex;
-    log('> tx signed: ' + txid,'ok');
-  } catch(e){ out.textContent = 'error: ' + e.message; log('> tx error: ' + e.message,'er'); }
-}
-function broadcastTx(){
-  var hex = window._lastTxHex;
-  if(!hex){ toasts('build a tx first','wa'); return; }
-  if(!confirm('Broadcast to Bitcoin network?')) return;
-  $('txBuildOut').textContent += '\n\nbroadcasting...';
-  fetch('https://mempool.space/api/tx', { method: 'POST', body: hex })
-    .then(function(r){
-      return r.text().then(function(t){
-        if(r.ok){ $('txBuildOut').textContent += '\n\nBROADCAST OK\ntxid: ' + t; log('> broadcast: ' + t,'ok'); }
-        else { $('txBuildOut').textContent += '\n\nREJECTED: ' + t; log('> broadcast rejected','er'); }
-      });
-    }).catch(function(e){ $('txBuildOut').textContent += '\n\nnetwork error: ' + e.message; });
-}
 function estimateFee(){
   var nIn = parseInt($('feeIn').value) || 1;
   var nOut = parseInt($('feeOut').value) || 2;
@@ -2601,8 +2709,7 @@ function estimateFee(){
   var rate = parseFloat($('feeRate').value) || 10;
   var inVb = { p2pkh: 148, 'p2sh-p2wpkh': 91, p2wpkh: 68, p2tr: 57.5 }[inType];
   var outVb = { p2pkh: 34, p2sh: 32, p2wpkh: 31, p2tr: 43 }[outType];
-  var overhead = 10.5;
-  var vsize = Math.ceil(overhead + nIn * inVb + nOut * outVb);
+  var vsize = Math.ceil(10.5 + nIn * inVb + nOut * outVb);
   var fee = Math.ceil(vsize * rate);
   $('feeOut').textContent = 'estimated vsize: ' + vsize + ' vB\nfee rate: ' + rate + ' sat/vB\ntotal fee: ' + fee + ' sat (' + (fee/1e8).toFixed(8) + ' BTC)';
 }
@@ -2616,16 +2723,12 @@ function disasmUI(){
     $('scriptOut').textContent = t;
   } catch(e){ $('scriptOut').textContent = 'error: ' + e.message; }
 }
-
-/* MARKET */
 function setTF(btn){
   var all = document.querySelectorAll('.tfBtn');
   for(var i=0;i<all.length;i++) all[i].classList.remove('on');
   btn.classList.add('on');
   loadMarket();
 }
-
-/* NET */
 function doDNS(){
   var name = $('dnsName').value.trim();
   var type = $('dnsType').value;
@@ -2710,7 +2813,7 @@ function probeScan(){
   var ports = [];
   var parts = portsRaw.split(',');
   for(var i=0;i<parts.length;i++) ports.push(Number(parts[i].trim()));
-  out.textContent = 'scanning ' + host + ' (' + ports.length + ' ports, ' + timeout + 'ms)...\n';
+  out.textContent = 'scanning ' + host + ' (' + ports.length + ' ports)...\n';
   var idx = 0;
   function next(){
     if(scanStop || idx >= ports.length){ out.textContent += '\ndone.'; return; }
@@ -2721,17 +2824,14 @@ function probeScan(){
     fetch('http://' + host + ':' + port + '/', { mode: 'no-cors', signal: ctl.signal })
       .then(function(){
         clearTimeout(tm);
-        out.textContent += '  ' + port + '  OPEN  (' + (performance.now() - t0).toFixed(0) + 'ms)\n';
+        out.textContent += '  ' + port + '  OPEN\n';
         out.scrollTop = out.scrollHeight;
         next();
       }).catch(function(e){
         clearTimeout(tm);
         var dt = performance.now() - t0;
-        var status;
-        if(e.name === 'AbortError') status = 'TIMEOUT (filtered)';
-        else if(dt < 500) status = 'CLOSED (refused)';
-        else status = 'BLOCKED (' + e.message.slice(0, 40) + ')';
-        out.textContent += '  ' + port + '  ' + status + '  (' + dt.toFixed(0) + 'ms)\n';
+        var status = e.name === 'AbortError' ? 'TIMEOUT' : (dt < 500 ? 'CLOSED' : 'BLOCKED');
+        out.textContent += '  ' + port + '  ' + status + ' (' + dt.toFixed(0) + 'ms)\n';
         out.scrollTop = out.scrollHeight;
         next();
       });
@@ -2739,8 +2839,6 @@ function probeScan(){
   next();
 }
 function stopScan(){ scanStop = true; }
-
-/* CONSOLE */
 var HIST = [], hIdx = -1;
 function cPrint(msg, cls){
   var t = $('term');
@@ -2766,123 +2864,78 @@ function runCmd(){
   var rest = parts.slice(1).join(' ');
   try {
     switch(cmd){
-      case 'help': cPrint('btc block fees fng halving | addr bal utxo | hash dhash ripemd h160 | wif unwif b58 b58d | derive sign schnorr | dns tx version clear', 'if'); break;
+      case 'help': cPrint('btc block fees fng halving | addr bal utxo | hash dhash sha512 ripemd h160 | wif unwif b58 b58d | derive sign schnorr | dns whoami myip tx version clear', 'if'); break;
       case 'btc':
-        fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
-          .then(function(r){ return r.json(); })
+        fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT').then(function(r){ return r.json(); })
           .then(function(j){ cPrint('BTC: $' + parseFloat(j.price).toLocaleString(), 'ok'); })
           .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
       case 'block':
-        fetch('https://mempool.space/api/blocks/tip/height')
-          .then(function(r){ return r.text(); })
+        fetch('https://mempool.space/api/blocks/tip/height').then(function(r){ return r.text(); })
           .then(function(t){ cPrint('height: ' + t, 'ok'); })
           .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
       case 'fees':
-        fetch('https://mempool.space/api/v1/fees/recommended')
-          .then(function(r){ return r.json(); })
+        fetch('https://mempool.space/api/v1/fees/recommended').then(function(r){ return r.json(); })
           .then(function(j){ cPrint('fastest ' + j.fastestFee + ' | 30m ' + j.halfHourFee + ' | 1h ' + j.hourFee + ' | eco ' + j.economyFee + ' sat/vB', 'ok'); })
           .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
       case 'fng':
-        fetch('https://api.alternative.me/fng/?limit=1')
-          .then(function(r){ return r.json(); })
+        fetch('https://api.alternative.me/fng/?limit=1').then(function(r){ return r.json(); })
           .then(function(j){ cPrint('Fear & Greed: ' + j.data[0].value + ' - ' + j.data[0].value_classification, 'ok'); })
           .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
-      case 'halving':
-        fetch('https://mempool.space/api/blocks/tip/height')
-          .then(function(r){ return r.text(); })
-          .then(function(t){
-            var h = parseInt(t);
-            var next = (Math.floor(h / 210000) + 1) * 210000;
-            cPrint('next halving block ' + next.toLocaleString() + ' (' + (next - h).toLocaleString() + ' blocks left)', 'ok');
+      case 'whoami':
+      case 'myip':
+        fetch('https://ipwho.is/').then(function(r){ return r.json(); })
+          .then(function(j){
+            cPrint('IP:       ' + j.ip, 'ok');
+            cPrint('ISP:      ' + (j.connection && j.connection.isp), 'ok');
+            cPrint('ASN:      AS' + (j.connection && j.connection.asn), 'ok');
+            cPrint('Location: ' + j.city + ', ' + j.region + ', ' + j.country + '  ' + flagEmoji(j.country_code), 'ok');
+            cPrint('Timezone: ' + (j.timezone && j.timezone.id), 'ok');
           }).catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
       case 'addr':
         var info = classify(rest);
         if(!info){ cPrint('invalid format', 'er'); break; }
-        try {
+        try{
           if(info.enc === 'Base58Check') b58checkDecodeSync(rest);
           else { var d = bech32Dec(rest); if(!d.valid) throw new Error('checksum'); }
           cPrint('valid ' + info.type + ' ' + info.net, 'ok');
         } catch(e){ cPrint('invalid: ' + e.message, 'er'); }
         break;
       case 'bal':
-        fetch('https://blockchain.info/q/addressbalance/' + rest + '?cors=true')
-          .then(function(r){ return r.text(); })
+        fetch('https://blockchain.info/q/addressbalance/' + rest + '?cors=true').then(function(r){ return r.text(); })
           .then(function(t){ cPrint((parseInt(t)/1e8).toFixed(8) + ' BTC', 'ok'); })
-          .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
-        break;
-      case 'utxo':
-        fetch('https://mempool.space/api/address/' + rest + '/utxo')
-          .then(function(r){ return r.json(); })
-          .then(function(j){ cPrint(JSON.stringify(j, null, 1), 'if'); })
           .catch(function(e){ cPrint('error: ' + e.message, 'er'); });
         break;
       case 'hash': cPrint(b2h(sha256JS(rest)), 'ok'); break;
       case 'dhash': cPrint(b2h(sha256JS(sha256JS(rest))), 'ok'); break;
       case 'sha512': cPrint(b2h(sha512JS(rest)), 'ok'); break;
-      case 'sha1': cPrint(b2h(sha1JS(rest)), 'ok'); break;
       case 'ripemd': cPrint(b2h(ripemd160(rest)), 'ok'); break;
       case 'h160': cPrint(b2h(ripemd160(sha256JS(rest))), 'ok'); break;
-      case 'keccak': cPrint(b2h(keccak256(rest)), 'ok'); break;
-      case 'wif': cPrint(toWIF(rest, true), 'ok'); break;
-      case 'unwif':
-        try {
-          var r = fromWIF(rest);
-          cPrint('key: ' + r.keyHex + ', compressed: ' + r.compressed, 'ok');
-        } catch(e){ cPrint('error: ' + e.message, 'er'); }
-        break;
-      case 'b58': cPrint(b58enc(h2b(rest)), 'ok'); break;
-      case 'b58d': cPrint(b2h(b58dec(rest)), 'ok'); break;
       case 'derive':
         var a = addressesFromPriv(rest);
         cPrint('P2PKH:  ' + a.p2pkh, 'ok');
         cPrint('P2WPKH: ' + a.p2wpkh, 'ok');
         cPrint('P2TR:   ' + a.p2tr, 'ok');
         break;
-      case 'sign':
-        var sp = rest.split(' ');
-        var hex = sp[0];
-        var msg = sp.slice(1).join(' ');
-        var sig = ecdsaSign(hex, TE.encode(msg));
-        cPrint('r||s: ' + b2h(cat(bigToBytes(sig.r, 32), bigToBytes(sig.s, 32))), 'ok');
-        break;
-      case 'schnorr':
-        var sp2 = rest.split(' ');
-        var hex2 = sp2[0];
-        var msg2 = sp2.slice(1).join(' ');
-        var r9 = schnorrSign(h2b(hex2), sha256JS(TE.encode(msg2)), null);
-        cPrint('sig: ' + r9.sigHex, 'ok');
-        break;
       case 'dns':
-        var sp3 = rest.split(' ');
-        var name = sp3[0];
-        var type = sp3[1] || 'A';
-        fetch('https://cloudflare-dns.com/dns-query?name=' + encodeURIComponent(name) + '&type=' + type, { headers: { Accept: 'application/dns-json' } })
+        var sp = rest.split(' ');
+        fetch('https://cloudflare-dns.com/dns-query?name=' + encodeURIComponent(sp[0]) + '&type=' + (sp[1] || 'A'), { headers: { Accept: 'application/dns-json' } })
           .then(function(r){ return r.json(); })
           .then(function(j){
-            if(j.Answer && j.Answer.length){
-              for(var i=0;i<j.Answer.length;i++) cPrint(j.Answer[i].data, 'ok');
-            } else cPrint('(no answer)', 'dm');
-          }).catch(function(e){ cPrint('error: ' + e.message, 'er'); });
-        break;
-      case 'tx':
-        try {
-          var tx = parseTx(rest);
-          cPrint('version ' + tx.version + ', ' + tx.inputs.length + ' in, ' + tx.outputs.length + ' out, size ' + tx.size, 'if');
-        } catch(e){ cPrint('error: ' + e.message, 'er'); }
+            if(j.Answer) for(var i=0;i<j.Answer.length;i++) cPrint(j.Answer[i].data, 'ok');
+            else cPrint('(no answer)', 'dm');
+          });
         break;
       case 'clear': $('term').innerHTML = ''; cPrint('cleared', 'dm'); break;
-      case 'version': cPrint('QCity Bitcoin Terminal v18', 'if'); break;
+      case 'version': cPrint('QCity Bitcoin Terminal v19', 'if'); break;
       default: cPrint('unknown: ' + cmd, 'er');
     }
   } catch(e){ cPrint('error: ' + e.message, 'er'); }
 }
-
-/* LOG */
 function exportLog(){
   var lines = [];
   var el = $('term2');
@@ -2890,96 +2943,36 @@ function exportLog(){
     var ls = el.querySelectorAll('.ln');
     for(var i=0;i<ls.length;i++) lines.push(ls[i].textContent);
   }
-  var blob = new Blob(['QCity v18 Session ' + new Date().toISOString() + '\n\n' + lines.join('\n')], { type: 'text/plain' });
+  var blob = new Blob(['QCity v19 Session ' + new Date().toISOString() + '\n\n' + lines.join('\n')], { type: 'text/plain' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'qcity-' + Date.now() + '.txt';
   a.click();
   toasts('log exported', 'ok');
 }
-
-/* CONFIG */
 function setTheme(name){
   if(name === 'green') document.body.className = '';
   else document.body.className = 't-' + name;
   toasts('theme: ' + name, 'cy');
 }
-
-/* ============================================================
-   SELF-TEST - verifies crypto against known vectors
-   ============================================================ */
 function runSelfTest(){
   var results = [];
   function pass(id, name, ok, detail){
     var el = $(id);
-    if(el){
-      el.textContent = ok ? 'PASS' : 'FAIL';
-      el.className = 'v ' + (ok ? 'ok' : 'er');
-    }
+    if(el){ el.textContent = ok ? 'PASS' : 'FAIL'; el.className = 'v ' + (ok ? 'ok' : 'er'); }
     results.push({ name: name, ok: ok, detail: detail });
   }
-  // SHA-256("abc")
-  try {
-    var s256 = b2h(sha256JS('abc'));
-    pass('t-sha256', 'SHA-256', s256 === 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad', s256);
-  } catch(e){ pass('t-sha256', 'SHA-256', false, e.message); }
-  // SHA-512("abc")
-  try {
-    var s512 = b2h(sha512JS('abc'));
-    pass('t-sha512', 'SHA-512', s512 === 'ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f', s512);
-  } catch(e){ pass('t-sha512', 'SHA-512', false, e.message); }
-  // SHA-1("abc")
-  try {
-    var s1 = b2h(sha1JS('abc'));
-    pass('t-sha1', 'SHA-1', s1 === 'a9993e364706816aba3e25717850c26c9cd0d89d', s1);
-  } catch(e){ pass('t-sha1', 'SHA-1', false, e.message); }
-  // RIPEMD-160("abc")
-  try {
-    var r = b2h(ripemd160('abc'));
-    pass('t-ripemd', 'RIPEMD-160', r === '8eb208f7e05d987a9b044a8e98c6b087f15a0bfc', r);
-  } catch(e){ pass('t-ripemd', 'RIPEMD-160', false, e.message); }
-  // SHA3-256("")
-  try {
-    var s3 = b2h(sha3_256(''));
-    pass('t-sha3', 'SHA3-256', s3 === 'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a', s3);
-  } catch(e){ pass('t-sha3', 'SHA3-256', false, e.message); }
-  // Keccak-256("")
-  try {
-    var k = b2h(keccak256(''));
-    pass('t-keccak', 'Keccak-256', k === 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470', k);
-  } catch(e){ pass('t-keccak', 'Keccak-256', false, e.message); }
-  // secp256k1: pubkey for priv=1
-  try {
-    var pub = b2h(pubBytes(1n, true));
-    pass('t-secp', 'secp256k1 G', pub === '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798', pub.slice(0, 20));
-  } catch(e){ pass('t-secp', 'secp256k1', false, e.message); }
-  // Bech32: known P2WPKH for hash 751e76e8199196d454941c45d1b3a323f1433bd6
-  try {
-    var b = bech32Enc('bc', 0, h2b('751e76e8199196d454941c45d1b3a323f1433bd6'));
-    pass('t-bech32', 'Bech32', b === 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', b);
-  } catch(e){ pass('t-bech32', 'Bech32', false, e.message); }
-  // Base58Check
-  try {
-    var b58 = b58checkSync(cat(new Uint8Array([0x00]), h2b('751e76e8199196d454941c45d1b3a323f1433bd6')));
-    pass('t-b58', 'Base58Check', b58 === '1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH', b58);
-  } catch(e){ pass('t-b58', 'Base58Check', false, e.message); }
-
+  try { var s256 = b2h(sha256JS('abc')); pass('t-sha256', 'SHA-256', s256 === 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad', s256); } catch(e){ pass('t-sha256', 'SHA-256', false, e.message); }
+  try { var s512 = b2h(sha512JS('abc')); pass('t-sha512', 'SHA-512', s512 === 'ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f', s512); } catch(e){ pass('t-sha512', 'SHA-512', false, e.message); }
+  try { var s1 = b2h(sha1JS('abc')); pass('t-sha1', 'SHA-1', s1 === 'a9993e364706816aba3e25717850c26c9cd0d89d', s1); } catch(e){ pass('t-sha1', 'SHA-1', false, e.message); }
+  try { var r = b2h(ripemd160('abc')); pass('t-ripemd', 'RIPEMD-160', r === '8eb208f7e05d987a9b044a8e98c6b087f15a0bfc', r); } catch(e){ pass('t-ripemd', 'RIPEMD-160', false, e.message); }
+  try { var s3 = b2h(sha3_256('')); pass('t-sha3', 'SHA3-256', s3 === 'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a', s3); } catch(e){ pass('t-sha3', 'SHA3-256', false, e.message); }
+  try { var k = b2h(keccak256('')); pass('t-keccak', 'Keccak-256', k === 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470', k); } catch(e){ pass('t-keccak', 'Keccak-256', false, e.message); }
+  try { var pub = b2h(pubBytes(1n, true)); pass('t-secp', 'secp256k1 G', pub === '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798', pub.slice(0, 20)); } catch(e){ pass('t-secp', 'secp256k1', false, e.message); }
+  try { var b = bech32Enc('bc', 0, h2b('751e76e8199196d454941c45d1b3a323f1433bd6')); pass('t-bech32', 'Bech32', b === 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', b); } catch(e){ pass('t-bech32', 'Bech32', false, e.message); }
+  try { var b58 = b58checkSync(cat(new Uint8Array([0x00]), h2b('751e76e8199196d454941c45d1b3a323f1433bd6'))); pass('t-b58', 'Base58Check', b58 === '1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH', b58); } catch(e){ pass('t-b58', 'Base58Check', false, e.message); }
   var passed = results.filter(function(x){ return x.ok; }).length;
   log('> self-test: ' + passed + '/' + results.length + ' passed', passed === results.length ? 'ok' : 'wa');
-  for(var i=0;i<results.length;i++){
-    log('  ' + (results[i].ok ? 'PASS' : 'FAIL') + ' ' + results[i].name + ' ' + (results[i].detail ? '= ' + results[i].detail.slice(0, 32) : ''), results[i].ok ? 'dm' : 'er');
-  }
-}
-
-/* ============================================================
-   QUICK STATUS
-   ============================================================ */
-function quickStatus(){
-  $('st-wc').textContent = (typeof crypto !== 'undefined' && crypto.subtle) ? 'available' : 'unavailable';
-  $('st-wc').className = 'v ' + ((crypto && crypto.subtle) ? 'ok' : 'wa');
-  $('st-sc').textContent = self.isSecureContext ? 'yes' : 'no';
-  $('st-sc').className = 'v ' + (self.isSecureContext ? 'ok' : 'wa');
-  $('st-cpu').textContent = (navigator.hardwareConcurrency || '?') + ' cores';
 }
 
 /* ============================================================
@@ -2990,9 +2983,7 @@ function boot(){
     // Wire tabs
     var tabs = document.querySelectorAll('.tab');
     for(var i=0;i<tabs.length;i++){
-      (function(t){
-        t.onclick = function(){ switchTab(t.dataset.tab); };
-      })(tabs[i]);
+      (function(t){ t.onclick = function(){ switchTab(t.dataset.tab); }; })(tabs[i]);
     }
     // Console input
     var ci = $('cInput');
@@ -3009,7 +3000,6 @@ function boot(){
         }
       });
     }
-    // Filter input already wired via oninput
     // Global keyboard shortcuts
     document.addEventListener('keydown', function(e){
       if(['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName) >= 0) return;
@@ -3020,18 +3010,31 @@ function boot(){
         if(tabs2[idx]) switchTab(tabs2[idx].dataset.tab);
       }
     });
-    // Quick status
-    quickStatus();
-    // Initial data
+    // Online/offline listeners
+    window.addEventListener('online', function(){ _onlineSince = Date.now(); updateConnection(); toasts('network: ONLINE', 'ok'); });
+    window.addEventListener('offline', function(){ updateConnection(); toasts('network: OFFLINE', 'er'); });
+    // Connection change listener (may not exist in all browsers)
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if(conn && conn.addEventListener) conn.addEventListener('change', updateConnection);
+
+    // Boot everything
+    runSelfTest();
+    runInternetIntel();
     loadChain();
     loadMarket();
     loadWordlist();
-    // Self-test
-    runSelfTest();
-    // Banner
-    log('> QCity Bitcoin Terminal v18 started','if');
-    log('> run self-test on DASHBOARD to verify crypto primitives','wa');
-    console.log('QCity Bitcoin Terminal v18 ready');
+
+    // Live clock every 1s
+    setInterval(updateClock, 1000);
+    // Live connection every 5s
+    setInterval(updateConnection, 5000);
+    // Auto refresh intel every 5 minutes
+    setInterval(fetchIpwho, 300000);
+    setInterval(fetchCloudflareTrace, 300000);
+
+    log('> QCity Bitcoin Terminal v19 started', 'if');
+    log('> run self-test on DASHBOARD to verify crypto primitives', 'wa');
+    console.log('QCity Bitcoin Terminal v19 ready');
   } catch(e){
     var box = $('errorBox');
     if(box){ box.style.display = 'block'; box.textContent += 'BOOT ERROR: ' + e.message + '\n' + (e.stack || '') + '\n'; }
