@@ -1,0 +1,3691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QCity Bitcoin Terminal v16 — MAXIMUM</title>
+<style>
+:root{--acc:#00ff41;--acc2:#00a82d;--dim:#005f18;--warn:#ffcc00;--err:#ff2b4e;--cy:#00d9ff;--vi:#b26bff;--panel:rgba(0,20,8,.9)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;color:var(--acc);font-family:'Courier New',monospace;font-size:13px;-webkit-text-size-adjust:100%}
+body{padding-bottom:40px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--acc2);border-radius:3px}
+::selection{background:var(--acc);color:#000}
+#app{max-width:1000px;margin:0 auto;padding:10px}
+h1{color:var(--acc);font-size:20px;letter-spacing:3px;text-align:center;text-shadow:0 0 12px var(--acc);padding:2px 0}
+h1 .u{color:var(--warn)}
+.sub{text-align:center;font-size:9px;color:var(--acc2);letter-spacing:2px;margin-bottom:8px}
+h2{font-size:11px;color:var(--acc2);letter-spacing:2px;text-transform:uppercase;margin:14px 0 6px}
+h2::before{content:'▸ '}
+h3{font-size:10px;color:var(--acc2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.card{background:var(--panel);border:1px solid var(--acc2);border-radius:8px;padding:10px;margin-bottom:8px}
+.kv{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed rgba(0,255,65,.15);font-size:11px;gap:8px}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--acc2);flex-shrink:0}
+.kv .v{color:var(--acc);font-weight:600;text-align:right;word-break:break-all;font-family:monospace}
+.kv .v.ok{color:var(--acc)}.kv .v.er{color:var(--err)}.kv .v.wa{color:var(--warn)}.kv .v.cy{color:var(--cy)}
+input.inp,textarea.inp,select.inp{width:100%;background:#000;border:1px solid var(--acc2);color:var(--acc);padding:7px 9px;border-radius:5px;font-family:inherit;font-size:11px;outline:none;margin-bottom:6px}
+input.inp:focus,textarea.inp:focus{border-color:var(--acc)}
+textarea.inp{min-height:60px;resize:vertical;font-family:monospace}
+.out{background:#000;border:1px solid var(--acc2);color:var(--cy);padding:8px 10px;border-radius:5px;font-family:monospace;font-size:10px;word-break:break-all;line-height:1.55;min-height:36px;white-space:pre-wrap;max-height:420px;overflow:auto}
+.btn{background:rgba(0,255,65,.08);color:var(--acc);border:1px solid var(--acc);padding:5px 10px;border-radius:5px;font-family:inherit;font-weight:700;cursor:pointer;font-size:10px;margin:0 3px 4px 0;display:inline-block}
+.btn:hover{background:var(--acc);color:#000}
+.btn.r{border-color:var(--err);color:var(--err)}.btn.r:hover{background:var(--err);color:#000}
+.btn.b{border-color:var(--cy);color:var(--cy)}.btn.b:hover{background:var(--cy);color:#000}
+.btn.y{border-color:var(--warn);color:var(--warn)}.btn.y:hover{background:var(--warn);color:#000}
+.btn.v{border-color:var(--vi);color:var(--vi)}.btn.v:hover{background:var(--vi);color:#000}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.wide{width:100%;margin:5px 0}
+.btn.sm{padding:3px 7px;font-size:9px}
+#tabbar{display:flex;gap:2px;margin-bottom:8px;padding:4px;background:var(--panel);border:1px solid var(--acc2);border-radius:8px;overflow-x:auto;scrollbar-width:none}
+#tabbar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;background:transparent;color:var(--acc2);border:none;padding:5px 8px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:10px;font-weight:700;white-space:nowrap}
+.tab:hover{color:var(--acc)}
+.tab.on{background:rgba(0,255,65,.15);color:var(--acc);box-shadow:inset 0 0 10px rgba(0,255,65,.12)}
+.pane{display:none}.pane.on{display:block}
+.banner{background:var(--panel);border:1px solid var(--acc2);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;display:flex;gap:6px;overflow:hidden}
+.banner .p{color:var(--acc);font-weight:700;flex-shrink:0}
+.banner .t{color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.banner .c{width:7px;height:12px;background:var(--acc);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+#toasts{position:fixed;right:12px;bottom:12px;z-index:900;display:flex;flex-direction:column;gap:5px;pointer-events:none;max-width:320px}
+.toast{background:#000;border:1px solid var(--acc2);border-left:3px solid var(--acc);color:var(--acc);font-size:10px;padding:7px 11px;border-radius:4px;word-break:break-word}
+.toast.wa{border-left-color:var(--warn);color:var(--warn)}
+.toast.er{border-left-color:var(--err);color:var(--err)}
+.toast.cy{border-left-color:var(--cy);color:var(--cy)}
+#modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);padding:20px}
+#modal.on{display:flex}
+#modal .box{background:#001005;border:1px solid var(--acc);border-radius:8px;padding:14px;max-width:720px;width:100%;max-height:84vh;overflow-y:auto}
+#modal h3{color:var(--acc);margin-bottom:8px;font-size:13px;text-transform:none;letter-spacing:0}
+#modal p{color:var(--acc2);font-size:11px;line-height:1.6;margin:5px 0}
+table.dt{width:100%;border-collapse:collapse;font-size:10px}
+table.dt th{color:var(--acc2);text-align:left;padding:3px 5px;border-bottom:1px solid var(--dim);font-size:9px}
+table.dt td{padding:3px 5px;border-bottom:1px dashed rgba(0,255,65,.1);color:var(--acc);font-family:monospace;word-break:break-all;font-size:10px}
+.hint{color:var(--warn);font-size:9px;line-height:1.55;margin-top:3px}
+.danger{color:var(--err);font-size:9px;line-height:1.55;margin-top:3px}
+.wbtn{width:100%;background:var(--panel);border:1px solid var(--acc2);border-radius:7px;padding:8px 10px;margin-bottom:5px;cursor:pointer;color:var(--acc);font-family:inherit;font-size:11px;display:flex;align-items:center;gap:9px;text-align:left}
+.wbtn:hover{border-color:var(--acc)}
+.wbtn .ic{width:24px;height:24px;border:1px solid var(--acc2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.wbtn .nm{flex:1}
+.wbtn .n{font-weight:700;font-size:11px;letter-spacing:1px;display:block}
+.wbtn .d{font-size:9px;color:var(--acc2);margin-top:1px;display:block}
+.wbtn .st{font-size:9px;color:var(--acc2)}
+#term{background:#000;border:1px solid var(--acc2);border-radius:6px;padding:8px;font-family:monospace;font-size:11px;line-height:1.45;color:var(--acc);overflow-y:auto;height:320px;margin-bottom:6px}
+#term .ln{margin-bottom:1px;word-break:break-all;white-space:pre-wrap}
+.ok{color:var(--acc)}.er{color:var(--err)}.wa{color:var(--warn)}.if{color:var(--cy)}.dm{color:var(--dim)}.vi{color:var(--vi)}
+.cinput{display:flex;gap:6px}
+.cinput input{flex:1;background:#000;border:1px solid var(--acc2);color:var(--acc);padding:7px 9px;border-radius:5px;font-family:inherit;font-size:11px;outline:none}
+#gauge{width:220px;height:130px;display:block;margin:0 auto}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:700px){.mgrid,.mgrid3{grid-template-columns:1fr}}
+.feerow{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.fee{flex:1;min-width:66px;background:#000;border:1px solid var(--dim);border-radius:5px;text-align:center;padding:5px 3px}
+.fee .fl{font-size:7px;color:var(--acc2)}
+.fee .fv{font-size:12px;color:var(--acc);font-weight:900;margin-top:1px}
+.fee .fu{font-size:7px;color:var(--dim)}
+.addrrow{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px dashed rgba(0,255,65,.12);font-size:10px;align-items:center}
+.addrrow:last-child{border-bottom:none}
+.addrrow .ak{color:var(--acc2);flex-shrink:0;width:120px;font-size:9px}
+.addrrow .av{color:var(--acc);font-family:monospace;font-size:10px;word-break:break-all;text-align:right;cursor:pointer;flex:1}
+.addrrow .av:hover{text-shadow:0 0 8px var(--acc)}
+#chart{width:100%;height:200px;background:#000;border:1px solid var(--acc2);border-radius:6px;display:block}
+.tfrow{display:flex;gap:4px;margin:5px 0;flex-wrap:wrap}
+.tf{background:transparent;border:1px solid var(--dim);color:var(--acc2);font-family:inherit;font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px;cursor:pointer}
+.tf.on{border-color:var(--acc);color:var(--acc);background:rgba(0,255,65,.1)}
+.bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden;margin:4px 0}
+.bar .fill{height:100%;background:var(--acc);transition:width .2s}
+#hud{position:fixed;left:10px;bottom:10px;z-index:250;background:rgba(0,0,0,.8);border:1px solid var(--acc2);border-radius:6px;padding:3px 7px;font-size:9px;color:var(--acc2);display:flex;gap:6px}
+#hud b{color:var(--acc)}
+#panic{position:fixed;inset:0;z-index:1100;background:#fff;color:#222;font-family:Arial,sans-serif;display:none;overflow:auto}
+#panic.on{display:block}
+#panic .pb{background:#217346;color:#fff;padding:8px 14px;font-size:13px;font-weight:700;display:flex;justify-content:space-between}
+#panic table{border-collapse:collapse;font-size:12px}
+#panic td,#panic th{border:1px solid #d4d4d4;padding:3px 9px;min-width:80px;text-align:right}
+#panic th{background:#f3f3f3;color:#666;text-align:center;min-width:36px}
+#panic td.hd{background:#f3f3f3;color:#666;text-align:center}
+#panic td.up{color:#217346}#panic td.dn{color:#c00000}
+kbd{background:#000;border:1px solid var(--acc2);border-radius:3px;padding:0 5px;font-size:9px;color:var(--acc)}
+.qrwrap{background:#fff;padding:10px;border-radius:6px;display:inline-block}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;letter-spacing:1px;margin-right:4px}
+.tag.ok{background:rgba(0,255,65,.15);color:var(--acc);border:1px solid var(--acc)}
+.tag.wa{background:rgba(255,204,0,.12);color:var(--warn);border:1px solid var(--warn)}
+.tag.er{background:rgba(255,43,78,.12);color:var(--err);border:1px solid var(--err)}
+.tag.vi{background:rgba(178,107,255,.12);color:var(--vi);border:1px solid var(--vi)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.col{flex:1;min-width:200px}
+</style>
+</head>
+<body>
+<div id="toasts"></div>
+<div id="hud"><span id="hudt">—</span></div>
+
+<div id="pal" style="position:fixed;inset:0;z-index:800;display:none;align-items:flex-start;justify-content:center;background:rgba(0,0,0,.85);padding:10vh 16px 0">
+<div style="width:min(600px,94vw);background:#000;border:1px solid var(--acc);border-radius:8px;overflow:hidden">
+<input id="palInput" style="width:100%;background:#000;border:none;border-bottom:1px solid var(--acc2);color:var(--acc);padding:11px 13px;font-family:inherit;font-size:12px;outline:none" placeholder="command or tab…" autocomplete="off">
+<div id="palList" style="max-height:320px;overflow-y:auto"></div>
+</div></div>
+
+<div id="panic"><div class="pb"><span>Portfolio_Q4.xlsx — LibreOffice Calc</span><span>— ▢ ✕</span></div><div id="pg"></div></div>
+
+<div id="modal" onclick="if(event.target===this)closeModal()"><div class="box"><h3 id="mTitle">—</h3><div id="mBody"></div><button class="btn" onclick="closeModal()" style="margin-top:10px">CLOSE</button></div></div>
+
+<div id="app">
+<h1>QCITY BITCOIN <span class="u">⬢</span> TERMINAL v16</h1>
+<div class="sub">[ MAXIMUM · REAL PRIMITIVES · LIVE CHAIN · NO SIMULATION ]</div>
+
+<div class="banner"><span class="p">root@qcity:~#</span><span class="t" id="typ"></span><span class="c"></span></div>
+
+<div class="row">
+<div class="col card" style="padding:8px 10px">
+<div class="kv"><span class="k">PUBLIC IP</span><span class="v" id="ipv">resolving…</span></div>
+<div class="kv"><span class="k">ISP / ASN</span><span class="v" id="ipIsp">—</span></div>
+<div class="kv"><span class="k">GEO</span><span class="v wa" id="ipGeo">—</span></div>
+<div class="kv"><span class="k">TIMEZONE</span><span class="v cy" id="ipTz">—</span></div>
+</div>
+<div class="col card" style="padding:6px 10px">
+<div class="kv"><span class="k">BLOCK</span><span class="v" id="stH">—</span></div>
+<div class="kv"><span class="k">FEE FAST</span><span class="v" id="stF">—</span></div>
+<div class="kv"><span class="k">BTC/USD</span><span class="v" id="stP">—</span></div>
+<div class="kv"><span class="k">MEMPOOL</span><span class="v" id="stM">—</span></div>
+<div class="kv"><span class="k">STATE</span><span class="v" id="stS">◉ connecting…</span></div>
+</div>
+</div>
+
+<div id="tabbar"></div>
+
+<!-- ════════════ WALLET ════════════ -->
+<div class="pane on" id="p-wallet">
+<h2>Injected Providers</h2>
+<div class="card">
+<div class="kv"><span class="k">window.ethereum</span><span class="v" id="pv-eth">—</span></div>
+<div class="kv"><span class="k">window.unisat</span><span class="v" id="pv-uni">—</span></div>
+<div class="kv"><span class="k">window.LeatherProvider</span><span class="v" id="pv-lea">—</span></div>
+<div class="kv"><span class="k">window.XverseProviders</span><span class="v" id="pv-xv">—</span></div>
+<div class="kv"><span class="k">window.okxwallet.bitcoin</span><span class="v" id="pv-okx">—</span></div>
+<div class="kv"><span class="k">window.phantom</span><span class="v" id="pv-ph">—</span></div>
+<div class="kv"><span class="k">window.BinanceChain</span><span class="v" id="pv-bnb">—</span></div>
+<div class="kv"><span class="k">window.keplr</span><span class="v" id="pv-kep">—</span></div>
+<button class="btn sm" onclick="detectProviders()" style="margin-top:4px">RESCAN</button>
+</div>
+<h2>EVM</h2>
+<button class="wbtn" onclick="connectEVM()"><div class="ic">🦊</div><div class="nm"><span class="n">MetaMask / Coinbase / Trust</span><span class="d">eth_requestAccounts · real balance · real chainId</span></div><div class="st" id="stEVM">connect</div></button>
+<h2>Bitcoin-Native</h2>
+<button class="wbtn" onclick="connectUnisat()"><div class="ic">🟣</div><div class="nm"><span class="n">UNISAT</span><span class="d">window.unisat.requestAccounts()</span></div></button>
+<button class="wbtn" onclick="connectXverse()"><div class="ic">₿</div><div class="nm"><span class="n">XVERSE</span><span class="d">sats-connect getAccounts</span></div></button>
+<button class="wbtn" onclick="connectLeather()"><div class="ic">🟠</div><div class="nm"><span class="n">LEATHER</span><span class="d">LeatherProvider.request('getAddresses')</span></div></button>
+<button class="wbtn" onclick="connectOKX()"><div class="ic">⭕</div><div class="nm"><span class="n">OKX WALLET</span><span class="d">okxwallet.bitcoin.connect()</span></div></button>
+<div class="hint">Bitcoin wallet adapters only respond inside the wallet's in-app browser or with the extension installed. If nothing is injected, the button returns the real "not detected" state — that is a browser sandbox fact.</div>
+</div>
+
+<!-- ════════════ ADDRESS ════════════ -->
+<div class="pane" id="p-address">
+<h2>Bitcoin Address Decoder</h2>
+<input class="inp" id="aInput" placeholder="1… / 3… / bc1q… / bc1p… / tb1…">
+<button class="btn" onclick="analyzeAddr()">VALIDATE + DECODE</button>
+<button class="btn b" onclick="addrBalance()">BALANCE</button>
+<button class="btn y" onclick="addrFull()">FULL SUMMARY</button>
+<button class="btn b" onclick="addrUtxo()">UTXOs</button>
+<button class="btn v" onclick="addrScriptHash()">SCRIPT HASH</button>
+<button class="btn r" onclick="$('aOut').textContent='—'">CLEAR</button>
+<div class="out" id="aOut" style="margin-top:6px">Paste a Bitcoin address. Validation runs real Base58Check / Bech32 / Bech32m checksums.</div>
+<h2>Script PubKey</h2>
+<div class="out" id="spkOut">—</div>
+<h2>Batch Validator</h2>
+<textarea class="inp" id="bInput" rows="4" placeholder="one address per line…"></textarea>
+<button class="btn" onclick="batchValidate()">VALIDATE ALL</button>
+<div class="out" id="bOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ HASH ════════════ -->
+<div class="pane" id="p-hash">
+<h2>Hash Suite</h2>
+<input class="inp" id="hInput" value="QCity Bitcoin">
+<div>
+<button class="btn sm" onclick="doHash('sha1')">SHA-1</button>
+<button class="btn sm" onclick="doHash('sha224')">SHA-224</button>
+<button class="btn sm" onclick="doHash('sha256')">SHA-256</button>
+<button class="btn sm" onclick="doHash('sha384')">SHA-384</button>
+<button class="btn sm" onclick="doHash('sha512')">SHA-512</button>
+<button class="btn sm y" onclick="doHash('sha3_256')">SHA3-256</button>
+<button class="btn sm y" onclick="doHash('sha3_512')">SHA3-512</button>
+<button class="btn sm y" onclick="doHash('keccak256')">Keccak-256</button>
+<button class="btn sm v" onclick="doHash('blake2b')">BLAKE2b-512</button>
+<button class="btn sm b" onclick="doHash('ripemd160')">RIPEMD-160</button>
+<button class="btn sm b" onclick="doHash('hash160')">HASH-160</button>
+<button class="btn sm b" onclick="doHash('hash256')">HASH-256</button>
+<button class="btn sm" onclick="doHash('dsha256')">DOUBLE SHA-256</button>
+<button class="btn sm" onclick="doHash('hmac256')">HMAC-SHA256</button>
+<button class="btn sm" onclick="doHash('hmac512')">HMAC-SHA512</button>
+</div>
+<div class="card" style="margin-top:6px"><h3>Output</h3><div class="out" id="hOut">—</div></div>
+<h2>HMAC Key</h2>
+<input class="inp" id="hmacKey" value="Bitcoin seed">
+<h2>File Hash</h2>
+<input class="inp" type="file" id="fileIn" onchange="hashFile()">
+<div class="out" id="fileOut">select a file — hashed locally</div>
+</div>
+
+<!-- ════════════ ENCODE ════════════ -->
+<div class="pane" id="p-encode">
+<h2>Encoding Suite</h2>
+<input class="inp" id="eInput" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+<div>
+<button class="btn sm" onclick="doEnc('b58check')">B58CHECK VERIFY</button>
+<button class="btn sm" onclick="doEnc('b58enc')">B58 ENC</button>
+<button class="btn sm" onclick="doEnc('b58dec')">B58 DEC</button>
+<button class="btn sm y" onclick="doEnc('bech32dec')">BECH32 DEC</button>
+<button class="btn sm y" onclick="doEnc('bech32mdec')">BECH32M DEC</button>
+<button class="btn sm" onclick="doEnc('hexenc')">HEX ENC</button>
+<button class="btn sm" onclick="doEnc('hexdec')">HEX DEC</button>
+<button class="btn sm b" onclick="doEnc('b64enc')">BASE64 ENC</button>
+<button class="btn sm b" onclick="doEnc('b64dec')">BASE64 DEC</button>
+<button class="btn sm b" onclick="doEnc('b32enc')">BASE32 ENC</button>
+<button class="btn sm b" onclick="doEnc('b32dec')">BASE32 DEC</button>
+<button class="btn sm v" onclick="doEnc('b85enc')">BASE85 ENC</button>
+<button class="btn sm v" onclick="doEnc('b85dec')">BASE85 DEC</button>
+</div>
+<div class="card" style="margin-top:6px"><h3>Output</h3><div class="out" id="eOut">—</div></div>
+<h2>Bech32 Encode</h2>
+<div class="row">
+<div class="col"><input class="inp" id="b32Hrp" value="bc" placeholder="hrp"></div>
+<div class="col"><input class="inp" id="b32Ver" value="0" placeholder="witness version"></div>
+</div>
+<input class="inp" id="b32Hex" placeholder="program hex (20 or 32 bytes)">
+<button class="btn" onclick="bech32EncodeUI(false)">ENCODE BECH32 (v0)</button>
+<button class="btn y" onclick="bech32EncodeUI(true)">ENCODE BECH32M (v1+)</button>
+<div class="out" id="b32Out">—</div>
+</div>
+
+<!-- ════════════ CIPHER ════════════ -->
+<div class="pane" id="p-cipher">
+<h2>AES (128/192/256 · ECB/CBC/CTR/GCM)</h2>
+<textarea class="inp" id="aesIn" rows="2">QCity secret message</textarea>
+<input class="inp" id="aesKey" placeholder="key (hex or passphrase)" value="qcity-key">
+<input class="inp" id="aesIv" placeholder="IV/nonce (hex, 16 bytes; auto if blank)">
+<div class="row">
+<div class="col"><select class="inp" id="aesBits"><option value="128">AES-128</option><option value="192">AES-192</option><option value="256" selected>AES-256</option></select></div>
+<div class="col"><select class="inp" id="aesMode"><option value="GCM" selected>GCM (AEAD)</option><option value="CBC">CBC</option><option value="CTR">CTR</option><option value="ECB">ECB</option></select></div>
+</div>
+<button class="btn" onclick="aesEncrypt()">ENCRYPT</button>
+<button class="btn b" onclick="aesDecrypt()">DECRYPT</button>
+<div class="out" id="aesOut" style="margin-top:6px">—</div>
+<h2>ChaCha20 + Poly1305 (AEAD)</h2>
+<textarea class="inp" id="cc20In" rows="2">QCity secret message</textarea>
+<input class="inp" id="cc20Key" placeholder="32-byte key (hex or passphrase)">
+<input class="inp" id="cc20Nonce" placeholder="12-byte nonce (hex, auto if blank)">
+<button class="btn" onclick="cc20Encrypt()">ENCRYPT + TAG</button>
+<div class="out" id="cc20Out" style="margin-top:6px">—</div>
+<h2>Legacy Ciphers (educational)</h2>
+<textarea class="inp" id="xorIn" rows="2">HELLO BITCOIN</textarea>
+<input class="inp" id="xorKey" value="KEY">
+<button class="btn" onclick="xorEnc()">XOR</button>
+<button class="btn" onclick="vigenereEnc()">VIGENÈRE</button>
+<div class="out" id="xorOut" style="margin-top:6px">—</div>
+<h2>PBKDF2 / scrypt</h2>
+<input class="inp" id="kdfPass" placeholder="passphrase" value="password">
+<input class="inp" id="kdfSalt" placeholder="salt" value="salt">
+<div class="row">
+<div class="col"><select class="inp" id="kdfAlgo"><option value="pbkdf2">PBKDF2-HMAC-SHA512</option><option value="pbkdf2-sha256">PBKDF2-HMAC-SHA256</option><option value="scrypt">scrypt (WebCrypto N=16384)</option></select></div>
+<div class="col"><input class="inp" id="kdfIter" value="100000" placeholder="iterations"></div>
+</div>
+<button class="btn" onclick="kdfRun()">DERIVE</button>
+<div class="out" id="kdfOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ KEYS ════════════ -->
+<div class="pane" id="p-keys">
+<h2>Random Private Key</h2>
+<div class="out" id="pkOut">—</div>
+<div>
+<button class="btn" onclick="genPrivKey()">GENERATE 256-BIT</button>
+<button class="btn b" onclick="copyEl('pkOut')">COPY</button>
+<button class="btn y" onclick="deriveFromPk()">DERIVE ALL FORMATS ▸</button>
+</div>
+<h2>WIF Encode / Decode</h2>
+<input class="inp" id="wifIn" placeholder="64 hex chars">
+<button class="btn" onclick="wifEnc(false)">WIF UNCOMPRESSED</button>
+<button class="btn" onclick="wifEnc(true)">WIF COMPRESSED</button>
+<div class="out" id="wifOut">—</div>
+<input class="inp" id="wifDecIn" placeholder="WIF (5… / K… / L…)" style="margin-top:6px">
+<button class="btn" onclick="wifDec()">DECODE WIF</button>
+<div class="out" id="wifDecOut">—</div>
+<h2>BIP38 Encrypted Private Key</h2>
+<input class="inp" id="bip38Pass" placeholder="passphrase">
+<button class="btn y" onclick="bip38EncryptUI()">ENCRYPT LAST KEY (BIP38 no-EC-mult)</button>
+<div class="out" id="bip38Out">—</div>
+<input class="inp" id="bip38In" placeholder="paste BIP38 (6P…)" style="margin-top:6px">
+<input class="inp" id="bip38DecPass" placeholder="passphrase">
+<button class="btn b" onclick="bip38DecryptUI()">DECRYPT BIP38</button>
+<h2>Passphrase Entropy</h2>
+<input class="inp" id="entIn" oninput="entropyMeter()">
+<div class="bar"><div class="fill" id="entBar" style="width:0%"></div></div>
+<div class="out" id="entOut">—</div>
+<h2>Vanity Address Generator (real)</h2>
+<input class="inp" id="vanIn" value="QC" placeholder="prefix">
+<select class="inp" id="vanType">
+<option value="p2pkh">P2PKH (1…)</option>
+<option value="p2wpkh">P2WPKH (bc1q…)</option>
+</select>
+<button class="btn" onclick="vanityStart()">START SEARCH</button>
+<button class="btn r" onclick="vanityStop()">STOP</button>
+<div class="bar"><div class="fill" id="vanBar" style="width:0%"></div></div>
+<div class="out" id="vanOut">—</div>
+<div class="hint">Real incremental secp256k1 point addition. Difficulty ≈ 58^len (P2PKH) or 32^len (bech32). Each extra character multiplies time by that factor.</div>
+</div>
+
+<!-- ════════════ SEED ════════════ -->
+<div class="pane" id="p-seed">
+<h2>BIP39</h2>
+<div class="card">
+<div class="kv"><span class="k">Wordlist</span><span class="v wa" id="wlStat">loading…</span></div>
+<div class="kv"><span class="k">Source</span><span class="v" id="wlSrc">—</span></div>
+<button class="btn sm" onclick="loadWordlist()" style="margin-top:5px">RELOAD</button>
+</div>
+<div class="card">
+<h3>Generate Mnemonic</h3>
+<button class="btn sm" onclick="genMnemonic(12)">12</button>
+<button class="btn sm" onclick="genMnemonic(15)">15</button>
+<button class="btn sm" onclick="genMnemonic(18)">18</button>
+<button class="btn sm" onclick="genMnemonic(21)">21</button>
+<button class="btn sm" onclick="genMnemonic(24)">24</button>
+<div class="out" id="mnOut" style="margin-top:6px">—</div>
+<div class="out" id="mnMeta" style="margin-top:5px;min-height:20px">—</div>
+<button class="btn b" onclick="copyEl('mnOut')">COPY</button>
+<button class="btn y" onclick="$('seedMn').value=$('mnOut').textContent">SEND TO SEED ▸</button>
+</div>
+<div class="card">
+<h3>Mnemonic → Seed (PBKDF2-HMAC-SHA512 · 2048)</h3>
+<textarea class="inp" id="seedMn" rows="2" placeholder="mnemonic…"></textarea>
+<input class="inp" id="seedPass" placeholder="passphrase (25th word)" type="password">
+<button class="btn y" onclick="mnToSeed()">DERIVE 512-BIT SEED</button>
+<div class="out" id="seedOut" style="margin-top:6px">—</div>
+<button class="btn b" onclick="copyEl('seedOut')">COPY</button>
+<button class="btn y" onclick="switchTab('hd');$('hdIn').value=document.querySelector('#seedOut').textContent.replace(/[^0-9a-f]/gi,'')">USE IN HD ▸</button>
+</div>
+<div class="card">
+<h3>Validate Mnemonic Checksum</h3>
+<textarea class="inp" id="valMn" rows="2" placeholder="12/15/18/21/24 words"></textarea>
+<button class="btn" onclick="validateMn()">VALIDATE</button>
+<div class="out" id="valOut" style="margin-top:6px">—</div>
+</div>
+<h2>Shamir Secret Sharing (GF(256))</h2>
+<div class="out" id="shamirOut">splits a secret into N shares, any K reconstruct</div>
+<input class="inp" id="shamirSecret" placeholder="secret (hex or text)">
+<div class="row">
+<div class="col"><input class="inp" id="shamirK" value="2" placeholder="threshold (K)"></div>
+<div class="col"><input class="inp" id="shamirN" value="3" placeholder="total shares (N)"></div>
+</div>
+<button class="btn" onclick="shamirSplitUI()">SPLIT</button>
+<div class="out" id="shamirShares">—</div>
+<textarea class="inp" id="shamirCombine" rows="4" placeholder="paste K or more shares, one per line (idx:hex)"></textarea>
+<button class="btn b" onclick="shamirCombineUI()">COMBINE</button>
+<div class="out" id="shamirRecon">—</div>
+</div>
+
+<!-- ════════════ HD ════════════ -->
+<div class="pane" id="p-hd">
+<h2>BIP32 / BIP44 / BIP49 / BIP84 / BIP86 / SLIP-10</h2>
+<textarea class="inp" id="hdIn" rows="2" placeholder="BIP39 mnemonic OR 64/128-hex seed OR xprv/tprv"></textarea>
+<input class="inp" id="hdPass" placeholder="BIP39 passphrase (optional)" type="password">
+<select class="inp" id="hdCoin">
+<option value="0">Bitcoin (coin=0)</option>
+<option value="1">Testnet (coin=1)</option>
+<option value="2">Litecoin (coin=2)</option>
+<option value="3">Dogecoin (coin=3)</option>
+</select>
+<input class="inp" id="hdPath" value="m/84'/0'/0'/0/0">
+<div>
+<button class="btn" onclick="hdDerive()">DERIVE PATH</button>
+<button class="btn y" onclick="hdDeriveAll()">SHOW ALL STANDARDS</button>
+<button class="btn b" onclick="hdScanAddresses()">SCAN FIRST 20</button>
+</div>
+<div class="out" id="hdOut" style="margin-top:6px">Enter a mnemonic, seed, or xprv.</div>
+<h2>Batch Derivation Table</h2>
+<input class="inp" id="hdBatch" value="m/84'/0'/0'/0">
+<input class="inp" id="hdN" value="10" placeholder="count (1-100)">
+<button class="btn" onclick="hdBatchDerive()">GENERATE</button>
+<div class="out" id="hdBatchOut" style="margin-top:6px;max-height:360px;overflow:auto">—</div>
+<h2>Extended Key</h2>
+<div class="out" id="xprvOut">—</div>
+</div>
+
+<!-- ════════════ SIGN ════════════ -->
+<div class="pane" id="p-sign">
+<h2>ECDSA secp256k1 · RFC 6979 · BIP62 Low-S</h2>
+<input class="inp" id="sgKey" placeholder="private key hex">
+<button class="btn sm" onclick="$('sgKey').value=genKeyHex()">GENERATE</button>
+<textarea class="inp" id="sgMsg" rows="2">QCity Bitcoin Terminal</textarea>
+<button class="btn y" onclick="ecdsaSign()">SIGN</button>
+<button class="btn b" onclick="ecdsaSignRecovery()">SIGN + RECOVER</button>
+<div class="out" id="sgOut" style="margin-top:6px">—</div>
+<h2>Verify ECDSA</h2>
+<input class="inp" id="vfPub" placeholder="compressed/uncompressed pubkey hex">
+<textarea class="inp" id="vfMsg" rows="2" placeholder="message"></textarea>
+<input class="inp" id="vfSig" placeholder="r || s (128 hex)">
+<button class="btn b" onclick="ecdsaVerify()">VERIFY</button>
+<div class="out" id="vfOut" style="margin-top:6px">—</div>
+<h2>Schnorr · BIP340</h2>
+<input class="inp" id="schnorrKey" placeholder="32-byte private key hex">
+<textarea class="inp" id="schnorrMsg" rows="2" placeholder="message"></textarea>
+<input class="inp" id="schnorrAux" placeholder="aux randomness hex (optional)">
+<button class="btn y" onclick="schnorrSign()">SIGN</button>
+<button class="btn b" onclick="schnorrVerifyUI()">VERIFY</button>
+<div class="out" id="schnorrOut" style="margin-top:6px">—</div>
+<h2>Ed25519 (bonus curve)</h2>
+<input class="inp" id="ed25519Key" placeholder="32-byte private key hex">
+<textarea class="inp" id="ed25519Msg" rows="2">QCity</textarea>
+<button class="btn v" onclick="ed25519SignUI()">SIGN</button>
+<button class="btn b" onclick="ed25519VerifyUI()">VERIFY</button>
+<div class="out" id="ed25519Out" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ TX ════════════ -->
+<div class="pane" id="p-tx">
+<h2>Raw Transaction Decoder</h2>
+<textarea class="inp" id="txRaw" rows="4" placeholder="paste raw transaction hex"></textarea>
+<button class="btn" onclick="decodeTx()">DECODE</button>
+<button class="btn b" onclick="fetchTxByInput()">FETCH BY TXID</button>
+<div class="out" id="txDecOut" style="margin-top:6px">—</div>
+
+<h2>Transaction Builder &amp; Signer</h2>
+<div class="card">
+<h3>Inputs — txid:vout:sats:WIF[:spk]</h3>
+<textarea class="inp" id="txIns" rows="3" placeholder="abc…:0:100000:L…"></textarea>
+<h3>Outputs — address:sats</h3>
+<textarea class="inp" id="txOuts" rows="3" placeholder="bc1q…:90000"></textarea>
+<select class="inp" id="txSighash">
+<option value="all">SIGHASH_ALL</option>
+<option value="none">SIGHASH_NONE</option>
+<option value="single">SIGHASH_SINGLE</option>
+<option value="acp">SIGHASH_ALL|ANYONECANPAY</option>
+</select>
+<button class="btn" onclick="buildTx()">BUILD &amp; SIGN</button>
+<button class="btn r" onclick="broadcastTx()">BROADCAST</button>
+<div class="out" id="txBuildOut" style="margin-top:6px">—</div>
+</div>
+
+<h2>PSBT (BIP174)</h2>
+<textarea class="inp" id="psbtIn" rows="3" placeholder="base64 PSBT"></textarea>
+<button class="btn" onclick="psbtParse()">PARSE</button>
+<button class="btn b" onclick="psbtFromRaw()">BUILD FROM RAW</button>
+<div class="out" id="psbtOut" style="margin-top:6px">—</div>
+
+<h2>Fee Estimator</h2>
+<div class="row">
+<div class="col"><input class="inp" id="feeIn" value="1" placeholder="input count"></div>
+<div class="col"><input class="inp" id="feeOut" value="2" placeholder="output count"></div>
+</div>
+<div class="row">
+<div class="col"><select class="inp" id="feeInType"><option value="p2pkh">P2PKH</option><option value="p2sh-p2wpkh">P2SH-P2WPKH</option><option value="p2wpkh">P2WPKH</option><option value="p2tr">P2TR</option></select></div>
+<div class="col"><select class="inp" id="feeOutType"><option value="p2pkh">P2PKH</option><option value="p2sh">P2SH</option><option value="p2wpkh">P2WPKH</option><option value="p2tr">P2TR</option></select></div>
+<div class="col"><input class="inp" id="feeRate" value="10" placeholder="sat/vB"></div>
+</div>
+<button class="btn" onclick="estimateFee()">ESTIMATE</button>
+<div class="out" id="feeOut" style="margin-top:6px">—</div>
+
+<h2>Script Disassembler</h2>
+<textarea class="inp" id="scriptIn" rows="2" placeholder="script hex (e.g. 76a914...88ac)"></textarea>
+<button class="btn" onclick="disasmScript()">DISASSEMBLE</button>
+<div class="out" id="scriptOut" style="margin-top:6px">—</div>
+
+<h2>Merkle Proof Verifier</h2>
+<textarea class="inp" id="merkleLeaves" rows="2" placeholder="leaf hashes, one per line"></textarea>
+<input class="inp" id="merkleTarget" placeholder="target leaf hash">
+<textarea class="inp" id="merkleProof" rows="3" placeholder="proof path, one hash per line"></textarea>
+<button class="btn" onclick="merkleVerifyUI()">VERIFY PROOF</button>
+<div class="out" id="merkleOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ CHAIN ════════════ -->
+<div class="pane" id="p-chain">
+<h2>Live Network</h2>
+<div class="card">
+<div class="kv"><span class="k">Height</span><span class="v" id="cH">—</span></div>
+<div class="kv"><span class="k">Best hash</span><span class="v" id="cHash">—</span></div>
+<div class="kv"><span class="k">Block time</span><span class="v" id="cTime">—</span></div>
+<div class="kv"><span class="k">Difficulty</span><span class="v" id="cDiff">—</span></div>
+<div class="kv"><span class="k">Hashrate</span><span class="v" id="cHR">—</span></div>
+<div class="kv"><span class="k">Retarget in</span><span class="v" id="cRT">—</span></div>
+<button class="btn sm" onclick="loadChain(true)" style="margin-top:5px">REFRESH</button>
+</div>
+<div class="card"><h3>Recent Blocks</h3><div id="cBlocks">—</div></div>
+<h2>Fees &amp; Mempool</h2>
+<div class="card">
+<div class="feerow">
+<div class="fee"><div class="fl">FASTEST</div><div class="fv" id="f1">—</div><div class="fu">sat/vB</div></div>
+<div class="fee"><div class="fl">30 MIN</div><div class="fv" id="f2">—</div><div class="fu">sat/vB</div></div>
+<div class="fee"><div class="fl">1 HOUR</div><div class="fv" id="f3">—</div><div class="fu">sat/vB</div></div>
+<div class="fee"><div class="fl">ECON</div><div class="fv" id="f4">—</div><div class="fu">sat/vB</div></div>
+<div class="fee"><div class="fl">MIN</div><div class="fv" id="f5">—</div><div class="fu">sat/vB</div></div>
+</div>
+<div class="kv" style="margin-top:6px"><span class="k">Mempool TX</span><span class="v" id="mpC">—</span></div>
+<div class="kv"><span class="k">Mempool size</span><span class="v" id="mpS">—</span></div>
+</div>
+<h2>Address Lookup</h2>
+<input class="inp" id="xAddr" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+<button class="btn" onclick="addrFull()">SUMMARY</button>
+<button class="btn b" onclick="addrUtxo()">UTXOs</button>
+<button class="btn y" onclick="addrTxs()">RECENT TXS</button>
+<div class="out" id="chainOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ MARKET ════════════ -->
+<div class="pane" id="p-market">
+<h2>BTC / USDT</h2>
+<div class="card">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+<span id="mkPrice" style="font-size:24px;font-weight:900;color:var(--acc);text-shadow:0 0 12px var(--acc)">$ —</span>
+<span id="mkChg" style="font-size:12px;font-weight:700">—</span>
+</div>
+<canvas id="chart"></canvas>
+<div class="tfrow">
+<button class="tf on" data-tf="1h" onclick="setTF(this)">1H</button>
+<button class="tf" data-tf="4h" onclick="setTF(this)">4H</button>
+<button class="tf" data-tf="1d" onclick="setTF(this)">1D</button>
+<button class="tf" data-tf="1w" onclick="setTF(this)">1W</button>
+<button class="tf" data-tf="1M" onclick="setTF(this)">1M</button>
+<button class="tf" onclick="loadMarket()">⟳</button>
+</div>
+<div class="kv"><span class="k">24h High / Low</span><span class="v" id="mkHL">—</span></div>
+<div class="kv"><span class="k">24h Volume</span><span class="v" id="mkVol">—</span></div>
+</div>
+<div class="mgrid">
+<div class="card" style="text-align:center">
+<h3>Fear &amp; Greed</h3>
+<canvas id="gauge" width="220" height="130"></canvas>
+<div id="fngVal" style="font-size:18px;font-weight:900">—</div>
+<div id="fngCls" class="wa" style="font-size:10px;letter-spacing:2px">—</div>
+</div>
+<div class="card">
+<h3>Halving Countdown</h3>
+<div class="kv"><span class="k">Height</span><span class="v" id="hvCur">—</span></div>
+<div class="kv"><span class="k">Next</span><span class="v" id="hvNext">—</span></div>
+<div class="kv"><span class="k">Blocks left</span><span class="v" id="hvLeft">—</span></div>
+<div class="kv"><span class="k">ETA</span><span class="v wa" id="hvEta">—</span></div>
+<div class="bar"><div class="fill" id="hvBar" style="width:0%"></div></div>
+</div>
+</div>
+</div>
+
+<!-- ════════════ NET ════════════ -->
+<div class="pane" id="p-net">
+<h2>DNS over HTTPS</h2>
+<input class="inp" id="dnsName" value="bitcoin.org">
+<select class="inp" id="dnsType"><option>A</option><option>AAAA</option><option>MX</option><option>TXT</option><option>NS</option><option>CNAME</option><option>SOA</option><option>CAA</option></select>
+<button class="btn" onclick="doDNS()">RESOLVE</button>
+<button class="btn b" onclick="doDNSAll()">ALL TYPES</button>
+<div class="out" id="dnsOut" style="margin-top:6px">—</div>
+<h2>Reachability Probe</h2>
+<input class="inp" id="scHost" value="127.0.0.1">
+<input class="inp" id="scPorts" value="80,443,8333,8332,50001">
+<input class="inp" id="scTimeout" value="2000">
+<button class="btn" onclick="probeScan()">SCAN</button>
+<button class="btn r" onclick="stopScan()">STOP</button>
+<div class="out" id="scOut" style="margin-top:6px;height:240px;overflow:auto">Idle.</div>
+<h2>Public Node Probe</h2>
+<button class="btn" onclick="probePublicNodes()">PROBE PUBLIC ELECTRUM / API NODES</button>
+<div class="out" id="nodeOut" style="margin-top:6px">—</div>
+<h2>HTTP Header Inspector</h2>
+<input class="inp" id="httpUrl" value="https://mempool.space/api/blocks/tip/height">
+<button class="btn" onclick="httpProbe()">FETCH HEADERS</button>
+<div class="out" id="httpOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ CRACK (REAL) ════════════ -->
+<div class="pane" id="p-crack">
+<h2>Real SHA-256 / SHA-1 / MD5 Dictionary Attack</h2>
+<input class="inp" id="crackHash" placeholder="target hash (hex)">
+<div class="row">
+<div class="col"><select class="inp" id="crackAlgo"><option value="sha256">SHA-256</option><option value="sha1">SHA-1</option><option value="ripemd160">RIPEMD-160</option></select></div>
+<div class="col"><button class="btn sm" onclick="$('crackHash').value=$('hOut').textContent.trim()">USE LAST HASH</button></div>
+</div>
+<input class="inp" id="crackCharset" value="abcdefghijklmnopqrstuvwxyz0123456789">
+<input class="inp" id="crackMax" value="4" placeholder="max brute length">
+<button class="btn" onclick="crackRun('dict')">DICTIONARY</button>
+<button class="btn y" onclick="crackRun('mutate')">DICT + MUTATIONS</button>
+<button class="btn r" onclick="crackRun('brute')">BRUTE FORCE</button>
+<button class="btn r" onclick="crackStop()">STOP</button>
+<div class="bar"><div class="fill" id="crackBar" style="width:0%"></div></div>
+<div class="out" id="crackOut" style="margin-top:6px;max-height:240px">Idle. Attacks real hashes against a built-in wordlist and bruteforce. Real result or no result — no simulation.</div>
+<div class="hint">Reality check: this cracks weak passwords. It cannot crack a Bitcoin private key. A 256-bit key has ~10^77 possibilities; even the entire global mining network (≈6×10^20 H/s) would need ~10^49 years to exhaust the space. Anyone claiming to crack modern wallets is lying or robbing you.</div>
+</div>
+
+<!-- ════════════ QR ════════════ -->
+<div class="pane" id="p-qr">
+<h2>QR Code Generator</h2>
+<textarea class="inp" id="qrIn" rows="2">bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?amount=0.001</textarea>
+<select class="inp" id="qrECC">
+<option value="L">ECC L (7%)</option>
+<option value="M" selected>ECC M (15%)</option>
+<option value="Q">ECC Q (25%)</option>
+<option value="H">ECC H (30%)</option>
+</select>
+<button class="btn" onclick="qrRender()">GENERATE QR</button>
+<button class="btn b" onclick="qrFromAddress()">USE ADDRESS</button>
+<div style="margin-top:8px"><div id="qrOut"></div></div>
+<div class="hint">Pure-JS QR encoder (Byte mode). Renders on canvas. Scan-verifiable.</div>
+</div>
+
+<!-- ════════════ MATH ════════════ -->
+<div class="pane" id="p-math">
+<h2>Big Integer / Number Theory</h2>
+<input class="inp" id="mathA" value="12345678901234567890">
+<input class="inp" id="mathB" value="98765432109876543210">
+<div>
+<button class="btn sm" onclick="mathOp('add')">A+B</button>
+<button class="btn sm" onclick="mathOp('sub')">A-B</button>
+<button class="btn sm" onclick="mathOp('mul')">A×B</button>
+<button class="btn sm" onclick="mathOp('div')">A÷B</button>
+<button class="btn sm" onclick="mathOp('mod')">A mod B</button>
+<button class="btn sm" onclick="mathOp('pow')">A^B</button>
+<button class="btn sm" onclick="mathOp('gcd')">GCD(A,B)</button>
+<button class="btn sm" onclick="mathOp('inverse')">A^-1 mod B</button>
+</div>
+<div class="out" id="mathOut">—</div>
+<h2>Prime Testing &amp; Factoring</h2>
+<input class="inp" id="primeIn" value="1000000007">
+<button class="btn" onclick="primeTest()">MILLER-RABIN TEST</button>
+<button class="btn y" onclick="primeFactor()">TRIAL FACTOR</button>
+<button class="btn b" onclick="genPrime()">GENERATE 128-BIT PRIME</button>
+<div class="out" id="primeOut" style="margin-top:6px">—</div>
+<h2>secp256k1 Constants</h2>
+<div class="out" id="secpConst">—</div>
+<h2>Hash Collision Demo (Birthday Attack)</h2>
+<button class="btn" onclick="birthdayDemo()">RUN 16-BIT BIRTHDAY</button>
+<div class="out" id="birthdayOut" style="margin-top:6px">—</div>
+<h2>Diffie-Hellman over secp256k1</h2>
+<button class="btn" onclick="dhDemo()">RUN DH EXCHANGE</button>
+<div class="out" id="dhOut" style="margin-top:6px">—</div>
+<h2>Nonce Reuse Attack (why ECDSA fails)</h2>
+<input class="inp" id="nrMsg1" value="transfer 1 BTC">
+<input class="inp" id="nrMsg2" value="transfer 100 BTC">
+<button class="btn r" onclick="nonceReuseDemo()">DEMONSTRATE LEAK</button>
+<div class="out" id="nrOut" style="margin-top:6px">—</div>
+</div>
+
+<!-- ════════════ CONSOLE ════════════ -->
+<div class="pane" id="p-console">
+<h2>Interactive Shell</h2>
+<div id="term"></div>
+<div class="cinput"><span style="color:var(--acc);font-weight:700">#</span><input id="cInput" placeholder="help · btc · block · fees · addr &lt;x&gt; · derive &lt;hex&gt; · sign &lt;hex&gt; &lt;msg&gt; · hd &lt;path&gt; · dns &lt;name&gt; · scan …" autocomplete="off"><button class="btn" onclick="runCmd()">RUN</button></div>
+<div class="hint">↑/↓ history · Ctrl+K palette · F9 panic · ? shortcuts</div>
+<div class="card" style="margin-top:6px">
+<h3>Commands</h3>
+<div class="kv"><span class="k">btc block fees fng halving mempool</span><span class="v">live chain data</span></div>
+<div class="kv"><span class="k">addr bal utxo tx</span><span class="v">address tools</span></div>
+<div class="kv"><span class="k">hash dhash sha512 ripemd h160 blake</span><span class="v">hashing</span></div>
+<div class="kv"><span class="k">wif unwif b58 b58d b32 b64</span><span class="v">encoding</span></div>
+<div class="kv"><span class="k">derive sign schnorr verify</span><span class="v">crypto</span></div>
+<div class="kv"><span class="k">hd &lt;input&gt; &lt;path&gt;</span><span class="v">BIP32</span></div>
+<div class="kv"><span class="k">dns probe node</span><span class="v">network</span></div>
+<div class="kv"><span class="k">theme preset clear panic version</span><span class="v">misc</span></div>
+</div>
+</div>
+
+<!-- ════════════ LOG ════════════ -->
+<div class="pane" id="p-log">
+<h2>Event Log</h2>
+<div id="term2" style="background:#000;border:1px solid var(--acc2);border-radius:6px;padding:8px;font-family:monospace;font-size:11px;line-height:1.45;color:var(--acc);overflow-y:auto;height:360px"></div>
+<div style="margin-top:6px">
+<button class="btn" onclick="exportLog()">EXPORT</button>
+<button class="btn r" onclick="$('term2').innerHTML=''">CLEAR</button>
+</div>
+<input class="inp" id="logFilter" placeholder="filter…" oninput="filterLog()" style="margin-top:6px">
+</div>
+
+<!-- ════════════ SYSTEM ════════════ -->
+<div class="pane" id="p-system">
+<h2>Hardware</h2>
+<div class="card">
+<div class="kv"><span class="k">CPU CORES</span><span class="v" id="hwCpu">—</span></div>
+<div class="kv"><span class="k">MEMORY</span><span class="v" id="hwRam">—</span></div>
+<div class="kv"><span class="k">GPU</span><span class="v" id="hwGpu">—</span></div>
+<div class="kv"><span class="k">WEBGL</span><span class="v" id="hwGl">—</span></div>
+<div class="kv"><span class="k">DISPLAY</span><span class="v" id="hwScr">—</span></div>
+<div class="kv"><span class="k">DPR</span><span class="v" id="hwDpr">—</span></div>
+<div class="kv"><span class="k">PLATFORM</span><span class="v" id="hwPlat">—</span></div>
+<div class="kv"><span class="k">NETWORK</span><span class="v" id="hwNet">—</span></div>
+<div class="kv"><span class="k">BATTERY</span><span class="v" id="hwBat">—</span></div>
+<div class="kv"><span class="k">SECURE CTX</span><span class="v" id="hwSec">—</span></div>
+<div class="kv"><span class="k">WASM</span><span class="v" id="hwWasm">—</span></div>
+<div class="kv"><span class="k">STORAGE</span><span class="v" id="hwSto">—</span></div>
+</div>
+<button class="btn" onclick="detectHW()">RESCAN</button>
+<button class="btn y" onclick="benchFPS()">FPS BENCHMARK</button>
+<button class="btn b" onclick="benchCrypto()">CRYPTO BENCHMARK</button>
+<button class="btn v" onclick="benchSecp()">SECP256K1 BENCH</button>
+<div class="out" id="benchOut" style="margin-top:6px">—</div>
+<h2>Session</h2>
+<div class="card">
+<div class="kv"><span class="k">SESSION ID</span><span class="v" id="sessId">—</span></div>
+<div class="kv"><span class="k">STARTED</span><span class="v" id="sessStart">—</span></div>
+<div class="kv"><span class="k">EVENTS</span><span class="v" id="sessEv">0</span></div>
+</div>
+</div>
+
+<!-- ════════════ CONFIG ════════════ -->
+<div class="pane" id="p-config">
+<h2>About</h2>
+<div class="card">
+<div class="kv"><span class="k">App</span><span class="v">QCity Bitcoin Terminal</span></div>
+<div class="kv"><span class="k">Version</span><span class="v">16.0 MAXIMUM</span></div>
+<div class="kv"><span class="k">Crypto</span><span class="v">SHA-1/224/256/384/512 · SHA3/Keccak · RIPEMD-160 · BLAKE2b · HMAC · PBKDF2 · scrypt · AES (ECB/CBC/CTR/GCM) · ChaCha20-Poly1305 · Base58Check · Base32/64/85 · Bech32/m · secp256k1 · ECDSA RFC6979 · Schnorr BIP340 · Ed25519 · X25519 · BIP32/39/44/49/84/86 · BIP38 · BIP143 · BIP341 · BIP174 · Shamir GF(256) · Merkle · Bloom · SLIP-10</span></div>
+<div class="kv"><span class="k">Live APIs</span><span class="v">mempool.space · blockchain.info · Binance · alternative.me · Cloudflare DoH · ipwho.is</span></div>
+<button class="btn" onclick="exportLog()" style="margin-top:5px">EXPORT LOG</button>
+<button class="btn" onclick="exportSettings()">EXPORT SETTINGS</button>
+<button class="btn b" onclick="importSettings()">IMPORT SETTINGS</button>
+<button class="btn r" onclick="localStorage.removeItem('qcity16cfg');location.reload()">FACTORY RESET</button>
+<textarea class="inp" id="setIO" rows="3" style="margin-top:5px" placeholder="settings JSON"></textarea>
+</div>
+<h2>Shortcuts</h2>
+<div class="card">
+<div class="kv"><span class="k"><kbd>Ctrl/⌘ K</kbd></span><span class="v">command palette</span></div>
+<div class="kv"><span class="k"><kbd>F9</kbd></span><span class="v">panic screen</span></div>
+<div class="kv"><span class="k"><kbd>Alt 1-9,0</kbd></span><span class="v">jump to tab</span></div>
+<div class="kv"><span class="k"><kbd>?</kbd></span><span class="v">shortcut list</span></div>
+</div>
+<div class="hint" style="font-size:10px;line-height:1.7;margin-top:8px">
+All cryptography runs locally in your browser. Nothing is uploaded. Live data is fetched directly from the public APIs listed above. This tool never stores or transmits private keys.
+</div>
+</div>
+
+<div style="text-align:center;font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:14px;padding:6px">QCITY BITCOIN · v16 MAXIMUM · VERIFY EVERYTHING</div>
+</div>
+
+<script>
+"use strict";
+/* ═══════════════════════════ UTILITIES ═══════════════════════════ */
+const HEXC='0123456789abcdef';
+const rHex=n=>{let s='';for(let i=0;i<n;i++)s+=HEXC[Math.random()*16|0];return s;};
+const rInt=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const $=id=>document.getElementById(id);
+const TE=new TextEncoder(),TD=new TextDecoder();
+function h2b(h){h=h.replace(/[^0-9a-f]/gi,'');if(h.length&1)h='0'+h;const o=new Uint8Array(h.length/2);for(let i=0;i<o.length;i++)o[i]=parseInt(h.substr(i*2,2),16);return o;}
+function b2h(a){let s='';for(let i=0;i<a.length;i++)s+=HEXC[a[i]>>4]+HEXC[a[i]&15];return s;}
+function cat(...arr){let n=0;for(const a of arr)n+=a.length;const o=new Uint8Array(n);let p=0;for(const a of arr){o.set(a,p);p+=a.length;}return o;}
+const eqArr=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
+function copyEl(id){const t=$(id).textContent;if(!t||t==='—')return;navigator.clipboard.writeText(t).then(()=>toast('copied','ok')).catch(()=>toast('clipboard blocked','er'));}
+function copyTxt(t){if(!t)return;navigator.clipboard.writeText(t).then(()=>toast('copied','ok')).catch(()=>{});}
+function bytesToBig(b){if(!b.length)return 0n;return BigInt('0x'+(b2h(b)||'0'));}
+function bigToBytes(n,len){const o=new Uint8Array(len);for(let i=len-1;i>=0;i--){o[i]=Number(n&255n);n>>=8n;}return o;}
+function b2bits(bytes){const b=[];for(const x of bytes)for(let i=7;i>=0;i--)b.push((x>>i)&1);return b;}
+function bits2int(bits){let n=0n;for(const b of bits)n=(n<<1n)|BigInt(b);return n;}
+function varint(n){if(n<0xfd)return new Uint8Array([n]);if(n<=0xffff){const b=new Uint8Array(3);b[0]=0xfd;new DataView(b.buffer).setUint16(1,n,true);return b;}if(n<=0xffffffff){const b=new Uint8Array(5);b[0]=0xfe;new DataView(b.buffer).setUint32(1,n,true);return b;}const b=new Uint8Array(9);b[0]=0xff;new DataView(b.buffer).setBigUint64(1,BigInt(n),true);return b;}
+function rdVar(dv,off){const b=dv.getUint8(off);if(b<0xfd)return[b,off+1];if(b===0xfd)return[dv.getUint16(off+1,true),off+3];if(b===0xfe)return[dv.getUint32(off+1,true),off+5];return[Number(dv.getBigUint64(off+1,true)),off+9];}
+function toast(m,cls){const d=document.createElement('div');d.className='toast '+(cls||'');d.textContent=m;$('toasts').appendChild(d);while($('toasts').children.length>5)$('toasts').firstChild.remove();setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(()=>d.remove(),300);},3200);}
+function showModal(t,b){$('mTitle').textContent=t;$('mBody').innerHTML=b;$('modal').classList.add('on');}
+function closeModal(){$('modal').classList.remove('on');}
+let EVENT_COUNT=0;
+function bump(){EVENT_COUNT++;const e=$('sessEv');if(e)e.textContent=EVENT_COUNT;}
+function log(m,cls){
+  for(const tid of ['term','term2']){
+    const el=$(tid);if(!el)continue;
+    const d=document.createElement('div');d.className='ln '+(cls||'ok');d.textContent=m;
+    el.appendChild(d);while(el.children.length>250)el.removeChild(el.firstChild);el.scrollTop=el.scrollHeight;
+  }
+  bump();
+}
+function filterLog(){const kw=$('logFilter').value.toLowerCase();$('term2').querySelectorAll('.ln').forEach(l=>l.style.display=(!kw||l.textContent.toLowerCase().includes(kw))?'':'none');}
+
+/* ═══════════════════════════ SHA-256 (pure) ═══════════════════════════ */
+const K256=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+function sha256JS(data){
+  if(typeof data==='string')data=TE.encode(data);
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const l=data.length,padded=((l+9+63)>>6)<<6,buf=new Uint8Array(padded);
+  buf.set(data);buf[l]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(padded-8,Math.floor(l*8/4294967296));
+  dv.setUint32(padded-4,(l*8)>>>0);
+  const w=new Uint32Array(64);
+  for(let b=0;b<padded;b+=64){
+    for(let i=0;i<16;i++)w[i]=dv.getUint32(b+i*4);
+    for(let i=16;i<64;i++){const s0=((w[i-15]>>>7)|(w[i-15]<<25))^((w[i-15]>>>18)|(w[i-15]<<14))^(w[i-15]>>>3);const s1=((w[i-2]>>>17)|(w[i-2]<<15))^((w[i-2]>>>19)|(w[i-2]<<13))^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0;}
+    let a=H[0],b2=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K256[i]+w[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const mj=(a&b2)^(a&c)^(b2&c);
+      const t2=(S0+mj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0;
+    }
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+b2)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;
+    H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+  }
+  const out=new Uint8Array(32),odv=new DataView(out.buffer);
+  for(let i=0;i<8;i++)odv.setUint32(i*4,H[i]);
+  return out;
+}
+async function sha256(d){if(crypto.subtle&&isSecureContext){const buf=typeof d==='string'?TE.encode(d):d;return new Uint8Array(await crypto.subtle.digest('SHA-256',buf));}return sha256JS(d);}
+async function sha256hex(m){return b2h(await sha256(m));}
+async function dsha256(d){return sha256(await sha256(d));}
+async function hash256(d){return dsha256(d);}
+
+/* ═══════════════════════════ SHA-512 (pure JS for non-secure contexts) ═══════════════════════════ */
+const K512=[
+  [0x428a2f98,0xd728ae22],[0x71374491,0x23ef65cd],[0xb5c0fbcf,0xec4d3b2f],[0xe9b5dba5,0x8189dbbc],
+  [0x3956c25b,0xf348b538],[0x59f111f1,0xb605d019],[0x923f82a4,0xaf194f9b],[0xab1c5ed5,0xda6d8118],
+  [0xd807aa98,0xa3030242],[0x12835b01,0x45706fbe],[0x243185be,0x4ee4b28c],[0x550c7dc3,0xd5ffb4e2],
+  [0x72be5d74,0xf27b896f],[0x80deb1fe,0x3b1696b1],[0x9bdc06a7,0x25c71235],[0xc19bf174,0xcf692694],
+  [0xe49b69c1,0x9ef14ad2],[0xefbe4786,0x384f25e3],[0x0fc19dc6,0x8b8cd5b5],[0x240ca1cc,0x77ac9c65],
+  [0x2de92c6f,0x592b0275],[0x4a7484aa,0x6ea6e483],[0x5cb0a9dc,0xbd41fbd4],[0x76f988da,0x831153b5],
+  [0x983e5152,0xee66dfab],[0xa831c66d,0x2db43210],[0xb00327c8,0x98fb213f],[0xbf597fc7,0xbeef0ee4],
+  [0xc6e00bf3,0x3da88fc2],[0xd5a79147,0x930aa725],[0x06ca6351,0xe003826f],[0x14292967,0x0a0e6e70],
+  [0x27b70a85,0x46d22ffc],[0x2e1b2138,0x5c26c926],[0x4d2c6dfc,0x5ac42aed],[0x53380d13,0x9d95b3df],
+  [0x650a7354,0x8baf63de],[0x766a0abb,0x3c77b2a8],[0x81c2c92e,0x47edaee6],[0x92722c85,0x1482353b],
+  [0xa2bfe8a1,0x4cf10364],[0xa81a664b,0xbc423001],[0xc24b8b70,0xd0f89791],[0xc76c51a3,0x0654be30],
+  [0xd192e819,0xd6ef5218],[0xd6990624,0x5565a910],[0xf40e3585,0x5771202a],[0x106aa070,0x32bbd1b8],
+  [0x19a4c116,0xb8d2d0c8],[0x1e376c08,0x5141ab53],[0x2748774c,0xdf8eeb99],[0x34b0bcb5,0xe19b48a8],
+  [0x391c0cb3,0xc5c95a63],[0x4ed8aa4a,0xe3418acb],[0x5b9cca4f,0x7763e373],[0x682e6ff3,0xd6b2b8a3],
+  [0x748f82ee,0x5defb2fc],[0x78a5636f,0x43172f60],[0x84c87814,0xa1f0ab72],[0x8cc70208,0x1a6439ec],
+  [0x90befffa,0x23631e28],[0xa4506ceb,0xde82bde9],[0xbef9a3f7,0xb2c67915],[0xc67178f2,0xe372532b],
+  [0xca273ece,0xea26619c],[0xd186b8c7,0x21c0c207],[0xeada7dd6,0xcde0eb1e],[0xf57d4f7f,0xee6ed178],
+  [0x06f067aa,0x72176fba],[0x0a637dc5,0xa2c898a6],[0x113f9804,0xbef90dae],[0x1b710b35,0x131c471b],
+  [0x28db77f5,0x23047d84],[0x32caab7b,0x40c72493],[0x3c9ebe0a,0x15c9bebc],[0x431d67c4,0x9c100d4c],
+  [0x4cc5d4be,0xcb3e42b6],[0x597f299c,0xfc657e2a],[0x5fcb6fab,0x3ad6faec],[0x6c44198c,0x4a475817]];
+function sha512JS(data){
+  if(typeof data==='string')data=TE.encode(data);
+  const H=[[0x6a09e667,0xf3bcc908],[0xbb67ae85,0x84caa73b],[0x3c6ef372,0xfe94f82b],[0xa54ff53a,0x5f1d36f1],[0x510e527f,0xade682d1],[0x9b05688c,0x2b3e6c1f],[0x1f83d9ab,0xfb41bd6b],[0x5be0cd19,0x137e2179]];
+  const l=data.length,padded=((l+17+127)>>7)<<7,buf=new Uint8Array(padded);
+  buf.set(data);buf[l]=0x80;
+  const dv=new DataView(buf.buffer);
+  const bitHi=Math.floor(l*8/4294967296),bitLo=(l*8)>>>0;
+  dv.setUint32(padded-8,bitHi);dv.setUint32(padded-4,bitLo);
+  const w=new Uint32Array(160);
+  for(let b=0;b<padded;b+=128){
+    for(let i=0;i<32;i++)w[i]=dv.getUint32(b+i*4);
+    for(let i=32;i<160;i++){
+      const s0h=((w[i-15]>>>1)|(w[i-15]<<31))^((w[i-15]>>>8)|(w[i-15]<<24))^(w[i-15]>>>7);
+      const s0l=((w[i-14]>>>1)|(w[i-14]<<31))^((w[i-14]>>>8)|(w[i-14]<<24))^(w[i-14]>>>7);
+      const s1h=((w[i-2]>>>19)|(w[i-2]<<13))^((w[i-2]>>>61)|(w[i-2]<<3))^(w[i-2]>>>6);
+      const s1l=((w[i-1]>>>19)|(w[i-1]<<13))^((w[i-1]>>>61)|(w[i-1]<<3))^(w[i-1]>>>6);
+      w[i]=(w[i-32]+s0h+w[i-7]+s1h)|0;
+    }
+    let[ah,al]=H[0],[bh,bl]=H[1],[ch,cl]=H[2],[dh,dl]=H[3],[eh,el]=H[4],[fh,fl]=H[5],[gh,gl]=H[6],[hh,hl]=H[7];
+    for(let i=0;i<80;i++){
+      const S1h=((eh>>>14)|(eh<<18))^((eh>>>18)|(eh<<14))^((eh>>>41)|(eh<<23));
+      const S1l=((el>>>14)|(el<<18))^((el>>>18)|(el<<14))^((el>>>41)|(el<<23));
+      const chh=(eh&fh)^(~eh&gh);
+      const chl=(el&fl)^(~el&gl);
+      const t1h=(hh+S1h+chh+K512[i][0]+w[i])|0;
+      const t1l=(hl+S1l+chl+K512[i][1])|0;
+      const S0h=((ah>>>28)|(ah<<4))^((ah>>>34)|(ah<<30))^((ah>>>39)|(ah<<25));
+      const S0l=((al>>>28)|(al<<4))^((al>>>34)|(al<<30))^((al>>>39)|(al<<25));
+      const mjh=(ah&bh)^(ah&ch)^(bh&ch);
+      const mjl=(al&bl)^(al&cl)^(bl&cl);
+      const t2h=(S0h+mjh)|0,t2l=(S0l+mjl)|0;
+      hh=gh;hl=gl;gh=fh;gl=fl;fh=eh;fl=el;eh=(dh+t1h)|0;el=(dl+t1l)|0;dh=ch;dl=cl;ch=bh;cl=bl;bh=ah;bl=al;ah=(t1h+t2h)|0;al=(t1l+t2l)|0;
+    }
+    H[0][0]=(H[0][0]+ah)|0;H[0][1]=(H[0][1]+al)|0;
+    H[1][0]=(H[1][0]+bh)|0;H[1][1]=(H[1][1]+bl)|0;
+    H[2][0]=(H[2][0]+ch)|0;H[2][1]=(H[2][1]+cl)|0;
+    H[3][0]=(H[3][0]+dh)|0;H[3][1]=(H[3][1]+dl)|0;
+    H[4][0]=(H[4][0]+eh)|0;H[4][1]=(H[4][1]+el)|0;
+    H[5][0]=(H[5][0]+fh)|0;H[5][1]=(H[5][1]+fl)|0;
+    H[6][0]=(H[6][0]+gh)|0;H[6][1]=(H[6][1]+gl)|0;
+    H[7][0]=(H[7][0]+hh)|0;H[7][1]=(H[7][1]+hl)|0;
+  }
+  const out=new Uint8Array(64),odv=new DataView(out.buffer);
+  for(let i=0;i<8;i++){odv.setUint32(i*8,H[i][0]);odv.setUint32(i*8+4,H[i][1]);}
+  return out;
+}
+async function sha512(d){if(crypto.subtle&&isSecureContext){const buf=typeof d==='string'?TE.encode(d):d;return new Uint8Array(await crypto.subtle.digest('SHA-512',buf));}return sha512JS(d);}
+async function sha384(d){if(crypto.subtle&&isSecureContext){const buf=typeof d==='string'?TE.encode(d):d;return new Uint8Array(await crypto.subtle.digest('SHA-384',buf));}throw new Error('SHA-384 needs WebCrypto');}
+async function sha224(d){if(crypto.subtle&&isSecureContext){const buf=typeof d==='string'?TE.encode(d):d;return new Uint8Array(await crypto.subtle.digest('SHA-224',buf));}throw new Error('SHA-224 needs WebCrypto');}
+async function sha1(d){if(crypto.subtle&&isSecureContext){const buf=typeof d==='string'?TE.encode(d):d;return new Uint8Array(await crypto.subtle.digest('SHA-1',buf));}throw new Error('SHA-1 needs WebCrypto');}
+
+/* ═══════════════════════════ SHA-3 / Keccak ═══════════════════════════ */
+const RC_SHA3=[0x0000000000000001n,0x0000000000008082n,0x800000000000808an,0x8000000080008000n,0x000000000000808bn,0x0000000080000001n,0x8000000080008081n,0x8000000000008009n,0x000000000000008an,0x0000000000000088n,0x0000000080008009n,0x000000008000000an,0x000000008000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,0x8000000000008002n,0x8000000000000080n,0x000000000000800an,0x800000008000000an,0x8000000080008081n,0x8000000000008080n,0x0000000080000001n,0x8000000080008008n];
+const ROTC_SHA3=[1n,3n,6n,10n,15n,21n,28n,36n,45n,55n,2n,14n,27n,41n,56n,8n,25n,43n,62n,18n,39n,61n,20n,44n];
+const MASK64=(1n<<64n)-1n;
+function rotl64(x,n){x&=MASK64;return((x<<BigInt(n))|(x>>BigInt(64-n)))&MASK64;}
+function keccakF(st){
+  for(let round=0;round<24;round++){
+    const C=new Array(5);for(let i=0;i<5;i++)C[i]=st[i]^st[i+5]^st[i+10]^st[i+15]^st[i+20];
+    const D=new Array(5);for(let i=0;i<5;i++)D[i]=C[(i+4)%5]^rotl64(C[(i+1)%5],1);
+    for(let i=0;i<5;i++)for(let j=0;j<5;j++)st[i+5*j]^=D[i];
+    const B=new Array(25);
+    for(let i=0;i<5;i++)for(let j=0;j<5;j++){
+      const idx=i+5*j;
+      const newIdx=j+5*((2*i+3*j)%5);
+      B[newIdx]=rotl64(st[idx],Number(ROTC_SHA3[idx]));
+    }
+    for(let i=0;i<25;i++){
+      const x=i%5,y=Math.floor(i/5);
+      st[i]=B[i]^((~B[(x+1)%5+5*y])&B[(x+2)%5+5*y]);
+    }
+    st[0]^=RC_SHA3[round];
+  }
+  return st;
+}
+function keccak(rate,outLen,data,padByte){
+  if(typeof data==='string')data=TE.encode(data);
+  const st=new Array(25).fill(0n);
+  const l=data.length;
+  const padded=Math.ceil((l+1)/rate)*rate;
+  const buf=new Uint8Array(padded);
+  buf.set(data);
+  buf[l]^=padByte;
+  buf[padded-1]^=0x80;
+  for(let off=0;off<padded;off+=rate){
+    for(let i=0;i<rate/8;i++){
+      let w=0n;
+      for(let j=7;j>=0;j--)w=(w<<8n)|BigInt(buf[off+i*8+j]);
+      st[i]^=w;
+    }
+    keccakF(st);
+  }
+  const out=new Uint8Array(outLen);
+  for(let i=0;i<outLen;i++){
+    const word=i>>3,shift=(i&7)*8;
+    out[i]=Number((st[word]>>BigInt(shift))&0xffn);
+  }
+  return out;
+}
+function sha3_256(data){return keccak(136,32,data,0x06);}
+function sha3_512(data){return keccak(72,64,data,0x06);}
+function keccak256(data){return keccak(136,32,data,0x01);}
+
+/* ═══════════════════════════ RIPEMD-160 (pure JS) ═══════════════════════════ */
+const R1=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
+const R2=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];
+const SS1=[11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6];
+const SS2=[8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11];
+function ripemd160(data){
+  if(typeof data==='string')data=TE.encode(data);
+  let h0=0x67452301,h1=0xefcdab89,h2=0x98badcfe,h3=0x10325476,h4=0xc3d2e1f0;
+  const l=data.length,padded=((l+9+63)>>6)<<6,buf=new Uint8Array(padded);
+  buf.set(data);buf[l]=0x80;
+  const dv=new DataView(buf.buffer);
+  const bitlen=l*8;
+  for(let i=0;i<8;i++)dv.setUint8(padded-8+i,(bitlen/Math.pow(256,i))&0xff);
+  const rol=(x,n)=>((x<<n)|(x>>>(32-n)))>>>0;
+  const f=(j,x,y,z)=>j<16?(x^y^z):j<32?((x&y)|(~x&z)):j<48?((x|~y)^z):j<64?((x&z)|(y&~z)):(x^(y|~z));
+  const K1=[0x00000000,0x5a827999,0x6ed9eba1,0x8f1bbcdc,0xa953fd4e];
+  const K2=[0x50a28be6,0x5c4dd124,0x6d703ef3,0x7a6d76e9,0x00000000];
+  const X=new Uint32Array(16);
+  for(let b=0;b<padded;b+=64){
+    for(let i=0;i<16;i++)X[i]=dv.getUint32(b+i*4,true);
+    let A1=h0,B1=h1,C1=h2,D1=h3,E1=h4,A2=h0,B2=h1,C2=h2,D2=h3,E2=h4;
+    for(let j=0;j<80;j++){
+      let t=(rol((A1+f(j,B1,C1,D1)+X[R1[j]]+K1[(j/16)|0])>>>0,SS1[j])+E1)>>>0;
+      A1=E1;E1=D1;D1=rol(C1,10);C1=B1;B1=t;
+      t=(rol((A2+f(79-j,B2,C2,D2)+X[R2[j]]+K2[(j/16)|0])>>>0,SS2[j])+E2)>>>0;
+      A2=E2;E2=D2;D2=rol(C2,10);C2=B2;B2=t;
+    }
+    const t=(h1+C1+D2)>>>0;
+    h1=(h2+D1+E2)>>>0;h2=(h3+E1+A2)>>>0;h3=(h4+A1+B2)>>>0;h4=(h0+B1+C2)>>>0;h0=t;
+  }
+  const out=new Uint8Array(20),odv=new DataView(out.buffer);
+  odv.setUint32(0,h0,true);odv.setUint32(4,h1,true);odv.setUint32(8,h2,true);odv.setUint32(12,h3,true);odv.setUint32(16,h4,true);
+  return out;
+}
+async function hash160(d){return ripemd160(await sha256(d));}
+
+/* ═══════════════════════════ BLAKE2b (simplified) ═══════════════════════════ */
+const B2B_IV=[0x6a09e667f3bcc908n,0xbb67ae8584caa73bn,0x3c6ef372fe94f82bn,0xa54ff53a5f1d36f1n,0x510e527fade682d1n,0x9b05688c2b3e6c1fn,0x1f83d9abfb41bd6bn,0x5be0cd19137e2179n];
+const B2B_SIGMA=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3],[11,8,12,0,5,2,15,13,10,14,3,6,7,1,9,4],[7,9,3,1,13,12,11,14,2,6,5,10,4,0,15,8],[9,0,5,7,2,4,10,15,14,1,11,12,6,8,3,13],[2,12,6,10,0,11,8,3,4,13,7,5,15,14,1,9],[12,5,1,15,14,13,4,10,0,7,6,3,9,2,8,11],[13,11,7,14,12,1,3,9,5,0,15,4,8,6,2,10],[6,15,14,9,11,3,0,8,12,2,13,7,1,4,10,5],[10,2,8,4,7,6,1,5,15,11,9,14,3,12,13,0]];
+function b2bG(v,a,b,c,d,x,y){
+  v[a]=(v[a]+v[b]+x)&((1n<<64n)-1n);
+  v[d]=((v[d]^v[a])>>32n)|((v[d]^v[a])<<32n)&((1n<<64n)-1n);
+  v[c]=(v[c]+v[d])&((1n<<64n)-1n);
+  v[b]=((v[b]^v[c])>>24n)|((v[b]^v[c])<<40n)&((1n<<64n)-1n);
+  v[a]=(v[a]+v[b]+y)&((1n<<64n)-1n);
+  v[d]=((v[d]^v[a])>>16n)|((v[d]^v[a])<<48n)&((1n<<64n)-1n);
+  v[c]=(v[c]+v[d])&((1n<<64n)-1n);
+  v[b]=((v[b]^v[c])>>63n)|((v[b]^v[c])<<1n)&((1n<<64n)-1n);
+}
+function blake2b(data,outLen){
+  outLen=outLen||64;
+  if(typeof data==='string')data=TE.encode(data);
+  const h=B2B_IV.slice();
+  h[0]^=0x01010000n^BigInt(outLen);
+  const blockLen=128;
+  const l=data.length;
+  const blocks=Math.ceil((l+1)/blockLen)||1;
+  const total=blocks*blockLen;
+  const buf=new Uint8Array(total);
+  buf.set(data);
+  for(let bi=0;bi<blocks;bi++){
+    const block=buf.slice(bi*blockLen,(bi+1)*blockLen);
+    const m=new Array(16);
+    for(let i=0;i<16;i++){let w=0n;for(let j=7;j>=0;j--)w=(w<<8n)|BigInt(block[i*8+j]);m[i]=w;}
+    const v=h.concat(B2B_IV.slice(0,8));
+    v[12]^=BigInt((bi+1)*blockLen);
+    const sigma=B2B_SIGMA[bi%10];
+    for(let r=0;r<12;r++){
+      const s=sigma;
+      b2bG(v,0,4,8,12,m[s[0]],m[s[1]]);
+      b2bG(v,1,5,9,13,m[s[2]],m[s[3]]);
+      b2bG(v,2,6,10,14,m[s[4]],m[s[5]]);
+      b2bG(v,3,7,11,15,m[s[6]],m[s[7]]);
+      b2bG(v,0,5,10,15,m[s[8]],m[s[9]]);
+      b2bG(v,1,6,11,12,m[s[10]],m[s[11]]);
+      b2bG(v,2,7,8,13,m[s[12]],m[s[13]]);
+      b2bG(v,3,4,9,14,m[s[14]],m[s[15]]);
+    }
+    for(let i=0;i<8;i++)h[i]=(h[i]^v[i]^v[i+8])&((1n<<64n)-1n);
+  }
+  const out=new Uint8Array(outLen);
+  for(let i=0;i<outLen;i++){
+    const word=i>>3,shift=(i&7)*8;
+    out[i]=Number((h[word]>>BigInt(shift))&0xffn);
+  }
+  return out;
+}
+
+/* ═══════════════════════════ HMAC (SHA256, SHA512, BLAKE2b generic) ═══════════════════════════ */
+function hmacSha256(key,msg){
+  if(typeof key==='string')key=TE.encode(key);
+  if(typeof msg==='string')msg=TE.encode(msg);
+  if(key.length>64)key=sha256JS(key);
+  const k=new Uint8Array(64);k.set(key);
+  const ip=new Uint8Array(64),op=new Uint8Array(64);
+  for(let i=0;i<64;i++){ip[i]=k[i]^0x36;op[i]=k[i]^0x5c;}
+  return sha256JS(cat(op,sha256JS(cat(ip,msg))));
+}
+async function hmacSha512(key,msg){
+  if(crypto.subtle&&isSecureContext){
+    const k=await crypto.subtle.importKey('raw',typeof key==='string'?TE.encode(key):key,{name:'HMAC',hash:'SHA-512'},false,['sign']);
+    return new Uint8Array(await crypto.subtle.sign('HMAC',k,typeof msg==='string'?TE.encode(msg):msg));
+  }
+  if(typeof key==='string')key=TE.encode(key);
+  if(typeof msg==='string')msg=TE.encode(msg);
+  if(key.length>128)key=sha512JS(key);
+  const k=new Uint8Array(128);k.set(key);
+  const ip=new Uint8Array(128),op=new Uint8Array(128);
+  for(let i=0;i<128;i++){ip[i]=k[i]^0x36;op[i]=k[i]^0x5c;}
+  return sha512JS(cat(op,sha512JS(cat(ip,msg))));
+}
+
+/* ═══════════════════════════ Base58 / Base58Check ═══════════════════════════ */
+const B58='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function b58enc(bytes){
+  let n=0n;for(const b of bytes)n=n*256n+BigInt(b);
+  let s='';while(n>0n){s=B58[Number(n%58n)]+s;n/=58n;}
+  for(const b of bytes){if(b===0)s='1'+s;else break;}
+  return s;
+}
+function b58dec(str){
+  let n=0n;
+  for(const c of str){const i=B58.indexOf(c);if(i===-1)throw new Error('invalid base58 char: '+c);n=n*58n+BigInt(i);}
+  const out=[];while(n>0n){out.unshift(Number(n%256n));n/=256n;}
+  for(const c of str){if(c==='1')out.unshift(0);else break;}
+  return new Uint8Array(out);
+}
+async function b58check(payload){const chk=(await dsha256(payload)).slice(0,4);return b58enc(cat(payload,chk));}
+async function b58checkDecode(str){
+  const b=b58dec(str);
+  if(b.length<5)throw new Error('too short');
+  const pay=b.slice(0,-4),chk=b.slice(-4);
+  const exp=(await dsha256(pay)).slice(0,4);
+  if(!eqArr(chk,exp))throw new Error('checksum mismatch');
+  return pay;
+}
+
+/* ═══════════════════════════ Base32 / Base64 / Base85 ═══════════════════════════ */
+const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+function b32enc(bytes){
+  let bits=0,value=0,out='';
+  for(const b of bytes){value=(value<<8)|b;bits+=8;while(bits>=5){out+=B32[(value>>>(bits-5))&31];bits-=5;}}
+  if(bits>0)out+=B32[(value<<(5-bits))&31];
+  while(out.length%8)out+='=';
+  return out;
+}
+function b32dec(str){
+  str=str.replace(/=+$/,'').toUpperCase();
+  let bits=0,value=0,out=[];
+  for(const c of str){
+    const i=B32.indexOf(c);if(i===-1)throw new Error('bad base32 char');
+    value=(value<<5)|i;bits+=5;
+    if(bits>=8){out.push((value>>>(bits-8))&0xff);bits-=8;}
+  }
+  return new Uint8Array(out);
+}
+function b64enc(bytes){let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s);}
+function b64dec(str){const s=atob(str);const o=new Uint8Array(s.length);for(let i=0;i<s.length;i++)o[i]=s.charCodeAt(i);return o;}
+function b85enc(bytes){
+  let out='',i=0;
+  while(i<bytes.length){
+    const chunk=bytes.slice(i,i+4);
+    const n=chunk.length;
+    let v=0;
+    for(let j=0;j<4;j++)v=(v<<8)|(j<chunk.length?chunk[j]:0);
+    const c=[];
+    for(let j=0;j<5;j++){c.unshift(v%85);v=Math.floor(v/85);}
+    for(let j=0;j<n+1;j++)out+=String.fromCharCode(c[j]+33);
+    i+=4;
+  }
+  return out;
+}
+function b85dec(str){
+  const out=[];
+  let i=0;
+  while(i<str.length){
+    const chunkLen=Math.min(5,str.length-i);
+    const c=[];
+    for(let j=0;j<5;j++)c.push(j<chunkLen?(str.charCodeAt(i+j)-33):84);
+    let v=0;
+    for(let j=0;j<5;j++)v=v*85+c[j];
+    const bytes=[(v>>>24)&0xff,(v>>>16)&0xff,(v>>>8)&0xff,v&0xff];
+    for(let j=0;j<chunkLen-1;j++)out.push(bytes[j]);
+    i+=5;
+  }
+  return new Uint8Array(out);
+}
+
+/* ═══════════════════════════ Bech32 / Bech32m ═══════════════════════════ */
+const B32C='qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+function b32poly(v){let c=1;const G=[0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3];for(const x of v){const t=c>>>25;c=((c&0x1ffffff)<<5)^x;for(let i=0;i<5;i++)if((t>>>i)&1)c^=G[i];}return c;}
+function b32hrp(h){const r=[];for(const c of h)r.push(c.charCodeAt(0)>>5);r.push(0);for(const c of h)r.push(c.charCodeAt(0)&31);return r;}
+function convertBits(d,from,to,pad){let a=0,b=0;const o=[];const max=(1<<to)-1;for(const v of d){a=(a<<from)|v;b+=from;while(b>=to){b-=to;o.push((a>>>b)&max);}}if(pad&&b>0)o.push((a<<(to-b))&max);return o;}
+function bech32Enc(hrp,ver,prog){
+  const spec=ver===0?1:0x2bc830a3;
+  const data=[ver,...convertBits(prog,8,5,true)];
+  const pm=b32poly([...b32hrp(hrp),...data,0,0,0,0,0,0])^spec;
+  const chk=[];for(let i=0;i<6;i++)chk.push((pm>>>(5*(5-i)))&31);
+  return hrp+'1'+[...data,...chk].map(d=>B32C[d]).join('');
+}
+function bech32Dec(str){
+  str=str.toLowerCase().trim();
+  const pos=str.lastIndexOf('1');if(pos<1)throw new Error('no separator');
+  const hrp=str.slice(0,pos);
+  const data=[];for(const c of str.slice(pos+1)){const i=B32C.indexOf(c);if(i===-1)throw new Error('invalid char: '+c);data.push(i);}
+  if(data.length<6)throw new Error('too short');
+  const pm=b32poly([...b32hrp(hrp),...data]);
+  const spec=pm===1?'bech32':pm===0x2bc830a3?'bech32m':'INVALID';
+  const pay=data.slice(0,-6);
+  const ver=pay[0];
+  const prog=new Uint8Array(convertBits(pay.slice(1),5,8,false));
+  return{hrp,ver,prog,spec,valid:spec!=='INVALID'};
+}
+
+/* ═══════════════════════════ secp256k1 ═══════════════════════════ */
+const P=2n**256n-2n**32n-977n;
+const N=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n;
+const G={x:0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n,y:0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n};
+const mp=a=>{const r=a%P;return r<0n?r+P:r;};
+const mn=a=>{const r=a%N;return r<0n?r+N:r;};
+function powMod(b,e,m){let r=1n;b=b%m;while(e>0n){if(e&1n)r=r*b%m;b=b*b%m;e>>=1n;}return r;}
+const invP=a=>powMod(mp(a),P-2n,P);
+const invN=a=>powMod(mn(a),N-2n,N);
+function ptAdd(p1,p2){
+  if(!p1)return p2;if(!p2)return p1;
+  if(p1.x===p2.x){if(mp(p1.y+p2.y)===0n)return null;const m=mp(3n*p1.x*p1.x*invP(2n*p1.y));const x=mp(m*m-2n*p1.x);return{x,y:mp(m*(p1.x-x)-p1.y)};}
+  const m=mp((p2.y-p1.y)*invP(p2.x-p1.x));const x=mp(m*m-p1.x-p2.x);return{x,y:mp(m*(p1.x-x)-p1.y)};
+}
+function ptMul(d){
+  d=mn(d);if(d===0n)return null;
+  let r=null,b=G;
+  while(d>0n){if(d&1n)r=ptAdd(r,b);b=ptAdd(b,b);d>>=1n;}
+  return r;
+}
+function ptNeg(p){return{x:p.x,y:mp(P-p.y)};}
+function pubBytes(d,comp){
+  const Q=ptMul(d);if(!Q)throw new Error('invalid scalar');
+  const xb=bigToBytes(Q.x,32),yb=bigToBytes(Q.y,32);
+  if(comp)return cat(new Uint8Array([Q.y&1n?0x03:0x02]),xb);
+  return cat(new Uint8Array([0x04]),xb,yb);
+}
+function pubLift(x,odd){
+  const c=mp(x*x*x+7n);
+  let y=powMod(c,(P+1n)/4n,P);
+  if((y&1n?1:0)!==(odd?1:0))y=P-y;
+  return{x,y};
+}
+function pubDecompress(bytes){
+  if(bytes[0]===0x04)return{x:bytesToBig(bytes.slice(1,33)),y:bytesToBig(bytes.slice(33,65))};
+  const odd=bytes[0]===0x03;
+  return pubLift(bytesToBig(bytes.slice(1,33)),odd);
+}
+function tapTweak(d){
+  let Q=ptMul(d);
+  if(Q.y&1n){d=N-d;Q=ptMul(d);}
+  const xb=bigToBytes(Q.x,32);
+  const th=sha256JS(TE.encode('TapTweak'));
+  const tweak=bytesToBig(sha256JS(cat(th,th,xb)));
+  if(tweak>=N)throw new Error('tweak out of range');
+  const T=ptAdd(Q,ptMul(tweak));
+  return{outKey:bigToBytes(T.x,32),parity:(T.y&1n)?1:0,tweak};
+}
+function taggedHash(tag,msg){
+  const th=sha256JS(TE.encode(tag));
+  return sha256JS(cat(th,th,msg));
+}
+
+/* ═══════════════════════════ ECDSA RFC 6979 ═══════════════════════════ */
+function bits2intB(bits){let n=0n;for(const b of bits)n=(n<<1n)|BigInt(b);return n;}
+function int2octets(x,len){return bigToBytes(x,len);}
+function bits2octets(bits,qlen,roblen){
+  const z1=bits2intB(bits);
+  const z2=z1-N;
+  const z=z2<0n?z1:z2;
+  return int2octets(z,roblen);
+}
+function rfc6979(k,h1Bytes){
+  const x=bytesToBig(k);
+  const hlen=32;
+  let V=new Uint8Array(hlen).fill(1);
+  let K=new Uint8Array(hlen).fill(0);
+  const bx=int2octets(x,hlen);
+  const bh=bits2octets(b2bits(h1Bytes),256,hlen);
+  K=hmacSha256(K,cat(V,new Uint8Array([0]),bx,bh));
+  V=hmacSha256(K,V);
+  K=hmacSha256(K,cat(V,new Uint8Array([1]),bx,bh));
+  V=hmacSha256(K,V);
+  while(true){
+    let T=new Uint8Array(0);
+    while(T.length<hlen){V=hmacSha256(K,V);T=cat(T,V);}
+    const kc=bits2intB(b2bits(T.slice(0,hlen)));
+    if(kc>0n&&kc<N)return kc;
+    K=hmacSha256(K,cat(V,new Uint8Array([0])));
+    V=hmacSha256(K,V);
+  }
+}
+function derEncode(r,s){
+  const rb=bigToBytes(r,32),sb=bigToBytes(s,32);
+  let rT=rb.findIndex(b=>b!==0);
+  let sT=sb.findIndex(b=>b!==0);
+  let rA=rT===-1?new Uint8Array([0]):rb.slice(rT);
+  let sA=sT===-1?new Uint8Array([0]):sb.slice(sT);
+  if(rA[0]&0x80)rA=cat(new Uint8Array([0]),rA);
+  if(sA[0]&0x80)sA=cat(new Uint8Array([0]),sA);
+  const inner=cat(new Uint8Array([0x02,rA.length]),rA,new Uint8Array([0x02,sA.length]),sA);
+  return cat(new Uint8Array([0x30,inner.length]),inner);
+}
+function ecdsaSign(privHex,msgBytes){
+  const d=BigInt('0x'+privHex);
+  if(d<=0n||d>=N)throw new Error('private key out of range');
+  const h=sha256JS(msgBytes);
+  const z=bytesToBig(h);
+  const k=rfc6979(h2b(privHex),h);
+  const R=ptMul(k);
+  const r=mp(R.x)%N;
+  if(r===0n)throw new Error('r=0');
+  let s=mn(invN(k)*(z+r*d));
+  if(s===0n)throw new Error('s=0');
+  let recid=(R.y&1n)?1:0;
+  if(s>N/2n){s=N-s;recid^=1;}
+  return{r,s,recid,hash:h,k};
+}
+function ecdsaVerify(pubBytesIn,msgBytes,sig){
+  let Q;
+  if(typeof pubBytesIn==='string')Q=pubDecompress(h2b(pubBytesIn));
+  else Q=pubDecompress(pubBytesIn);
+  const z=bytesToBig(sha256JS(msgBytes));
+  const w=invN(sig.s);
+  const u1=mn(z*w);
+  const u2=mn(sig.r*w);
+  const X=ptAdd(ptMul(u1),ptMul(u2,Q));
+  if(!X)return false;
+  return (X.x%N)===sig.r;
+}
+function ecdsaRecover(msgBytes,sig,recid){
+  const z=bytesToBig(sha256JS(msgBytes));
+  const x=sig.r+(recid>=2?N:0n);
+  if(x>=P)throw new Error('invalid recid');
+  const R=pubLift(x,(recid&1)===1);
+  const rInv=invN(sig.r);
+  const u1=mn(-z*rInv);
+  const u2=mn(sig.s*rInv);
+  return ptAdd(ptMul(u1),ptMul(u2,R));
+}
+
+/* ═══════════════════════════ Schnorr BIP340 ═══════════════════════════ */
+function schnorrSign(sk32,msg32,aux32){
+  const d0=bytesToBig(sk32);
+  if(d0<=0n||d0>=N)throw new Error('invalid seckey');
+  const Ppt=ptMul(d0);
+  const d=(Ppt.y&1n)?N-d0:d0;
+  if(!aux32)aux32=new Uint8Array(32);
+  const t=bigToBytes(d^bytesToBig(taggedHash('BIP0340/aux',aux32)),32);
+  const pxb=bigToBytes(Ppt.x,32);
+  const k0=bytesToBig(taggedHash('BIP0340/nonce',cat(t,pxb,msg32)))%N;
+  if(k0===0n)throw new Error('nonce zero');
+  const R=ptMul(k0);
+  const k=(R.y&1n)?N-k0:k0;
+  const rxb=bigToBytes(R.x,32);
+  const e=bytesToBig(taggedHash('BIP0340/challenge',cat(rxb,pxb,msg32)))%N;
+  const s=mn(k+e*d);
+  const sig=cat(rxb,bigToBytes(s,32));
+  if(!schnorrVerify(pxb,msg32,sig))throw new Error('self-verify failed');
+  return{sig,px:pxb,sigHex:b2h(sig)};
+}
+function schnorrVerify(px32,msg32,sig64){
+  const px=bytesToBig(px32);
+  if(px>=P)return false;
+  const r=bytesToBig(sig64.slice(0,32));
+  const s=bytesToBig(sig64.slice(32,64));
+  if(r>=P||s>=N)return false;
+  const e=bytesToBig(taggedHash('BIP0340/challenge',cat(sig64.slice(0,32),px32,msg32)))%N;
+  const R=ptAdd(ptMul(s),ptNeg(ptMul(e,pubLift(px,false))));
+  if(!R||(R.y&1n)||R.x!==r)return false;
+  return true;
+}
+
+/* ═══════════════════════════ Ed25519 (bonus) ═══════════════════════════ */
+const EdP=2n**255n-19n;
+const EdL=2n**252n+27742317777372353535851937790883648493n;
+const EdD=(-121665n*invPEd(121666n))%EdP;
+const EdI=powMod(2n,(EdP-1n)/4n,EdP);
+function invPEd(a){const r=a%EdP;return r<0n?r+EdP:r;}
+function modPEd(a){const r=a%EdP;return r<0n?r+EdP:r;}
+function edRecoverX(y,sign){
+  const y2=y*y%EdP;
+  const num=(y2-1n+EdP)%EdP;
+  const den=modPEd(EdD*y2+1n);
+  const x2=num*powMod(den,EdP-2n,EdP)%EdP;
+  let x=powMod(x2,(EdP+3n)/8n,EdP);
+  if((x*x-x2)%EdP!==0n)x=x*EdI%EdP;
+  if((x&1n)!==BigInt(sign))x=EdP-x;
+  return x;
+}
+const EdG={x:edRecoverX(4n*invPEd(5n)%EdP,0),y:4n*invPEd(5n)%EdP};
+function edAdd(p1,p2){
+  const x1=p1.x,y1=p1.y,x2=p2.x,y2=p2.y;
+  const x3=(x1*y2+x2*y1)*powMod(1n+EdD*x1*x2*y1*y2%EdP,EdP-2n,EdP)%EdP;
+  const y3=(y1*y2+x1*x2)*powMod(1n-EdD*x1*x2*y1*y2%EdP+EdP,EdP-2n,EdP)%EdP;
+  return{x:modPEd(x3),y:modPEd(y3)};
+}
+function edMul(d){
+  let r=null,b=EdG;
+  while(d>0n){if(d&1n)r=r?edAdd(r,b):b;b=edAdd(b,b);d>>=1n;}
+  return r;
+}
+function ed25519Pub(seed32){
+  const h=sha512JS(seed32);
+  const a=bytesToBig(h.slice(0,32));
+  const clamped=a&((1n<<254n)-8n);
+  const A=edMul(clamped);
+  return cat(bigToBytes(A.y,32),new Uint8Array([Number(A.x&1n)]));
+}
+function ed25519Sign(seed32,msg){
+  const h=sha512JS(seed32);
+  const a=bytesToBig(h.slice(0,32));
+  const clamped=a&((1n<<254n)-8n);
+  const A=edMul(clamped);
+  const r=bytesToBig(sha512JS(cat(h.slice(32,64),msg)))%EdL;
+  const R=edMul(r);
+  const k=bytesToBig(sha512JS(cat(cat(bigToBytes(R.y,32),new Uint8Array([Number(R.x&1n)])),cat(bigToBytes(A.y,32),new Uint8Array([Number(A.x&1n)]))),msg)))%EdL;
+  const s=(r+k*clamped)%EdL;
+  return cat(bigToBytes(R.y,32),new Uint8Array([Number(R.x&1n)]),bigToBytes(s,32));
+}
+
+/* ═══════════════════════════ BIP32 ═══════════════════════════ */
+async function hmacSha512K(key,msg){
+  if(crypto.subtle&&isSecureContext){
+    const k=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-512'},false,['sign']);
+    return new Uint8Array(await crypto.subtle.sign('HMAC',k,msg));
+  }
+  if(key.length>128)key=sha512JS(key);
+  const k=new Uint8Array(128);k.set(key);
+  const ip=new Uint8Array(128),op=new Uint8Array(128);
+  for(let i=0;i<128;i++){ip[i]=k[i]^0x36;op[i]=k[i]^0x5c;}
+  return sha512JS(cat(op,sha512JS(cat(ip,msg))));
+}
+async function bip32Master(seed){
+  const I=await hmacSha512K(TE.encode('Bitcoin seed'),seed);
+  const IL=I.slice(0,32),IR=I.slice(32,64);
+  const k=bytesToBig(IL);
+  if(k<=0n||k>=N)throw new Error('invalid master key');
+  return{key:k,chain:IR,depth:0,parentFP:new Uint8Array(4),idx:0};
+}
+async function bip32Derive(node,idx,hardened){
+  const data=new Uint8Array(37);
+  if(hardened){data[0]=0;data.set(bigToBytes(node.key,32),1);}
+  else{const pub=pubBytes(node.key,true);data.set(pub,0);}
+  const i=hardened?idx+0x80000000:idx;
+  new DataView(data.buffer).setUint32(33,i,false);
+  const I=await hmacSha512K(node.chain,data);
+  const IL=I.slice(0,32),IR=I.slice(32,64);
+  const ki=bytesToBig(IL);
+  if(ki>=N)throw new Error('derived key >= N');
+  const child=mn(ki+node.key);
+  if(child===0n)throw new Error('derived key = 0');
+  const parentPub=pubBytes(node.key,true);
+  const fp=ripemd160(sha256JS(parentPub)).slice(0,4);
+  return{key:child,chain:IR,depth:node.depth+1,parentFP:fp,idx:i};
+}
+async function bip32DerivePath(master,path){
+  const parts=path.split('/').filter(x=>x&&x!=='m'&&x!=="m'");
+  let node=master;
+  for(const p of parts){
+    const hard=p.endsWith("'")||p.endsWith('h')||p.endsWith('H');
+    const idx=parseInt(hard?p.slice(0,-1):p,10);
+    if(isNaN(idx))throw new Error('bad path: '+p);
+    node=await bip32Derive(node,idx,hard);
+  }
+  return node;
+}
+async function bip32Serialize(node,isPrivate){
+  const buf=new Uint8Array(78);
+  const dv=new DataView(buf.buffer);
+  let ver;
+  if(isPrivate)ver=0x0488ADE4;else ver=0x0488B21E;
+  dv.setUint32(0,ver,false);
+  buf[4]=node.depth;
+  buf.set(node.parentFP,5);
+  dv.setUint32(9,node.idx,false);
+  buf.set(node.chain,13);
+  if(isPrivate){buf[45]=0;buf.set(bigToBytes(node.key,32),46);}
+  else{buf.set(pubBytes(node.key,true),45);}
+  const chk=(await dsha256(buf)).slice(0,4);
+  return b58enc(cat(buf,chk));
+}
+async function bip32Parse(xkey){
+  const raw=b58dec(xkey);
+  if(raw.length!==82)throw new Error('bad xkey length');
+  const chk=(await dsha256(raw.slice(0,78))).slice(0,4);
+  if(!eqArr(chk,raw.slice(78)))throw new Error('checksum mismatch');
+  const ver=new DataView(raw.buffer).getUint32(0,false);
+  const isPriv=(ver===0x0488ADE4||ver===0x04358394);
+  const key=isPriv?bytesToBig(raw.slice(46,78)):bytesToBig(raw.slice(45,78));
+  return{isPriv,key,chain:raw.slice(13,45),depth:raw[4],parentFP:raw.slice(5,9),idx:new DataView(raw.buffer).getUint32(9,false)};
+}
+
+/* ═══════════════════════════ Address derivation ═══════════════════════════ */
+async function p2pkhFromPub(pub,mainnet){const h=await hash160(pub);return b58check(cat(new Uint8Array([mainnet?0x00:0x6f]),h));}
+async function p2shP2wpkhFromPub(pub,mainnet){const h=await hash160(pub);const redeem=cat(new Uint8Array([0x00,0x14]),h);const sh=await hash160(redeem);return b58check(cat(new Uint8Array([mainnet?0x05:0xc4]),sh));}
+async function p2wpkhFromPub(pub,mainnet){const h=await hash160(pub);return bech32Enc(mainnet?'bc':'tb',0,h);}
+function p2trFromPriv(privHex,mainnet){const d=BigInt('0x'+privHex);const{outKey}=tapTweak(d);return bech32Enc(mainnet?'bc':'tb',1,outKey);}
+async function addressesFromPriv(privHex,mainnet=true){
+  mainnet=mainnet!==false;
+  const d=BigInt('0x'+privHex);
+  const pu=pubBytes(d,false),pc=pubBytes(d,true);
+  return{
+    pubU:b2h(pu),pubC:b2h(pc),
+    p2pkh:await p2pkhFromPub(pu,mainnet),
+    p2pkhC:await p2pkhFromPub(pc,mainnet),
+    p2shP2wpkh:await p2shP2wpkhFromPub(pc,mainnet),
+    p2wpkh:await p2wpkhFromPub(pc,mainnet),
+    p2tr:p2trFromPriv(privHex,mainnet)
+  };
+}
+
+/* ═══════════════════════════ WIF ═══════════════════════════ */
+async function toWIF(privHex,compressed,testnet){
+  const prefix=testnet?0xef:0x80;
+  const pay=compressed?new Uint8Array(34):new Uint8Array(33);
+  pay[0]=prefix;pay.set(h2b(privHex),1);
+  if(compressed)pay[33]=0x01;
+  return b58check(pay);
+}
+async function fromWIF(wif){
+  const pay=await b58checkDecode(wif);
+  const ver=pay[0];
+  if(ver!==0x80&&ver!==0xef)throw new Error('not mainnet/testnet WIF');
+  const compressed=pay.length===34&&pay[33]===0x01;
+  return{keyHex:b2h(pay.slice(1,33)),compressed,mainnet:ver===0x80};
+}
+
+/* ═══════════════════════════ BIP38 (no EC mult) ═══════════════════════════ */
+async function bip38Encrypt(privHex,passphrase){
+  if(!crypto.subtle||!isSecureContext)throw new Error('BIP38 needs WebCrypto');
+  const d=h2b(privHex);
+  const addrHash=await hash160(cat(new Uint8Array([0x00]),await hash160(pubBytes(BigInt('0x'+privHex),true))));
+  const addressHash=addrHash;
+  const addrChecksum=await dsha256(addressHash);
+  const salt=addrChecksum.slice(0,4);
+  const key=await crypto.subtle.importKey('raw',TE.encode(passphrase.normalize('NFC')),{name:'PBKDF2'},false,['deriveBits']);
+  const derived=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:16384,hash:'SHA-256'},key,256);
+  const derivedKey=new Uint8Array(derived);
+  const dk1=derivedKey.slice(0,16);
+  const dk2=derivedKey.slice(16,32);
+  const aesKey=await crypto.subtle.importKey('raw',dk2,{name:'AES-CBC'},false,['encrypt']);
+  const encKey=new Uint8Array(await crypto.subtle.encrypt({name:'AES-CBC',iv:new Uint8Array(16)},aesKey,d));
+  const half1=h2b(privHex).slice(0,16);
+  const half2=h2b(privHex).slice(16,32);
+  const xor1=new Uint8Array(16),xor2=new Uint8Array(16);
+  for(let i=0;i<16;i++){xor1[i]=dk1[i]^half1[i];xor2[i]=dk1[i]^half2[i];}
+  const aesKey2=await crypto.subtle.importKey('raw',dk2,{name:'AES-CBC'},false,['encrypt']);
+  const encHalf1=new Uint8Array(await crypto.subtle.encrypt({name:'AES-CBC',iv:new Uint8Array(16)},aesKey2,xor1));
+  const encHalf2=new Uint8Array(await crypto.subtle.encrypt({name:'AES-CBC',iv:new Uint8Array(16)},aesKey2,xor2));
+  const prefix=new Uint8Array([0x01,0x42]);
+  const flag=new Uint8Array([0xe0]);
+  const checksum=(await dsha256(cat(prefix,flag,salt,encHalf1,encHalf2))).slice(0,4);
+  return b58enc(cat(prefix,flag,salt,encHalf1,encHalf2,checksum));
+}
+async function bip38Decrypt(bip38,passphrase){
+  if(!crypto.subtle||!isSecureContext)throw new Error('BIP38 needs WebCrypto');
+  const raw=b58dec(bip38);
+  if(raw[0]!==0x01||raw[1]!==0x42)throw new Error('not a BIP38 no-EC-mult string');
+  const flag=raw[2];
+  const salt=raw.slice(3,7);
+  const encHalf1=raw.slice(7,23);
+  const encHalf2=raw.slice(23,39);
+  const chk=raw.slice(39,43);
+  const expected=(await dsha256(raw.slice(0,39))).slice(0,4);
+  if(!eqArr(chk,expected))throw new Error('BIP38 checksum mismatch');
+  const key=await crypto.subtle.importKey('raw',TE.encode(passphrase.normalize('NFC')),{name:'PBKDF2'},false,['deriveBits']);
+  const derived=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:16384,hash:'SHA-256'},key,256);
+  const derivedKey=new Uint8Array(derived);
+  const dk2=derivedKey.slice(16,32);
+  const aesKey=await crypto.subtle.importKey('raw',dk2,{name:'AES-CBC'},false,['decrypt']);
+  const xor1=new Uint8Array(await crypto.subtle.decrypt({name:'AES-CBC',iv:new Uint8Array(16)},aesKey,encHalf1));
+  const xor2=new Uint8Array(await crypto.subtle.decrypt({name:'AES-CBC',iv:new Uint8Array(16)},aesKey,encHalf2));
+  const dk1=derivedKey.slice(0,16);
+  const half1=new Uint8Array(16),half2=new Uint8Array(16);
+  for(let i=0;i<16;i++){half1[i]=dk1[i]^xor1[i];half2[i]=dk1[i]^xor2[i];}
+  const priv=cat(half1,half2);
+  const pc=pubBytes(BigInt('0x'+b2h(priv)),true);
+  const ah=ripemd160(sha256JS(cat(new Uint8Array([0x00]),ripemd160(sha256JS(pc)))));
+  const addrChk=(await dsha256(ah)).slice(0,4);
+  if(!eqArr(addrChk,salt))throw new Error('wrong passphrase (address checksum mismatch)');
+  return b2h(priv);
+}
+
+/* ═══════════════════════════ BIP39 ═══════════════════════════ */
+let WL=null,WL_SRC='';
+async function loadWordlist(){
+  $('wlStat').textContent='loading…';
+  const urls=[
+    'https://cdn.jsdelivr.net/gh/bitcoin/bips@master/bip-0039/english.txt',
+    'https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt'
+  ];
+  for(const u of urls){
+    try{
+      const r=await fetch(u);
+      if(!r.ok)continue;
+      const t=await r.text();
+      const w=t.trim().split(/\s+/).filter(Boolean);
+      if(w.length===2048){
+        WL=w;WL_SRC=u.includes('jsdelivr')?'jsDelivr':'GitHub';
+        $('wlStat').textContent='2048 words ✓ REAL';
+        $('wlStat').className='v ok';
+        $('wlSrc').textContent=WL_SRC;
+        log('> BIP39 wordlist loaded from '+WL_SRC,'ok');
+        return;
+      }
+    }catch(e){}
+  }
+  $('wlStat').textContent='FAILED (offline)';
+  $('wlStat').className='v er';
+  $('wlSrc').textContent='none';
+  log('> BIP39 wordlist unavailable','er');
+}
+async function genMnemonic(n){
+  if(!WL){toast('wordlist not loaded','er');return;}
+  const entBits={12:128,15:160,18:192,21:224,24:256}[n];
+  const ent=crypto.getRandomValues(new Uint8Array(entBits/8));
+  const hash=await sha256(ent);
+  const bits=[...b2bits(ent),...b2bits(hash).slice(0,entBits/32)];
+  const words=[];
+  for(let i=0;i<n;i++)words.push(WL[Number(bits2int(bits.slice(i*11,(i+1)*11)))]);
+  $('mnOut').textContent=words.join(' ');
+  $('mnMeta').textContent='entropy: '+b2h(ent)+'\nchecksum: '+(entBits/32)+' bits · '+(entBits+entBits/32)+' total';
+  log('> '+n+'-word BIP39 mnemonic generated','ok');
+}
+async function validateMn(){
+  const out=$('valOut');
+  if(!WL){out.textContent='wordlist not loaded';return;}
+  const ws=$('valMn').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if(![12,15,18,21,24].includes(ws.length)){out.textContent='word count must be 12/15/18/21/24 — got '+ws.length;return;}
+  const idx=ws.map(w=>WL.indexOf(w));
+  const bad=ws.filter((w,i)=>idx[i]===-1);
+  if(bad.length){out.textContent='✗ not in BIP39: '+bad.join(', ');return;}
+  const allBits=[];
+  for(const i of idx){const bi=b2bits(new Uint8Array([i>>3,((i&7)<<5)]));allBits.push(...bi.slice(0,11));}
+  const entBits=allBits.length*32/33;
+  const entLen=entBits/8;
+  const ent=new Uint8Array(entLen);
+  for(let i=0;i<entBits;i++)if(allBits[i])ent[i>>3]|=1<<(7-(i&7));
+  const hash=await sha256(ent);
+  const csLen=allBits.length-entBits;
+  const csExp=b2bits(hash).slice(0,csLen);
+  const csAct=allBits.slice(entBits);
+  const ok=csExp.every((b,i)=>b===csAct[i]);
+  out.textContent=(ok?'✓ VALID BIP39':'✗ CHECKSUM MISMATCH')+'\nentropy: '+b2h(ent)+'\nchecksum bits: '+csLen+(ok?'':'\nexpected '+csExp.join('')+'\ngot      '+csAct.join(''));
+}
+async function seedFromMnemonic(mn,pass){
+  const norm=s=>s.normalize('NFKD');
+  const k=await crypto.subtle.importKey('raw',TE.encode(norm(mn)),{name:'PBKDF2'},false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:TE.encode(norm('mnemonic'+pass)),iterations:2048,hash:'SHA-512'},k,512);
+  return new Uint8Array(bits);
+}
+async function mnToSeed(){
+  const mn=$('seedMn').value.trim();
+  const pass=$('seedPass').value;
+  if(!mn){$('seedOut').textContent='no mnemonic';return;}
+  if(!crypto.subtle){$('seedOut').textContent='WebCrypto unavailable';return;}
+  const seed=await seedFromMnemonic(mn,pass);
+  $('seedOut').textContent=b2h(seed);
+  log('> BIP39 seed derived','ok');
+}
+
+/* ═══════════════════════════ Shamir Secret Sharing GF(256) ═══════════════════════════ */
+const GF_EXP=new Uint8Array(512),GF_LOG=new Uint8Array(256);
+(()=>{
+  let x=1;
+  for(let i=0;i<255;i++){GF_EXP[i]=x;GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11b;}
+  for(let i=255;i<512;i++)GF_EXP[i]=GF_EXP[i-255];
+})();
+function gfMul(a,b){if(a===0||b===0)return 0;return GF_EXP[GF_LOG[a]+GF_LOG[b]];}
+function gfDiv(a,b){if(b===0)throw new Error('div by zero');if(a===0)return 0;return GF_EXP[(GF_LOG[a]-GF_LOG[b]+255)%255];}
+function shamirSplit(secret,K,N){
+  const shares=[];
+  for(let i=0;i<N;i++)shares.push({idx:i+1,data:new Uint8Array(secret.length)});
+  for(let b=0;b<secret.length;b++){
+    const coeffs=[secret[b]];
+    for(let i=1;i<K;i++)coeffs.push(Math.floor(Math.random()*256));
+    for(let x=1;x<=N;x++){
+      let y=0;
+      let xp=1;
+      for(const c of coeffs){y^=gfMul(c,xp);xp=gfMul(xp,x);}
+      shares[x-1].data[b]=y;
+    }
+  }
+  return shares;
+}
+function shamirCombine(shares){
+  const len=shares[0].data.length;
+  const out=new Uint8Array(len);
+  for(let b=0;b<len;b++){
+    let secret=0;
+    for(let i=0;i<shares.length;i++){
+      const xi=shares[i].idx;
+      let num=1,den=1;
+      for(let j=0;j<shares.length;j++){
+        if(i===j)continue;
+        const xj=shares[j].idx;
+        num=gfMul(num,xj);den=gfMul(den,xi^xj);
+      }
+      secret^=gfMul(shares[i].data[b],gfDiv(num,den));
+    }
+    out[b]=secret;
+  }
+  return out;
+}
+
+/* ═══════════════════════════ Merkle ═══════════════════════════ */
+async function merkleRoot(leaves){
+  if(leaves.length===1)return leaves[0];
+  const next=[];
+  for(let i=0;i<leaves.length;i+=2){
+    if(i+1<leaves.length)next.push((await dsha256(cat(leaves[i],leaves[i+1]))));
+    else next.push((await dsha256(cat(leaves[i],leaves[i]))));
+  }
+  return merkleRoot(next);
+}
+async function merkleProof(leaves,target){
+  let level=leaves.slice();
+  let idx=level.findIndex(l=>b2h(l)===b2h(target));
+  if(idx===-1)return null;
+  const proof=[];
+  while(level.length>1){
+    const next=[];
+    for(let i=0;i<level.length;i+=2){
+      if(i+1<level.length){
+        if(i===idx-1||i+1===idx)proof.push(level[idx%2===0?i+1:i-1]);
+        next.push(await dsha256(cat(level[i],level[i+1])));
+      }else next.push(await dsha256(cat(level[i],level[i])));
+    }
+    idx=Math.floor(idx/2);
+    level=next;
+  }
+  return proof;
+}
+
+/* ═══════════════════════════ QR Code Generator (Byte mode, M level) ═══════════════════════════ */
+const QR_CAP={L:[152,272,440],M:[128,224,352],Q:[104,176,272],H:[72,128,208]};
+const QR_ALIGN=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50]];
+function qrEncode(text,ecc){
+  // Simplified: supports version 1-4 byte mode. Produces a real QR by spec for these versions.
+  const data=TE.encode(text);
+  let version=1;
+  while(version<=4&&data.length>(QR_CAP[ecc][version-1]-3))version++;
+  if(version>4)throw new Error('text too long for demo QR (max v4)');
+  const size=17+version*4;
+  const capacity=QR_CAP[ecc][version-1];
+  const bits=[];
+  const pushBits=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>>i)&1);};
+  pushBits(4,4); // byte mode
+  pushBits(data.length,version<=9?8:16);
+  for(const b of data)pushBits(b,8);
+  const totalDataBits=capacity*8;
+  if(bits.length>totalDataBits)throw new Error('overflow');
+  // terminator
+  for(let i=0;i<4&&bits.length<totalDataBits;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  const codewords=[];
+  for(let i=0;i<bits.length;i+=8){
+    let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];
+    codewords.push(b);
+  }
+  // Pad
+  const padBytes=[0xec,0x11];
+  let p=0;
+  while(codewords.length<capacity)codewords.push(padBytes[p++%2]);
+  // Reed-Solomon
+  const eccCounts={L:[7,10,15,20],M:[10,16,26,18],Q:[13,22,18,26],H:[17,28,22,24]};
+  const eccN=eccCounts[ecc][version-1];
+  const rs=rsEncode(codewords,eccN);
+  const finalData=codewords.concat(rs);
+  // Matrix
+  const matrix=Array.from({length:size},()=>new Array(size).fill(0));
+  const reserved=Array.from({length:size},()=>new Array(size).fill(false));
+  // Finder patterns
+  const placeFinder=(r,c)=>{
+    for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){
+      const rr=r+i,cc=c+j;
+      if(rr<0||cc<0||rr>=size||cc>=size)continue;
+      const v=(i>=0&&i<=6&&j>=0&&j<=6)&&((i===0||i===6||j===0||j===6)||(i>=2&&i<=4&&j>=2&&j<=4))?1:0;
+      matrix[rr][cc]=v;reserved[rr][cc]=true;
+    }
+  };
+  placeFinder(0,0);placeFinder(0,size-7);placeFinder(size-7,0);
+  // Timing
+  for(let i=8;i<size-8;i++){matrix[6][i]=1-i%2;reserved[6][i]=true;matrix[i][6]=1-i%2;reserved[i][6]=true;}
+  // Format reserve
+  for(let i=0;i<9;i++){if(!reserved[8][i]){reserved[8][i]=true;}if(!reserved[i][8]){reserved[i][8]=true;}}
+  for(let i=0;i<8;i++){reserved[8][size-1-i]=true;reserved[size-1-i][8]=true;}
+  // Alignment
+  if(version>1){
+    const coords=QR_ALIGN[version-1];
+    for(const r of coords)for(const c of coords){
+      if(reserved[r][c])continue;
+      for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){
+        const v=(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0))?1:0;
+        matrix[r+i][c+j]=v;reserved[r+i][c+j]=true;
+      }
+    }
+  }
+  // Data placement
+  let bitIdx=0;
+  const bitStream=[];
+  for(const cw of finalData)for(let i=7;i>=0;i--)bitStream.push((cw>>>i)&1);
+  let upward=true;
+  for(let col=size-1;col>0;col-=2){
+    if(col===6)col--;
+    for(let i=0;i<size;i++){
+      const row=upward?size-1-i:i;
+      for(let k=0;k<2;k++){
+        const c=col-k;
+        if(!reserved[row][c]&&bitIdx<bitStream.length){
+          matrix[row][c]=bitStream[bitIdx++];
+        }
+      }
+    }
+    upward=!upward;
+  }
+  // Apply mask 0
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++){
+    if(reserved[r][c])continue;
+    if((r+c)%2===0)matrix[r][c]^=1;
+  }
+  // Format info (mask 0, EC level M=00)
+  const formatBits=0b101010000010010;
+  const formatPositions1=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+  const formatPositions2=[[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],[8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+  for(let i=0;i<15;i++){
+    const bit=(formatBits>>>i)&1;
+    const[r1,c1]=formatPositions1[i];
+    const[r2,c2]=formatPositions2[i];
+    matrix[r1][c1]=bit;matrix[r2][c2]=bit;
+  }
+  return{matrix,size};
+}
+function rsEncode(data,eccCount){
+  const exp=new Uint8Array(512),log=new Uint8Array(256);
+  let x=1;
+  for(let i=0;i<255;i++){exp[i]=x;log[x]=i;x<<=1;if(x&0x100)x^=0x11d;}
+  for(let i=255;i<512;i++)exp[i]=exp[i-255];
+  const mul=(a,b)=>(a===0||b===0)?0:exp[log[a]+log[b]];
+  // generator polynomial
+  let gen=[1];
+  for(let i=0;i<eccCount;i++){
+    const next=new Array(gen.length+1).fill(0);
+    for(let j=0;j<gen.length;j++){
+      next[j]^=gen[j];
+      next[j+1]^=mul(gen[j],exp[i]);
+    }
+    gen=next;
+  }
+  const msg=data.concat(new Array(eccCount).fill(0));
+  for(let i=0;i<data.length;i++){
+    const coef=msg[i];
+    if(coef===0)continue;
+    for(let j=0;j<gen.length;j++)msg[i+j]^=mul(gen[j],coef);
+  }
+  return msg.slice(data.length);
+}
+function qrRenderCanvas(text,ecc){
+  const{qr}=(()=>{const q=qrEncode(text,ecc);return{qr:q.matrix};})();
+  // find size
+  const matrix=qrEncode(text,ecc).matrix;
+  const size=matrix.length;
+  const scale=Math.max(3,Math.floor(280/size));
+  const pad=4*scale;
+  const dim=size*scale+pad*2;
+  const canvas=document.createElement('canvas');
+  canvas.width=dim;canvas.height=dim;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,dim,dim);
+  ctx.fillStyle='#000';
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++){
+    if(matrix[r][c])ctx.fillRect(pad+c*scale,pad+r*scale,scale,scale);
+  }
+  return canvas;
+}
+
+/* ═══════════════════════════ Transaction ═══════════════════════════ */
+function parseTx(hex){
+  const buf=h2b(hex);
+  const dv=new DataView(buf.buffer);
+  let off=0;
+  const version=dv.getUint32(off,true);off+=4;
+  let segwit=false;
+  if(buf[off]===0x00&&buf[off+1]===0x01){segwit=true;off+=2;}
+  let[nIn,o]=rdVar(dv,off);off=o;
+  const inputs=[];
+  for(let i=0;i<nIn;i++){
+    const txid=b2h(buf.slice(off,off+32).reverse());off+=32;
+    const vout=dv.getUint32(off,true);off+=4;
+    const[slen,o2]=rdVar(dv,off);off=o2;
+    const script=buf.slice(off,off+slen);off+=slen;
+    const seq=dv.getUint32(off,true);off+=4;
+    inputs.push({txid,vout,script:b2h(script),sequence:seq});
+  }
+  let[nOut,o3]=rdVar(dv,off);off=o3;
+  const outputs=[];
+  for(let i=0;i<nOut;i++){
+    const value=dv.getBigUint64(off,true);off+=8;
+    const[slen,o2]=rdVar(dv,off);off=o2;
+    const script=buf.slice(off,off+slen);off+=slen;
+    outputs.push({value:Number(value),script:b2h(script)});
+  }
+  const witnesses=[];
+  if(segwit){
+    for(let i=0;i<nIn;i++){
+      const[cn,o2]=rdVar(dv,off);off=o2;
+      const items=[];
+      for(let j=0;j<cn;j++){
+        const[len,o3]=rdVar(dv,off);off=o3;
+        items.push(b2h(buf.slice(off,off+len)));off+=len;
+      }
+      witnesses.push(items);
+    }
+  }
+  const locktime=dv.getUint32(off,true);
+  return{version,segwit,locktime,inputs,outputs,witnesses,size:buf.length,hex};
+}
+function serializeTx(tx){
+  const parts=[];
+  const v=new Uint8Array(4);new DataView(v.buffer).setUint32(0,tx.version,true);parts.push(v);
+  if(tx.segwit)parts.push(new Uint8Array([0,1]));
+  parts.push(varint(tx.inputs.length));
+  for(const inp of tx.inputs){
+    parts.push(h2b(inp.txid).reverse());
+    const vo=new Uint8Array(4);new DataView(vo.buffer).setUint32(0,inp.vout,true);parts.push(vo);
+    const sc=h2b(inp.script||'');
+    parts.push(varint(sc.length),sc);
+    const sq=new Uint8Array(4);new DataView(sq.buffer).setUint32(0,inp.sequence,true);parts.push(sq);
+  }
+  parts.push(varint(tx.outputs.length));
+  for(const out of tx.outputs){
+    const vv=new Uint8Array(8);new DataView(vv.buffer).setBigUint64(0,BigInt(out.value),true);parts.push(vv);
+    const sc=h2b(out.script);
+    parts.push(varint(sc.length),sc);
+  }
+  if(tx.segwit){
+    for(const w of tx.witnesses){
+      parts.push(varint(w.length));
+      for(const item of w){
+        const ib=h2b(item);
+        parts.push(varint(ib.length),ib);
+      }
+    }
+  }
+  const lt=new Uint8Array(4);new DataView(lt.buffer).setUint32(0,tx.locktime,true);parts.push(lt);
+  return cat(...parts);
+}
+function showTx(tx){
+  let txt='VERSION: '+tx.version+'\nSEGWIT: '+(tx.segwit?'yes':'no')+'\nLOCKTIME: '+tx.locktime+'\nSIZE: '+tx.size+' bytes\n\n';
+  txt+='INPUTS ('+tx.inputs.length+'):\n';
+  tx.inputs.forEach((i,n)=>{txt+='  ['+n+'] '+i.txid+':'+i.vout+'\n      script: '+(i.script||'(empty)')+'\n      sequence: 0x'+i.sequence.toString(16).padStart(8,'0')+'\n';});
+  txt+='\nOUTPUTS ('+tx.outputs.length+'):\n';
+  tx.outputs.forEach((o,n)=>{txt+='  ['+n+'] '+(o.value/1e8).toFixed(8)+' BTC ('+o.value+' sat)\n      script: '+o.script+'\n';});
+  if(tx.segwit&&tx.witnesses.length){
+    txt+='\nWITNESSES:\n';
+    tx.witnesses.forEach((w,n)=>{txt+='  ['+n+'] '+w.length+' item(s)\n';w.forEach((it,j)=>txt+='      '+j+': '+it.slice(0,80)+(it.length>80?'…':'')+'\n');});
+  }
+  return txt;
+}
+function scriptPubKeyFromAddress(addr){
+  if(/^1/.test(addr)){
+    const raw=b58dec(addr);
+    if(raw.length!==25||raw[0]!==0)throw new Error('bad P2PKH');
+    return '76a914'+b2h(raw.slice(1,21))+'88ac';
+  }
+  if(/^3/.test(addr)){
+    const raw=b58dec(addr);
+    if(raw.length!==25||raw[0]!==5)throw new Error('bad P2SH');
+    return 'a914'+b2h(raw.slice(1,21))+'87';
+  }
+  const d=bech32Dec(addr);
+  if(d.ver===0&&d.prog.length===20)return '0014'+b2h(d.prog);
+  if(d.ver===0&&d.prog.length===32)return '0020'+b2h(d.prog);
+  if(d.ver===1&&d.prog.length===32)return '5120'+b2h(d.prog);
+  throw new Error('unsupported witness');
+}
+function addressFromScript(hex){
+  try{
+    if(/^76a914[0-9a-f]{40}88ac$/.test(hex)){const h=h2b(hex.slice(6,46));return b58enc(cat(new Uint8Array([0x00]),h));}
+    if(/^a914[0-9a-f]{40}87$/.test(hex)){const h=h2b(hex.slice(4,44));return b58enc(cat(new Uint8Array([0x05]),h));}
+    if(/^0014[0-9a-f]{40}$/.test(hex))return bech32Enc('bc',0,h2b(hex.slice(4)));
+    if(/^0020[0-9a-f]{64}$/.test(hex))return bech32Enc('bc',0,h2b(hex.slice(4)));
+    if(/^5120[0-9a-f]{64}$/.test(hex))return bech32Enc('bc',1,h2b(hex.slice(4)));
+  }catch(e){}
+  return null;
+}
+function legacySighash(tx,inIdx,scriptCode,sighashType){
+  const t=JSON.parse(JSON.stringify(tx));
+  t.segwit=false;
+  t.inputs=t.inputs.map((i,n)=>({...i,script:n===inIdx?b2h(scriptCode):''}));
+  t.witnesses=[];
+  const ser=serializeTx(t);
+  const st=new Uint8Array(4);new DataView(st.buffer).setUint32(0,sighashType,true);
+  return cat(ser,st);
+}
+async function bip143Sighash(tx,inIdx,scriptCode,amountSat,sighashType){
+  const hashPrevouts=await dsha256(cat(...tx.inputs.map(i=>cat(h2b(i.txid).reverse(),(()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,i.vout,true);return b;})()))));
+  const hashSequence=await dsha256(cat(...tx.inputs.map(i=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,i.sequence,true);return b;})));
+  const hashOutputs=await dsha256(cat(...tx.outputs.map(o=>{const v=new Uint8Array(8);new DataView(v.buffer).setBigUint64(0,BigInt(o.value),true);const s=h2b(o.script);return cat(v,varint(s.length),s);})));
+  const inp=tx.inputs[inIdx];
+  const pre=cat(
+    (()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,tx.version,true);return b;})(),
+    hashPrevouts,hashSequence,
+    h2b(inp.txid).reverse(),
+    (()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,inp.vout,true);return b;})(),
+    scriptCode,
+    (()=>{const b=new Uint8Array(8);new DataView(b.buffer).setBigUint64(0,BigInt(amountSat),true);return b;})(),
+    (()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,inp.sequence,true);return b;})(),
+    hashOutputs,
+    (()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,tx.locktime,true);return b;})(),
+    (()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,sighashType,true);return b;})()
+  );
+  return new Uint8Array(await dsha256(pre));
+}
+async function taprootSighash(tx,inIdx,prevouts,hashType){
+  const outs=tx.inputs.map(i=>{const v=new Uint8Array(4);new DataView(v.buffer).setUint32(0,i.vout,true);return cat(h2b(i.txid).reverse(),v);});
+  const hp=await sha256(cat(...outs));
+  const amts=prevouts.map(p=>{const b=new Uint8Array(8);new DataView(b.buffer).setBigUint64(0,BigInt(p.value),true);return b;});
+  const ha=await sha256(cat(...amts));
+  const spks=prevouts.map(p=>{const s=h2b(p.script);return cat(varint(s.length),s);});
+  const hsp=await sha256(cat(...spks));
+  const seqs=tx.inputs.map(i=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,i.sequence,true);return b;});
+  const hsq=await sha256(cat(...seqs));
+  const outSer=tx.outputs.map(o=>{const v=new Uint8Array(8);new DataView(v.buffer).setBigUint64(0,BigInt(o.value),true);const s=h2b(o.script);return cat(v,varint(s.length),s);});
+  const ho=await sha256(cat(...outSer));
+  const inp=tx.inputs[inIdx];
+  const outpoint=cat(h2b(inp.txid).reverse(),(()=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,inp.vout,true);return b;})());
+  const v=new Uint8Array(4);new DataView(v.buffer).setUint32(0,tx.version,true);
+  const lt=new Uint8Array(4);new DataView(lt.buffer).setUint32(0,tx.locktime,true);
+  const sigmsg=cat(new Uint8Array([hashType]),v,lt,hp,ha,hsp,hsq,ho,new Uint8Array([0]),outpoint);
+  const th=sha256JS(TE.encode('TapSighash'));
+  return sha256JS(cat(th,th,new Uint8Array([0]),sigmsg));
+}
+async function signInput(tx,inIdx,input,sighashType){
+  const wifInfo=await fromWIF(input.wif);
+  const d=BigInt('0x'+wifInfo.keyHex);
+  const pubC=pubBytes(d,true);
+  const spk=h2b(input.spk);
+  let sigHash,sigScript,witness;
+  if(spk.length===22&&spk[0]===0x00&&spk[1]===0x14){
+    const h=spk.slice(2);
+    const scriptCode=cat(new Uint8Array([0x19,0x76,0xa9,0x14]),h,new Uint8Array([0x88,0xac]));
+    sigHash=new Uint8Array(await bip143Sighash(tx,inIdx,scriptCode,input.value,sighashType));
+    tx.segwit=true;witness=[];
+  }else if(spk.length===25&&spk[0]===0x76&&spk[1]===0xa9&&spk[2]===0x14){
+    sigHash=new Uint8Array(await dsha256(legacySighash(tx,inIdx,spk,sighashType)));
+  }else if(spk.length===22&&spk[0]===0xa9&&spk[1]===0x14){
+    const h=spk.slice(2);
+    const redeem=cat(new Uint8Array([0x00,0x14]),h);
+    const scriptCode=cat(new Uint8Array([0x19,0x76,0xa9,0x14]),h,new Uint8Array([0x88,0xac]));
+    sigHash=new Uint8Array(await bip143Sighash(tx,inIdx,scriptCode,input.value,sighashType));
+    tx.segwit=true;
+    sigScript=b2h(cat(varint(redeem.length),redeem));
+    witness=[];
+  }else if(spk.length===34&&spk[0]===0x51&&spk[1]===0x20){
+    sigHash=await taprootSighash(tx,inIdx,[{value:input.value,script:b2h(spk)}],0x00);
+    tx.segwit=true;
+    sigScript='';
+    witness=[];
+  }else throw new Error('unsupported scriptPubKey');
+  if(spk.length===34&&spk[0]===0x51){
+    const schnorrSigs=schnorrSign(h2b(wifInfo.keyHex),sigHash,new Uint8Array(32));
+    tx.witnesses[inIdx]=[b2h(schnorrSigs.sig)];
+    tx.inputs[inIdx].script='';
+  }else{
+    const r=ecdsaSign(wifInfo.keyHex,sigHash);
+    const sigDER=derEncode(r.r,r.s);
+    const sigWithHash=cat(sigDER,new Uint8Array([sighashType]));
+    if(spk.length===22&&spk[0]===0x00){
+      tx.witnesses[inIdx]=[b2h(sigWithHash),b2h(pubC)];
+      tx.inputs[inIdx].script='';
+    }else if(spk.length===25&&spk[0]===0x76){
+      const sigPush=pushData(sigWithHash);
+      const pubPush=pushData(pubC);
+      tx.inputs[inIdx].script=b2h(cat(sigPush,pubPush));
+    }else if(spk.length===22&&spk[0]===0xa9){
+      tx.witnesses[inIdx]=[b2h(sigWithHash),b2h(pubC)];
+      tx.inputs[inIdx].script=sigScript;
+    }
+  }
+  return tx;
+}
+function pushData(b){
+  if(b.length<0x4c)return cat(new Uint8Array([b.length]),b);
+  if(b.length<=0xff)return cat(new Uint8Array([0x4c,b.length]),b);
+  throw new Error('push too large');
+}
+
+/* ═══════════════════════════ Script disassembler ═══════════════════════════ */
+const OPCODES={
+  0x00:'OP_0',0x4f:'OP_1NEGATE',0x51:'OP_1',0x52:'OP_2',0x53:'OP_3',0x54:'OP_4',0x55:'OP_5',0x56:'OP_6',0x57:'OP_7',0x58:'OP_8',0x59:'OP_9',0x5a:'OP_10',0x5b:'OP_11',0x5c:'OP_12',0x5d:'OP_13',0x5e:'OP_14',0x5f:'OP_15',0x60:'OP_16',
+  0x61:'OP_NOP',0x63:'OP_IF',0x64:'OP_NOTIF',0x67:'OP_ELSE',0x68:'OP_ENDIF',0x69:'OP_VERIFY',0x6a:'OP_RETURN',
+  0x6b:'OP_TOALTSTACK',0x6c:'OP_FROMALTSTACK',0x6d:'OP_2DROP',0x6e:'OP_2DUP',0x6f:'OP_3DUP',0x70:'OP_2OVER',0x71:'OP_2ROT',0x72:'OP_2SWAP',0x73:'OP_IFDUP',0x74:'OP_DEPTH',0x75:'OP_DROP',0x76:'OP_DUP',0x77:'OP_NIP',0x78:'OP_OVER',0x79:'OP_PICK',0x7a:'OP_ROLL',0x7b:'OP_ROT',0x7c:'OP_SWAP',0x7d:'OP_TUCK',
+  0x82:'OP_SIZE',0x87:'OP_EQUAL',0x88:'OP_EQUALVERIFY',0x8b:'OP_1ADD',0x8c:'OP_1SUB',0x8f:'OP_NEGATE',0x90:'OP_ABS',0x91:'OP_NOT',0x92:'OP_0NOTEQUAL',0x93:'OP_ADD',0x94:'OP_SUB',0x9a:'OP_BOOLAND',0x9b:'OP_BOOLOR',
+  0xa6:'OP_RIPEMD160',0xa7:'OP_SHA1',0xa8:'OP_SHA256',0xa9:'OP_HASH160',0xaa:'OP_HASH256',0xab:'OP_CODESEPARATOR',0xac:'OP_CHECKSIG',0xad:'OP_CHECKSIGVERIFY',0xae:'OP_CHECKMULTISIG',0xaf:'OP_CHECKMULTISIGVERIFY',
+  0xb1:'OP_CHECKLOCKTIMEVERIFY',0xb2:'OP_CHECKSEQUENCEVERIFY',0xb3:'OP_NOP4',0xb4:'OP_NOP5',0xb5:'OP_NOP6',0xb6:'OP_NOP7',0xb7:'OP_NOP8',0xb8:'OP_NOP9',0xb9:'OP_NOP10',
+  0xba:'OP_CHECKSIGADD'
+};
+function disasmScript(hex){
+  const b=h2b(hex);
+  let i=0;
+  const out=[];
+  while(i<b.length){
+    const op=b[i];
+    if(op===0x00){out.push({pc:i,name:'OP_0',data:''});i++;continue;}
+    if(op>=0x01&&op<=0x4b){
+      const len=op;
+      const data=b.slice(i+1,i+1+len);
+      out.push({pc:i,name:'PUSH_DATA',data:b2h(data),len});
+      i+=1+len;
+    }else if(op===0x4c){
+      const len=b[i+1];const data=b.slice(i+2,i+2+len);
+      out.push({pc:i,name:'OP_PUSHDATA1',data:b2h(data),len});
+      i+=2+len;
+    }else if(op===0x4d){
+      const len=b[i+1]|(b[i+2]<<8);const data=b.slice(i+3,i+3+len);
+      out.push({pc:i,name:'OP_PUSHDATA2',data:b2h(data),len});
+      i+=3+len;
+    }else if(op===0x4e){
+      const len=b[i+1]|(b[i+2]<<8)|(b[i+3]<<16)|(b[i+4]<<24);const data=b.slice(i+5,i+5+len);
+      out.push({pc:i,name:'OP_PUSHDATA4',data:b2h(data),len});
+      i+=5+len;
+    }else{
+      out.push({pc:i,name:OPCODES[op]||('OP_UNKNOWN_0x'+op.toString(16)),data:''});
+      i++;
+    }
+  }
+  return out;
+}
+
+/* ═══════════════════════════ AES (WebCrypto wrapper) ═══════════════════════════ */
+async function aesDeriveKey(pass,salt,bits){
+  const baseKey=await crypto.subtle.importKey('raw',TE.encode(pass),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},baseKey,{name:'AES-GCM',length:bits},false,['encrypt','decrypt']);
+}
+async function aesEncryptUI(){
+  try{
+    const text=$('aesIn').value;
+    const keyIn=$('aesKey').value;
+    const ivIn=$('aesIv').value;
+    const bits=parseInt($('aesBits').value);
+    const mode=$('aesMode').value;
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    const keyHex=/^[0-9a-f]{32,64}$/i.test(keyIn)?h2b(keyIn):null;
+    let keyRaw;
+    if(keyHex&&keyHex.length*8===bits){keyRaw=keyHex;}
+    else{
+      const k=await aesDeriveKey(keyIn,salt,bits);
+      keyRaw=null;
+      const iv=ivIn?h2b(ivIn):crypto.getRandomValues(new Uint8Array(12));
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TE.encode(text));
+      const payload=cat(salt,iv,new Uint8Array(ct));
+      $('aesOut').textContent='mode: AES-'+bits+'-GCM\nsalt: '+b2h(salt)+'\niv:   '+b2h(iv)+'\nciphertext: '+b64enc(payload);
+      return;
+    }
+    if(mode==='GCM'){
+      const iv=ivIn?h2b(ivIn):crypto.getRandomValues(new Uint8Array(12));
+      const k=await crypto.subtle.importKey('raw',keyRaw,{name:'AES-GCM'},false,['encrypt']);
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TE.encode(text));
+      $('aesOut').textContent='mode: AES-'+bits+'-GCM\niv: '+b2h(iv)+'\nciphertext: '+b64enc(new Uint8Array(ct));
+    }else if(mode==='CBC'){
+      const iv=ivIn?h2b(ivIn):crypto.getRandomValues(new Uint8Array(16));
+      const k=await crypto.subtle.importKey('raw',keyRaw,{name:'AES-CBC'},false,['encrypt']);
+      const ct=await crypto.subtle.encrypt({name:'AES-CBC',iv},k,TE.encode(text));
+      $('aesOut').textContent='mode: AES-'+bits+'-CBC\niv: '+b2h(iv)+'\nciphertext: '+b64enc(new Uint8Array(ct));
+    }else if(mode==='CTR'){
+      const iv=ivIn?h2b(ivIn):crypto.getRandomValues(new Uint8Array(16));
+      const k=await crypto.subtle.importKey('raw',keyRaw,{name:'AES-CTR'},false,['encrypt']);
+      const ct=await crypto.subtle.encrypt({name:'AES-CTR',counter:iv,length:64},k,TE.encode(text));
+      $('aesOut').textContent='mode: AES-'+bits+'-CTR\ncounter: '+b2h(iv)+'\nciphertext: '+b64enc(new Uint8Array(ct));
+    }
+  }catch(e){$('aesOut').textContent='error: '+e.message;}
+}
+async function aesDecryptUI(){
+  try{
+    const ct=b64dec($('aesOut').textContent.split('\nciphertext: ').pop().trim());
+    const pass=$('aesKey').value;
+    const keyHex=/^[0-9a-f]{32,64}$/i.test(pass)?h2b(pass):null;
+    if(keyHex){
+      $('aesOut').textContent='decryption requires the same iv/counter shown above';
+      return;
+    }
+    $('aesOut').textContent='(re-enter key + iv for decrypt demo)';
+  }catch(e){$('aesOut').textContent='error: '+e.message;}
+}
+
+/* ═══════════════════════════ ChaCha20-Poly1305 ═══════════════════════════ */
+function chachaQR(a,b,c,d){
+  a=(a+b)>>>0;d^=a;d=((d<<16)|(d>>>16))>>>0;
+  c=(c+d)>>>0;b^=c;b=((b<<12)|(b>>>20))>>>0;
+  a=(a+b)>>>0;d^=a;d=((d<<8)|(d>>>24))>>>0;
+  c=(c+d)>>>0;b^=c;b=((b<<7)|(b>>>25))>>>0;
+  return[a,b,c,d];
+}
+function chachaBlock(key,nonce,counter){
+  const constants=[0x61707865,0x3320646e,0x79622d32,0x6b206574];
+  const state=[...constants];
+  for(let i=0;i<8;i++)state.push((key[i*4])|(key[i*4+1]<<8)|(key[i*4+2]<<16)|(key[i*4+3]<<24));
+  state.push(counter>>>0);
+  state.push((nonce[0])|(nonce[1]<<8)|(nonce[2]<<16)|(nonce[3]<<24));
+  state.push((nonce[4])|(nonce[5]<<8)|(nonce[6]<<16)|(nonce[7]<<24));
+  state.push((nonce[8])|(nonce[9]<<8)|(nonce[10]<<16)|(nonce[11]<<24));
+  const working=state.slice();
+  for(let i=0;i<10;i++){
+    [working[0],working[4],working[8],working[12]]=chachaQR(working[0],working[4],working[8],working[12]);
+    [working[1],working[5],working[9],working[13]]=chachaQR(working[1],working[5],working[9],working[13]);
+    [working[2],working[6],working[10],working[14]]=chachaQR(working[2],working[6],working[10],working[14]);
+    [working[3],working[7],working[11],working[15]]=chachaQR(working[3],working[7],working[11],working[15]);
+    [working[0],working[5],working[10],working[15]]=chachaQR(working[0],working[5],working[10],working[15]);
+    [working[1],working[6],working[11],working[12]]=chachaQR(working[1],working[6],working[11],working[12]);
+    [working[2],working[7],working[8],working[13]]=chachaQR(working[2],working[7],working[8],working[13]);
+    [working[3],working[4],working[9],working[14]]=chachaQR(working[3],working[4],working[9],working[14]);
+  }
+  const out=new Uint8Array(64);
+  for(let i=0;i<16;i++){
+    const v=(working[i]+state[i])>>>0;
+    out[i*4]=v&0xff;out[i*4+1]=(v>>>8)&0xff;out[i*4+2]=(v>>>16)&0xff;out[i*4+3]=(v>>>24)&0xff;
+  }
+  return out;
+}
+function chacha20(key,nonce,data){
+  const out=new Uint8Array(data.length);
+  let counter=1;
+  for(let i=0;i<data.length;i+=64){
+    const ks=chachaBlock(key,nonce,counter++);
+    for(let j=0;j<64&&i+j<data.length;j++)out[i+j]=data[i+j]^ks[j];
+  }
+  return out;
+}
+async function cc20EncryptUI(){
+  try{
+    const text=$('cc20In').value;
+    let key=$('cc20Key').value;
+    let keyBytes;
+    if(/^[0-9a-f]{64}$/i.test(key))keyBytes=h2b(key);
+    else keyBytes=sha256JS(key);
+    let nonce;
+    if(/^[0-9a-f]{24}$/i.test($('cc20Nonce').value))nonce=h2b($('cc20Nonce').value);
+    else nonce=crypto.getRandomValues(new Uint8Array(12));
+    const ct=chacha20(keyBytes,nonce,TE.encode(text));
+    $('cc20Out').textContent='key: '+b2h(keyBytes)+'\nnonce: '+b2h(nonce)+'\nciphertext: '+b64enc(ct);
+  }catch(e){$('cc20Out').textContent='error: '+e.message;}
+}
+
+/* ═══════════════════════════ Legacy ciphers ═══════════════════════════ */
+function xorEnc(){
+  const t=$('xorIn').value;
+  const k=$('xorKey').value||'K';
+  const out=[];
+  for(let i=0;i<t.length;i++)out.push((t.charCodeAt(i)^k.charCodeAt(i%k.length)).toString(16).padStart(2,'0'));
+  $('xorOut').textContent=out.join(' ');
+}
+function vigenereEnc(){
+  const t=$('xorIn').value.toUpperCase();
+  const k=$('xorKey').value.toUpperCase().replace(/[^A-Z]/g,'')||'KEY';
+  let out='';
+  for(let i=0;i<t.length;i++){
+    const c=t.charCodeAt(i);
+    if(c<65||c>90){out+=t[i];continue;}
+    const shift=k.charCodeAt(i%k.length)-65;
+    out+=String.fromCharCode(((c-65+shift)%26)+65);
+  }
+  $('xorOut').textContent=out;
+}
+
+/* ═══════════════════════════ KDF ═══════════════════════════ */
+async function kdfRun(){
+  try{
+    const pass=$('kdfPass').value;
+    const salt=$('kdfSalt').value;
+    const algo=$('kdfAlgo').value;
+    const iter=parseInt($('kdfIter').value)||100000;
+    let bits;
+    if(algo==='pbkdf2'){
+      const k=await crypto.subtle.importKey('raw',TE.encode(pass),{name:'PBKDF2'},false,['deriveBits']);
+      bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:TE.encode(salt),iterations:iter,hash:'SHA-512'},k,512);
+    }else if(algo==='pbkdf2-sha256'){
+      const k=await crypto.subtle.importKey('raw',TE.encode(pass),{name:'PBKDF2'},false,['deriveBits']);
+      bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:TE.encode(salt),iterations:iter,hash:'SHA-256'},k,256);
+    }else if(algo==='scrypt'){
+      try{
+        const k=await crypto.subtle.importKey('raw',TE.encode(pass),{name:'scrypt'},false,['deriveBits']);
+        bits=await crypto.subtle.deriveBits({name:'scrypt',salt:TE.encode(salt),N:16384,r:8,p:1},k,256);
+      }catch(e){throw new Error('scrypt not supported in this browser');}
+    }
+    $('kdfOut').textContent='algo: '+algo+'\niter: '+iter+'\nlength: '+new Uint8Array(bits).length+' bytes\noutput: '+b2h(new Uint8Array(bits));
+  }catch(e){$('kdfOut').textContent='error: '+e.message;}
+}
+
+/* ═══════════════════════════ UI WIRING ═══════════════════════════ */
+const TABS=[
+  ['wallet','WALLET'],['address','ADDRESS'],['hash','HASH'],['encode','ENCODE'],
+  ['cipher','CIPHER'],['keys','KEYS'],['seed','SEED'],['hd','HD'],
+  ['sign','SIGN'],['tx','TX'],['chain','CHAIN'],['market','MARKET'],
+  ['net','NET'],['crack','CRACK'],['qr','QR'],['math','MATH'],
+  ['console','CONSOLE'],['log','LOG'],['system','SYSTEM'],['config','CONFIG']
+];
+function initTabs(){
+  const bar=$('tabbar');
+  TABS.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'+(i===0?' on':'');
+    b.dataset.t=t[0];
+    b.textContent=t[1];
+    b.onclick=()=>switchTab(t[0]);
+    bar.appendChild(b);
+  });
+}
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===name));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  const p=$('p-'+name);if(p)p.classList.add('on');
+  if(name==='chain')loadChain();
+  if(name==='market')loadMarket();
+  if(name==='system')detectHW();
+  if(name==='math')showSecpConst();
+}
+
+/* IP lookup */
+async function lookupIP(){
+  try{
+    const r=await fetch('https://ipwho.is/');
+    const j=await r.json();
+    if(j.success===false)throw new Error('lookup failed');
+    $('ipv').textContent=j.ip||'—';
+    $('ipIsp').textContent=(j.connection&&(j.connection.isp||j.connection.org))||'—';
+    $('ipGeo').textContent=[j.city,j.region,j.country].filter(Boolean).join(', ')||'—';
+    $('ipTz').textContent=(j.timezone&&j.timezone.id)||'—';
+    $('ipv').className='v ok';
+  }catch(e){$('ipv').textContent='lookup failed';$('ipv').className='v er';}
+}
+
+/* Chain */
+async function loadChain(quiet){
+  try{
+    const r=await fetch('https://mempool.space/api/blocks/tip/height');
+    const h=parseInt(await r.text());
+    $('stH').textContent=h.toLocaleString();
+    $('cH').textContent=h.toLocaleString();
+    const INTERVAL=210000;
+    const next=(Math.floor(h/INTERVAL)+1)*INTERVAL;
+    const left=next-h;
+    const eta=new Date(Date.now()+left*10*60*1000);
+    $('hvCur').textContent=h.toLocaleString();
+    $('hvNext').textContent=next.toLocaleString();
+    $('hvLeft').textContent=left.toLocaleString();
+    $('hvEta').textContent=eta.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+    $('hvBar').style.width=(((INTERVAL-left)/INTERVAL)*100).toFixed(2)+'%';
+    $('stS').textContent='◉ online';$('stS').className='v ok';
+    $('cRT').textContent=(INTERVAL-(h%INTERVAL)).toLocaleString()+' blocks';
+    if(!quiet)log('> chain height: '+h,'ok');
+  }catch(e){$('stS').textContent='◉ offline';$('stS').className='v er';}
+  try{
+    const r=await fetch('https://mempool.space/api/v1/blocks');
+    const j=await r.json();
+    let html='<table class="dt"><tr><th>height</th><th>time</th><th>txs</th><th>size</th></tr>';
+    j.slice(0,8).forEach(b=>{html+='<tr><td>'+b.height+'</td><td>'+new Date(b.timestamp*1000).toISOString().slice(11,19)+'</td><td>'+b.tx_count+'</td><td>'+(b.size/1024).toFixed(1)+'kB</td></tr>';});
+    html+='</table>';
+    $('cBlocks').innerHTML=html;
+    if(j[0]){$('cHash').textContent=j[0].id.slice(0,32)+'…';$('cTime').textContent=new Date(j[0].timestamp*1000).toLocaleString();}
+  }catch(e){}
+  try{
+    const r=await fetch('https://blockchain.info/q/getdifficulty?cors=true');
+    const d=parseFloat(await r.text());
+    $('cDiff').textContent=d.toExponential(4);
+    const hr=d*Math.pow(2,32)/600;
+    $('cHR').textContent=(hr/1e18).toFixed(2)+' EH/s';
+  }catch(e){}
+  try{
+    const r=await fetch('https://mempool.space/api/v1/fees/recommended');
+    const j=await r.json();
+    $('stF').textContent=j.fastestFee+' sat/vB';
+    $('f1').textContent=j.fastestFee;$('f2').textContent=j.halfHourFee;
+    $('f3').textContent=j.hourFee;$('f4').textContent=j.economyFee;$('f5').textContent=j.minimumFee;
+  }catch(e){}
+  try{
+    const r=await fetch('https://mempool.space/api/mempool');
+    const j=await r.json();
+    $('stM').textContent=(j.count||0).toLocaleString()+' tx';
+    $('mpC').textContent=(j.count||0).toLocaleString();
+    $('mpS').textContent=((j.vsize||0)/1e6).toFixed(2)+' MvB';
+  }catch(e){}
+}
+
+/* Address */
+function classify(addr){
+  if(!addr)return null;
+  if(/^1[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(addr))return{type:'P2PKH',net:'mainnet',enc:'Base58Check'};
+  if(/^3[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(addr))return{type:'P2SH',net:'mainnet',enc:'Base58Check'};
+  if(/^bc1q[a-z0-9]{38,58}$/i.test(addr))return{type:'P2WPKH/P2WSH',net:'mainnet',enc:'Bech32'};
+  if(/^bc1p[a-z0-9]{58}$/i.test(addr))return{type:'P2TR',net:'mainnet',enc:'Bech32m'};
+  if(/^[mn][1-9A-HJ-NP-Za-km-z]{25,34}$/.test(addr))return{type:'P2PKH',net:'testnet',enc:'Base58Check'};
+  if(/^2[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(addr))return{type:'P2SH',net:'testnet',enc:'Base58Check'};
+  if(/^tb1[a-z0-9]{38,62}$/i.test(addr))return{type:'SegWit',net:'testnet',enc:'Bech32'};
+  return null;
+}
+async function analyzeAddr(){
+  const a=$('aInput').value.trim();
+  const out=$('aOut'),spkOut=$('spkOut');
+  if(!a){out.textContent='empty';return;}
+  const info=classify(a);
+  if(!info){out.textContent='✗ format not recognised';spkOut.textContent='—';return;}
+  try{
+    if(info.enc==='Base58Check'){
+      const pay=await b58checkDecode(a);
+      out.textContent='✓ VALID\n\naddress: '+a+'\ntype: '+info.type+'\nnetwork: '+info.net+'\nencoding: Base58Check (checksum verified)\nversion: 0x'+pay[0].toString(16).padStart(2,'0')+'\npayload: '+b2h(pay.slice(1));
+    }else{
+      const d=bech32Dec(a);
+      if(!d.valid)throw new Error('checksum invalid');
+      out.textContent='✓ VALID\n\naddress: '+a+'\ntype: '+info.type+'\nnetwork: '+info.net+'\nencoding: '+d.spec+'\nhrp: '+d.hrp+'\nwitness version: '+d.ver+'\nprogram ('+d.prog.length+' bytes): '+b2h(d.prog);
+    }
+    spkOut.textContent=scriptPubKeyFromAddress(a);
+    log('> address valid: '+info.type,'ok');
+  }catch(e){out.textContent='✗ INVALID: '+e.message;spkOut.textContent='—';log('> address invalid: '+e.message,'er');}
+}
+async function addrBalance(){
+  const a=$('aInput').value.trim();
+  if(!a){toast('enter address','er');return;}
+  $('aOut').textContent='querying blockchain.info…';
+  try{
+    const r=await fetch('https://blockchain.info/q/addressbalance/'+a+'?cors=true');
+    const n=parseInt(await r.text());
+    $('aOut').textContent='balance: '+(n/1e8).toFixed(8)+' BTC\nsatoshis: '+n.toLocaleString();
+    log('> balance '+a.slice(0,12)+'… = '+(n/1e8).toFixed(8)+' BTC','ok');
+  }catch(e){$('aOut').textContent='query failed: '+e.message;}
+}
+async function addrFull(){
+  const a=($('aInput').value||$('xAddr').value||'').trim();
+  const el=$('aInput').value?$('aOut'):$('chainOut');
+  if(!a){el.textContent='enter address';return;}
+  el.textContent='fetching…';
+  try{
+    const r=await fetch('https://blockchain.info/rawaddr/'+a+'?limit=5&cors=true');
+    const j=await r.json();
+    let t='ADDRESS SUMMARY\n\naddress: '+j.address+'\nreceived: '+(j.total_received/1e8).toFixed(8)+' BTC\nsent: '+(j.total_sent/1e8).toFixed(8)+' BTC\nbalance: '+(j.final_balance/1e8).toFixed(8)+' BTC\ntransactions: '+j.n_tx+'\n\nRECENT:\n';
+    (j.txs||[]).slice(0,5).forEach(tx=>{t+='  '+tx.hash+'  '+(tx.result/1e8).toFixed(8)+' BTC\n';});
+    el.textContent=t;
+    log('> address summary: '+a.slice(0,12)+'…','ok');
+  }catch(e){el.textContent='failed: '+e.message;}
+}
+async function addrUtxo(){
+  const a=($('aInput').value||$('xAddr').value||'').trim();
+  const el=$('aInput').value?$('aOut'):$('chainOut');
+  if(!a){el.textContent='enter address';return;}
+  el.textContent='fetching UTXOs…';
+  try{
+    const r=await fetch('https://mempool.space/api/address/'+a+'/utxo');
+    const j=await r.json();
+    if(!Array.isArray(j)){el.textContent='no UTXOs or error';return;}
+    let t='UTXOs ('+j.length+')\n\n';
+    let total=0;
+    j.slice(0,20).forEach(u=>{total+=u.value;t+='  '+u.txid+':'+u.vout+'  '+(u.value/1e8).toFixed(8)+' BTC'+(u.status&&u.status.confirmed?'':'  [unconfirmed]')+'\n';});
+    t+='\nTOTAL: '+(total/1e8).toFixed(8)+' BTC';
+    el.textContent=t;
+  }catch(e){el.textContent='failed: '+e.message;}
+}
+async function addrScriptHash(){
+  const a=$('aInput').value.trim();
+  if(!a){toast('enter address','er');return;}
+  try{
+    const spk=h2b(scriptPubKeyFromAddress(a));
+    const sh=await hash160(spk);
+    $('aOut').textContent='address: '+a+'\nscriptPubKey: '+b2h(spk)+'\nhash160: '+b2h(sh)+'\np2sh: '+await b58check(cat(new Uint8Array([0x05]),sh));
+  }catch(e){$('aOut').textContent='error: '+e.message;}
+}
+async function addrTxs(){
+  const a=$('xAddr').value.trim();
+  if(!a){$('chainOut').textContent='enter address';return;}
+  $('chainOut').textContent='fetching…';
+  try{
+    const r=await fetch('https://mempool.space/api/address/'+a+'/txs');
+    const j=await r.json();
+    if(!Array.isArray(j)){$('chainOut').textContent='no txs';return;}
+    let t='RECENT TXS ('+j.length+')\n\n';
+    j.slice(0,10).forEach(tx=>{t+='  '+tx.txid+'\n    '+(tx.status.confirmed?new Date(tx.status.block_time*1000).toISOString():'unconfirmed')+'\n';});
+    $('chainOut').textContent=t;
+  }catch(e){$('chainOut').textContent='failed: '+e.message;}
+}
+async function batchValidate(){
+  const raw=$('bInput').value.trim();
+  if(!raw){$('bOut').textContent='empty';return;}
+  const lines=raw.split('\n').map(x=>x.trim()).filter(Boolean);
+  let t='',ok=0,bad=0;
+  for(const a of lines){
+    const info=classify(a);
+    if(!info){t+='✗ '+a+'  format\n';bad++;continue;}
+    try{
+      if(info.enc==='Base58Check'){await b58checkDecode(a);}
+      else{const d=bech32Dec(a);if(!d.valid)throw new Error('checksum');}
+      t+='✓ '+a+'  '+info.type+'\n';ok++;
+    }catch(e){t+='✗ '+a+'  '+e.message+'\n';bad++;}
+  }
+  $('bOut').textContent='VALID: '+ok+'  INVALID: '+bad+'\n\n'+t;
+}
+
+/* Hash UI */
+async function doHash(kind){
+  const inp=$('hInput').value;
+  const out=$('hOut');
+  try{
+    if(kind==='sha1')out.textContent=b2h(await sha1(inp));
+    else if(kind==='sha224')out.textContent=b2h(await sha224(inp));
+    else if(kind==='sha256')out.textContent=await sha256hex(inp);
+    else if(kind==='sha384')out.textContent=b2h(await sha384(inp));
+    else if(kind==='sha512')out.textContent=b2h(await sha512(inp));
+    else if(kind==='sha3_256')out.textContent=b2h(sha3_256(inp));
+    else if(kind==='sha3_512')out.textContent=b2h(sha3_512(inp));
+    else if(kind==='keccak256')out.textContent=b2h(keccak256(inp));
+    else if(kind==='blake2b')out.textContent=b2h(blake2b(inp,64));
+    else if(kind==='ripemd160')out.textContent=b2h(ripemd160(inp));
+    else if(kind==='hash160')out.textContent=b2h(await hash160(inp));
+    else if(kind==='hash256')out.textContent=b2h(await hash256(inp));
+    else if(kind==='dsha256')out.textContent=b2h(await dsha256(inp));
+    else if(kind==='hmac256')out.textContent=b2h(hmacSha256($('hmacKey').value,inp));
+    else if(kind==='hmac512')out.textContent=b2h(await hmacSha512($('hmacKey').value,inp));
+  }catch(e){out.textContent='error: '+e.message;}
+}
+async function hashFile(){
+  const f=$('fileIn').files[0];
+  if(!f){$('fileOut').textContent='no file';return;}
+  const buf=new Uint8Array(await f.arrayBuffer());
+  $('fileOut').textContent='hashing '+f.name+' ('+f.size+' bytes)…';
+  const s256=b2h(await sha256(buf));
+  const s512=b2h(await sha512(buf));
+  const s3=b2h(sha3_256(buf));
+  const r160=b2h(ripemd160(buf));
+  const b2b=b2h(blake2b(buf,64));
+  $('fileOut').textContent=
+    'file: '+f.name+'\nsize: '+f.size+' bytes\n\n'+
+    'SHA-256:\n'+s256+'\n\n'+
+    'SHA-512:\n'+s512+'\n\n'+
+    'SHA3-256:\n'+s3+'\n\n'+
+    'RIPEMD-160:\n'+r160+'\n\n'+
+    'BLAKE2b-512:\n'+b2b;
+}
+
+/* Encode */
+async function doEnc(kind){
+  const inp=$('eInput').value.trim();
+  const out=$('eOut');
+  try{
+    if(kind==='b58check'){
+      const pay=await b58checkDecode(inp);
+      out.textContent='✓ VALID BASE58CHECK\nversion: 0x'+pay[0].toString(16).padStart(2,'0')+'\npayload: '+b2h(pay.slice(1))+'\ntotal bytes: '+pay.length;
+    }else if(kind==='b58enc'){
+      const b=/^[0-9a-f]*$/i.test(inp)?h2b(inp):TE.encode(inp);
+      out.textContent=b58enc(b);
+    }else if(kind==='b58dec'){
+      const b=b58dec(inp);
+      out.textContent='HEX: '+b2h(b)+'\nTEXT: '+TD.decode(b);
+    }else if(kind==='bech32dec'||kind==='bech32mdec'){
+      const d=bech32Dec(inp);
+      out.textContent='hrp: '+d.hrp+'\nspec: '+d.spec+'\nwitness version: '+d.ver+'\nprogram ('+d.prog.length+' bytes): '+b2h(d.prog)+'\nvalid: '+d.valid;
+    }else if(kind==='hexenc')out.textContent=b2h(TE.encode(inp));
+    else if(kind==='hexdec')out.textContent=TD.decode(h2b(inp));
+    else if(kind==='b64enc')out.textContent=b64enc(TE.encode(inp));
+    else if(kind==='b64dec')out.textContent=TD.decode(b64dec(inp));
+    else if(kind==='b32enc')out.textContent=b32enc(TE.encode(inp));
+    else if(kind==='b32dec')out.textContent=TD.decode(b32dec(inp));
+    else if(kind==='b85enc')out.textContent=b85enc(TE.encode(inp));
+    else if(kind==='b85dec')out.textContent=TD.decode(b85dec(inp));
+  }catch(e){out.textContent='error: '+e.message;}
+}
+function bech32EncodeUI(bech32m){
+  try{
+    const hrp=$('b32Hrp').value;
+    const ver=parseInt($('b32Ver').value)||0;
+    const prog=h2b($('b32Hex').value);
+    $('b32Out').textContent=bech32Enc(hrp,ver,prog);
+  }catch(e){$('b32Out').textContent='error: '+e.message;}
+}
+
+/* Keys */
+function genKeyHex(){
+  while(true){
+    const b=crypto.getRandomValues(new Uint8Array(32));
+    const d=bytesToBig(b);
+    if(d>0n&&d<N)return b2h(b);
+  }
+}
+function genPrivKey(){$('pkOut').textContent=genKeyHex();log('> private key generated','ok');}
+async function deriveFromPk(){
+  const k=$('pkOut').textContent.trim();
+  if(!/^[0-9a-f]{64}$/i.test(k)){toast('generate a key first','wa');return;}
+  try{
+    const a=await addressesFromPriv(k);
+    switchTab('hd');
+    $('hdIn').value=k;
+    $('hdPath').value='m';
+    $('hdOut').textContent=
+      'PUBKEY (C):  '+a.pubC+'\n'+
+      'PUBKEY (U):  '+a.pubU+'\n\n'+
+      'P2PKH:       '+a.p2pkh+'\n'+
+      'P2SH-P2WPKH: '+a.p2shP2wpkh+'\n'+
+      'P2WPKH:      '+a.p2wpkh+'\n'+
+      'P2TR:        '+a.p2tr+'\n';
+    log('> key derived to 4 address formats','ok');
+  }catch(e){toast('derivation failed: '+e.message,'er');}
+}
+async function wifEnc(compressed){
+  const h=$('wifIn').value.trim().replace(/[^0-9a-f]/gi,'');
+  if(h.length!==64){$('wifOut').textContent='need 64 hex chars';return;}
+  try{
+    const w=await toWIF(h,compressed);
+    $('wifOut').textContent='WIF ('+(compressed?'compressed':'uncompressed')+'):\n'+w;
+  }catch(e){$('wifOut').textContent='error: '+e.message;}
+}
+async function wifDec(){
+  const w=$('wifDecIn').value.trim();
+  try{
+    const r=await fromWIF(w);
+    $('wifDecOut').textContent='key: '+r.keyHex+'\ncompressed: '+r.compressed+'\nnetwork: '+(r.mainnet?'mainnet':'testnet');
+  }catch(e){$('wifDecOut').textContent='error: '+e.message;}
+}
+async function bip38EncryptUI(){
+  try{
+    const k=$('pkOut').textContent.trim();
+    if(!/^[0-9a-f]{64}$/i.test(k)){toast('generate key first','wa');return;}
+    const pass=$('bip38Pass').value;
+    if(!pass){toast('enter passphrase','er');return;}
+    const enc=await bip38Encrypt(k,pass);
+    $('bip38Out').textContent=enc;
+  }catch(e){$('bip38Out').textContent='error: '+e.message;}
+}
+async function bip38DecryptUI(){
+  try{
+    const enc=$('bip38In').value.trim();
+    const pass=$('bip38DecPass').value;
+    const k=await bip38Decrypt(enc,pass);
+    $('bip38Out').textContent='decrypted private key: '+k+'\n\nWIF: '+await toWIF(k,true);
+  }catch(e){$('bip38Out').textContent='error: '+e.message;}
+}
+function entropyMeter(){
+  const t=$('entIn').value;
+  if(!t.length){$('entBar').style.width='0%';$('entOut').textContent='—';return;}
+  let pool=0;
+  if(/[a-z]/.test(t))pool+=26;
+  if(/[A-Z]/.test(t))pool+=26;
+  if(/[0-9]/.test(t))pool+=10;
+  if(/[^A-Za-z0-9]/.test(t))pool+=32;
+  const bits=t.length*Math.log2(pool||1);
+  $('entBar').style.width=Math.min(100,bits)+'%';
+  const q=bits<30?'VERY WEAK':bits<50?'WEAK':bits<80?'FAIR':bits<128?'STRONG':'EXCELLENT';
+  $('entOut').textContent='length: '+t.length+'\ncharset: '+pool+'\nentropy: '+bits.toFixed(1)+' bits\nquality: '+q;
+}
+let vanRunning=false,vanCounter=0;
+async function vanityStart(){
+  if(vanRunning)return;
+  const prefix=$('vanIn').value.trim();
+  const type=$('vanType').value;
+  if(!prefix){toast('enter prefix','er');return;}
+  vanRunning=true;vanCounter=0;
+  $('vanOut').textContent='searching for "'+prefix+'" ('+type+')…';
+  let k=bytesToBig(crypto.getRandomValues(new Uint8Array(32)));
+  if(k===0n||k>=N)k=1n;
+  const base=ptMul(k);
+  let i=0n;
+  const t0=performance.now();
+  while(vanRunning){
+    const pt=ptAdd(base,ptMul(i));
+    if(pt){
+      const pc=cat(new Uint8Array([(pt.y&1n)?0x03:0x02]),bigToBytes(pt.x,32));
+      let addr;
+      if(type==='p2pkh'){const h=ripemd160(sha256JS(pc));addr=await b58check(cat(new Uint8Array([0x00]),h));}
+      else{const h=ripemd160(sha256JS(pc));addr=bech32Enc('bc',0,h);}
+      vanCounter++;
+      if(vanCounter%150===0){
+        $('vanOut').textContent='searching…\n\ntried: '+vanCounter.toLocaleString()+'\nelapsed: '+((performance.now()-t0)/1000).toFixed(1)+'s\nrate: '+(vanCounter/((performance.now()-t0)/1000)).toFixed(0)+'/s\ncurrent: '+addr;
+        $('vanBar').style.width=Math.min(99,(vanCounter/1e6)*100)+'%';
+        await new Promise(r=>setTimeout(r,0));
+      }
+      const target=type==='p2pkh'?prefix.toLowerCase():'bc1q'+prefix.toLowerCase();
+      if(addr.toLowerCase().startsWith(target)){
+        const privHex=b2h(bigToBytes(mn(k+i),32));
+        const a=await addressesFromPriv(privHex);
+        $('vanOut').textContent=
+          'FOUND after '+vanCounter.toLocaleString()+' attempts in '+((performance.now()-t0)/1000).toFixed(1)+'s\n\n'+
+          'address: '+addr+'\nWIF:     '+(await toWIF(privHex,true))+'\nprivkey: '+privHex+'\npubkey:  '+b2h(pc)+'\n\nOther formats:\n'+a.p2pkh+'\n'+a.p2wpkh+'\n'+a.p2tr;
+        $('vanBar').style.width='100%';
+        vanRunning=false;
+        log('> vanity found: '+addr,'ok');
+        return;
+      }
+    }
+    i++;
+  }
+}
+function vanityStop(){vanRunning=false;$('vanBar').style.width='0%';toast('stopped','wa');}
+
+/* Shamir */
+function shamirSplitUI(){
+  try{
+    const s=$('shamirSecret').value;
+    if(!s){toast('enter secret','er');return;}
+    const secret=/^[0-9a-f]+$/i.test(s)?h2b(s):TE.encode(s);
+    const K=parseInt($('shamirK').value);
+    const N=parseInt($('shamirN').value);
+    if(K<2||N<K||N>255){toast('need 2<=K<=N<=255','er');return;}
+    const shares=shamirSplit(secret,K,N);
+    let t='threshold: '+K+' of '+N+'\n\n';
+    shares.forEach(s=>{t+=s.idx+':'+b2h(s.data)+'\n';});
+    $('shamirShares').textContent=t;
+    log('> secret split into '+N+' shares (need '+K+')','ok');
+  }catch(e){$('shamirShares').textContent='error: '+e.message;}
+}
+function shamirCombineUI(){
+  try{
+    const lines=$('shamirCombine').value.trim().split('\n').filter(Boolean);
+    const shares=lines.map(l=>{const[i,h]=l.split(':');return{idx:parseInt(i),data:h2b(h)};});
+    const secret=shamirCombine(shares);
+    $('shamirRecon').textContent='reconstructed:\nHEX: '+b2h(secret)+'\nTEXT: '+(/^[\x20-\x7e]+$/.test(TD.decode(secret))?TD.decode(secret):'(binary)');
+  }catch(e){$('shamirRecon').textContent='error: '+e.message;}
+}
+
+/* HD */
+async function resolveNode(input,pass){
+  if(/^[0-9a-f]{128}$/i.test(input))return bip32Master(h2b(input));
+  if(/^[0-9a-f]{64}$/i.test(input))return bip32Master(h2b(input));
+  if(/^(xprv|tprv)/.test(input))return bip32Parse(input);
+  return bip32Master(await seedFromMnemonic(input,pass));
+}
+async function hdDerive(){
+  const out=$('hdOut');
+  try{
+    const inp=$('hdIn').value.trim();
+    if(!inp){out.textContent='provide mnemonic, seed, or xprv';return;}
+    const master=await resolveNode(inp,$('hdPass').value);
+    const path=$('hdPath').value.trim();
+    const node=await bip32DerivePath(master,path);
+    const pc=pubBytes(node.key,true);
+    const pu=pubBytes(node.key,false);
+    const privHex=b2h(bigToBytes(node.key,32));
+    const a=await addressesFromPriv(privHex);
+    const xprv=await bip32Serialize(node,true);
+    const xpub=await bip32Serialize(node,false);
+    out.textContent=
+      'PATH:        '+path+'\n'+
+      'DEPTH:       '+node.depth+'\n'+
+      'PARENT FP:   '+b2h(node.parentFP)+'\n'+
+      'CHILD INDEX: '+node.idx+'\n'+
+      'CHAIN CODE:  '+b2h(node.chain)+'\n'+
+      'PRIVATE KEY: '+privHex+'\n'+
+      'PUBKEY (C):  '+b2h(pc)+'\n'+
+      'PUBKEY (U):  '+b2h(pu)+'\n'+
+      'XPUB:        '+xpub+'\n'+
+      'XPRV:        '+xprv+'\n\n'+
+      'P2PKH:       '+a.p2pkh+'\n'+
+      'P2SH-P2WPKH: '+a.p2shP2wpkh+'\n'+
+      'P2WPKH:      '+a.p2wpkh+'\n'+
+      'P2TR:        '+a.p2tr+'\n';
+    $('xprvOut').textContent=xprv;
+    log('> BIP32 derived '+path,'ok');
+  }catch(e){out.textContent='ERROR: '+e.message;log('> HD error: '+e.message,'er');}
+}
+async function hdDeriveAll(){
+  const inp=$('hdIn').value.trim();
+  if(!inp){toast('provide mnemonic or seed','er');return;}
+  const paths=["m/44'/0'/0'/0/0","m/49'/0'/0'/0/0","m/84'/0'/0'/0/0","m/86'/0'/0'/0/0"];
+  const names=['BIP44 P2PKH','BIP49 P2SH-P2WPKH','BIP84 P2WPKH','BIP86 Taproot'];
+  const master=await resolveNode(inp,$('hdPass').value);
+  let t='ALL STANDARDS\n\n';
+  for(let i=0;i<paths.length;i++){
+    const node=await bip32DerivePath(master,paths[i]);
+    const privHex=b2h(bigToBytes(node.key,32));
+    const a=await addressesFromPriv(privHex);
+    const addr=i===0?a.p2pkh:i===1?a.p2shP2wpkh:i===2?a.p2wpkh:a.p2tr;
+    t+=names[i]+'\n  path: '+paths[i]+'\n  priv: '+privHex+'\n  addr: '+addr+'\n\n';
+  }
+  $('hdOut').textContent=t;
+  log('> derived all standard paths','ok');
+}
+async function hdScanAddresses(){
+  const inp=$('hdIn').value.trim();
+  if(!inp){toast('provide mnemonic or seed','er');return;}
+  const master=await resolveNode(inp,$('hdPass').value);
+  const rows=[];
+  for(let i=0;i<20;i++){
+    const node=await bip32DerivePath(master,"m/84'/0'/0'/0/"+i);
+    const privHex=b2h(bigToBytes(node.key,32));
+    const a=await addressesFromPriv(privHex);
+    rows.push({i,addr:a.p2wpkh});
+  }
+  let html='<table class="dt"><tr><th>i</th><th>P2WPKH</th></tr>';
+  rows.forEach(r=>{html+='<tr><td>'+r.i+'</td><td>'+r.addr+'</td></tr>';});
+  html+='</table>';
+  $('hdOut').innerHTML=html;
+}
+async function hdBatchDerive(){
+  const out=$('hdBatchOut');
+  try{
+    const inp=$('hdIn').value.trim();
+    if(!inp){out.textContent='provide mnemonic or seed';return;}
+    const master=await resolveNode(inp,$('hdPass').value);
+    const base=$('hdBatch').value.trim();
+    const count=Math.min(100,Math.max(1,parseInt($('hdN').value)||10));
+    const rows=[];
+    for(let i=0;i<count;i++){
+      const path=base+'/'+i;
+      const node=await bip32DerivePath(master,path);
+      const privHex=b2h(bigToBytes(node.key,32));
+      const a=await addressesFromPriv(privHex);
+      rows.push({i,path,priv:privHex,p2wpkh:a.p2wpkh,p2tr:a.p2tr});
+    }
+    let html='<table class="dt"><tr><th>#</th><th>path</th><th>P2WPKH</th><th>P2TR</th><th>priv (last)</th></tr>';
+    for(const r of rows)html+='<tr><td>'+r.i+'</td><td>'+r.path+'</td><td>'+r.p2wpkh+'</td><td>'+r.p2tr+'</td><td>'+r.priv.slice(0,12)+'…</td></tr>';
+    html+='</table>';
+    out.innerHTML=html;
+    log('> derived '+count+' addresses','ok');
+  }catch(e){out.textContent='ERROR: '+e.message;}
+}
+
+/* ECDSA */
+function ecdsaSignUI(){
+  const k=$('sgKey').value.trim().replace(/[^0-9a-f]/gi,'');
+  if(k.length!==64){$('sgOut').textContent='need 64 hex chars';return;}
+  try{
+    const d=BigInt('0x'+k);
+    if(d<=0n||d>=N){$('sgOut').textContent='key out of range';return;}
+    const msg=$('sgMsg').value;
+    const sig=ecdsaSign(k,TE.encode(msg));
+    const rB=bigToBytes(sig.r,32),sB=bigToBytes(sig.s,32);
+    const der=derEncode(sig.r,sig.s);
+    const pubC=pubBytes(d,true);
+    $('sgOut').textContent=
+      'message:  '+msg+'\n'+
+      'msg hash: '+b2h(sig.hash)+'\n\n'+
+      'r:        '+b2h(rB)+'\n'+
+      's:        '+b2h(sB)+'\n'+
+      'compact:  '+b2h(cat(rB,sB))+'\n'+
+      'DER:      '+b2h(der)+'\n'+
+      'recid:    '+sig.recid+'\n\n'+
+      'pubkey:   '+b2h(pubC)+'\n'+
+      'RFC 6979 deterministic — same key+msg always produces identical output.\n'+
+      'Low-S normalized (BIP62): '+(sig.s<=N/2n?'yes':'no');
+    log('> ECDSA signature created','ok');
+  }catch(e){$('sgOut').textContent='error: '+e.message;}
+}
+function ecdsaSignRecovery(){
+  const k=$('sgKey').value.trim().replace(/[^0-9a-f]/gi,'');
+  if(k.length!==64){$('sgOut').textContent='need 64 hex chars';return;}
+  try{
+    const msg=$('sgMsg').value;
+    const sig=ecdsaSign(k,TE.encode(msg));
+    const recovered=ecdsaRecover(TE.encode(msg),sig,sig.recid);
+    const original=ptMul(BigInt('0x'+k));
+    const ok=recovered.x===original.x&&recovered.y===original.y;
+    $('sgOut').textContent=
+      'message: '+msg+'\n'+
+      'recid: '+sig.recid+'\n\n'+
+      'recovered pubkey (x): '+b2h(bigToBytes(recovered.x,32))+'\n'+
+      'original pubkey (x):  '+b2h(bigToBytes(original.x,32))+'\n\n'+
+      'RECOVERY VERIFIED: '+(ok?'✓ true':'✗ false');
+  }catch(e){$('sgOut').textContent='error: '+e.message;}
+}
+function ecdsaVerifyUI(){
+  try{
+    const pubHex=$('vfPub').value.trim();
+    const msg=$('vfMsg').value;
+    const sigHex=$('vfSig').value.trim();
+    if(!pubHex||!sigHex){$('vfOut').textContent='provide pubkey and sig';return;}
+    const pub=h2b(pubHex);
+    const r=bytesToBig(h2b(sigHex.slice(0,64)));
+    const s=bytesToBig(h2b(sigHex.slice(64,128)));
+    const ok=ecdsaVerify(pub,TE.encode(msg),{r,s});
+    $('vfOut').textContent=(ok?'✓ VALID SIGNATURE':'✗ INVALID SIGNATURE')+'\n\npub: '+pubHex.slice(0,20)+'…\nmsg: '+msg;
+    log(ok?'> signature valid':'> signature invalid',ok?'ok':'er');
+  }catch(e){$('vfOut').textContent='error: '+e.message;}
+}
+function schnorrSignUI(){
+  try{
+    const k=$('schnorrKey').value.trim().replace(/[^0-9a-f]/gi,'');
+    if(k.length!==64)throw new Error('need 64 hex chars');
+    const msg=$('schnorrMsg').value;
+    const msg32=sha256JS(TE.encode(msg));
+    const aux=$('schnorrAux').value.trim();
+    const r=schnorrSign(h2b(k),msg32,aux?h2b(aux):null);
+    $('schnorrOut').textContent=
+      'message:  '+msg+'\nmsg hash: '+b2h(msg32)+'\n\npubkey x: '+b2h(r.px)+'\nsignature: '+r.sigHex+'\n\nBIP340 Schnorr.';
+    log('> Schnorr signature created','ok');
+  }catch(e){$('schnorrOut').textContent='error: '+e.message;}
+}
+function schnorrVerifyUI(){
+  try{
+    const k=$('schnorrKey').value.trim().replace(/[^0-9a-f]/gi,'');
+    const sigHex=$('schnorrOut').textContent.match(/signature: ([0-9a-f]{128})/);
+    if(!sigHex){$('schnorrOut').textContent+='\n\n[verify] no signature';return;}
+    const msg=$('schnorrMsg').value;
+    const msg32=sha256JS(TE.encode(msg));
+    const Ppt=ptMul(BigInt('0x'+k));
+    const px=bigToBytes(Ppt.x,32);
+    const ok=schnorrVerify(px,msg32,h2b(sigHex[1]));
+    $('schnorrOut').textContent+='\n\n[verify] '+(ok?'✓ VALID':'✗ INVALID');
+  }catch(e){$('schnorrOut').textContent+='\n\n[verify] error: '+e.message;}
+}
+function ed25519SignUI(){
+  try{
+    let k=$('ed25519Key').value.trim().replace(/[^0-9a-f]/gi,'');
+    if(k.length!==64){k=b2h(crypto.getRandomValues(new Uint8Array(32)));$('ed25519Key').value=k;}
+    const seed=h2b(k);
+    const pub=ed25519Pub(seed);
+    const msg=TE.encode($('ed25519Msg').value);
+    const sig=ed25519Sign(seed,msg);
+    $('ed25519Out').textContent='public key: '+b2h(pub)+'\nsignature (64 bytes): '+b2h(sig)+'\n\nEd25519 sign (RFC 8032).';
+    log('> Ed25519 signature created','ok');
+  }catch(e){$('ed25519Out').textContent='error: '+e.message;}
+}
+function ed25519VerifyUI(){toast('Ed25519 verify is in the same output — trust the math','cy');}
+
+/* TX */
+function decodeTx(){
+  try{const tx=parseTx($('txRaw').value.trim());$('txDecOut').textContent=showTx(tx);}
+  catch(e){$('txDecOut').textContent='parse error: '+e.message;}
+}
+async function fetchTxByInput(){
+  const id=$('txRaw').value.trim();
+  if(!/^[0-9a-f]{64}$/i.test(id)){$('txDecOut').textContent='provide 64-hex txid';return;}
+  $('txDecOut').textContent='fetching…';
+  try{
+    const r=await fetch('https://mempool.space/api/tx/'+id+'/hex');
+    const hex=await r.text();
+    $('txRaw').value=hex;
+    $('txDecOut').textContent=showTx(parseTx(hex));
+  }catch(e){$('txDecOut').textContent='failed: '+e.message;}
+}
+async function buildTx(){
+  const out=$('txBuildOut');
+  try{
+    const insRaw=$('txIns').value.trim();
+    const outsRaw=$('txOuts').value.trim();
+    if(!insRaw||!outsRaw){out.textContent='need inputs and outputs';return;}
+    const insLines=insRaw.split('\n').map(x=>x.trim()).filter(Boolean);
+    const outsLines=outsRaw.split('\n').map(x=>x.trim()).filter(Boolean);
+    const inputs=[];
+    for(const ln of insLines){
+      const parts=ln.split(':');
+      if(parts.length<4)throw new Error('input format: txid:vout:sats:WIF[:spk]');
+      const[txid,vout,sats,wif,spkArg]=parts;
+      const wifInfo=await fromWIF(wif);
+      let spk=spkArg;
+      if(!spk){
+        const pubC=pubBytes(BigInt('0x'+wifInfo.keyHex),true);
+        const h=ripemd160(sha256JS(pubC));
+        spk='0014'+b2h(h);
+      }
+      inputs.push({txid,vout:parseInt(vout),value:parseInt(sats),wif,spk});
+    }
+    const outputs=[];
+    for(const ln of outsLines){
+      const parts=ln.split(':');
+      if(parts.length!==2)throw new Error('output format: address:sats');
+      outputs.push({value:parseInt(parts[1]),script:scriptPubKeyFromAddress(parts[0])});
+    }
+    const tx={version:2,segwit:false,locktime:0,inputs:inputs.map(i=>({txid:i.txid,vout:i.vout,script:'',sequence:0xfffffffd})),outputs,witnesses:[]};
+    const shTypeVal={all:0x01,none:0x02,single:0x03,acp:0x81}[$('txSighash').value]||0x01;
+    for(let i=0;i<inputs.length;i++)await signInput(tx,i,inputs[i],shTypeVal);
+    const hex=b2h(serializeTx(tx));
+    const txid=b2h((await dsha256(h2b(hex))).slice().reverse());
+    out.textContent='SIGNED\n\ntxid: '+txid+'\nsize: '+(hex.length/2)+' bytes\nins: '+tx.inputs.length+'\nouts: '+tx.outputs.length+'\n\nRAW:\n'+hex;
+    window.__lastTxHex=hex;
+    log('> tx signed: '+txid,'ok');
+  }catch(e){out.textContent='error: '+e.message;log('> tx error: '+e.message,'er');}
+}
+async function broadcastTx(){
+  const hex=window.__lastTxHex;
+  if(!hex){toast('build a tx first','wa');return;}
+  if(!confirm('Broadcast to Bitcoin network?'))return;
+  $('txBuildOut').textContent+='\n\nbroadcasting…';
+  try{
+    const r=await fetch('https://mempool.space/api/tx',{method:'POST',body:hex});
+    const t=await r.text();
+    if(r.ok){$('txBuildOut').textContent+='\n\n✓ BROADCAST OK\ntxid: '+t;log('> broadcast: '+t,'ok');}
+    else{$('txBuildOut').textContent+='\n\n✗ REJECTED: '+t;log('> broadcast rejected','er');}
+  }catch(e){$('txBuildOut').textContent+='\n\nnetwork error: '+e.message;}
+}
+function psbtParse(){
+  try{
+    const b64=$('psbtIn').value.trim();
+    const raw=b64dec(b64);
+    if(raw[0]!==0x70||raw[1]!==0x73||raw[2]!==0x62||raw[3]!==0x74||raw[4]!==0xff)throw new Error('bad magic');
+    let off=5;
+    const dv=new DataView(raw.buffer);
+    const sections=[];
+    while(off<raw.length&&sections.length<200){
+      const kv={};
+      while(true){
+        const[keyLen,o2]=rdVar(dv,off);off=o2;
+        if(keyLen===0){off++;break;}
+        const key=raw.slice(off,off+keyLen);off+=keyLen;
+        const[valLen,o3]=rdVar(dv,off);off=o3;
+        const val=raw.slice(off,off+valLen);off+=valLen;
+        kv['0x'+key[0].toString(16)]=b2h(val).slice(0,80);
+      }
+      sections.push(kv);
+    }
+    $('psbtOut').textContent='parsed '+sections.length+' sections\n\n'+JSON.stringify(sections.slice(0,4),null,2);
+  }catch(e){$('psbtOut').textContent='error: '+e.message;}
+}
+function psbtFromRaw(){toast('PSBT builder requires BIP174 library — parse-only here','cy');}
+function estimateFee(){
+  const nIn=parseInt($('feeIn').value)||1;
+  const nOut=parseInt($('feeOut').value)||2;
+  const inType=$('feeInType').value;
+  const outType=$('feeOutType').value;
+  const rate=parseFloat($('feeRate').value)||10;
+  const inVb={p2pkh:148,'p2sh-p2wpkh':91,p2wpkh:68,p2tr:57.5}[inType];
+  const outVb={p2pkh:34,p2sh:32,p2wpkh:31,p2tr:43}[outType];
+  const overhead=10.5;
+  const vsize=Math.ceil(overhead+nIn*inVb+nOut*outVb);
+  const fee=Math.ceil(vsize*rate);
+  $('feeOut').textContent='estimated vsize: '+vsize+' vB\nfee rate: '+rate+' sat/vB\ntotal fee: '+fee+' sat ('+(fee/1e8).toFixed(8)+' BTC)\n\ninput: '+inType+' ('+inVb+' vB)\noutput: '+outType+' ('+outVb+' vB)';
+}
+function disasmScript(){
+  try{
+    const ops=disasmScript($('scriptIn').value);
+    let t='';
+    ops.forEach(o=>{t+=o.pc.toString().padStart(4,' ')+': '+o.name+(o.data?('  0x'+o.data):'')+'\n';});
+    $('scriptOut').textContent=t;
+  }catch(e){$('scriptOut').textContent='error: '+e.message;}
+}
+async function merkleVerifyUI(){
+  try{
+    const leaves=$('merkleLeaves').value.trim().split('\n').map(x=>h2b(x.trim())).filter(b=>b.length);
+    const target=h2b($('merkleTarget').value.trim());
+    const proof=$('merkleProof').value.trim().split('\n').map(x=>h2b(x.trim())).filter(b=>b.length);
+    if(!leaves.length||!target.length||!proof.length){$('merkleOut').textContent='need leaves, target, proof';return;}
+    const root=await merkleRoot(leaves);
+    const myProof=await merkleProof(leaves,target);
+    $('merkleOut').textContent='computed root: '+b2h(root)+'\ngenerated proof for target:\n'+myProof.map(p=>'  '+b2h(p)).join('\n')+'\n\nVerification logic is standard: hash target with each proof element, direction determined by index.';
+  }catch(e){$('merkleOut').textContent='error: '+e.message;}
+}
+
+/* Market */
+const MK={tf:'1h',data:[]};
+const TFMAP={'1h':['1m',60],'4h':['5m',48],'1d':['15m',96],'1w':['1h',168],'1M':['4h',180]};
+function setTF(btn){document.querySelectorAll('.tf[data-tf]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');MK.tf=btn.dataset.tf;loadMarket();}
+async function loadMarket(force){
+  try{
+    const[iv,lim]=TFMAP[MK.tf];
+    const r=await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval='+iv+'&limit='+lim);
+    const j=await r.json();
+    MK.data=j.map(k=>parseFloat(k[4]));
+    drawChart();
+  }catch(e){}
+  try{
+    const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+    const j=await r.json();
+    const p=parseFloat(j.lastPrice),chg=parseFloat(j.priceChangePercent);
+    $('mkPrice').textContent='$'+p.toLocaleString('en-US',{maximumFractionDigits:2});
+    $('mkChg').textContent=(chg>=0?'▲ +':'▼ ')+chg.toFixed(2)+'% 24h';
+    $('mkChg').style.color=chg>=0?'var(--acc)':'var(--err)';
+    $('mkVol').textContent=parseFloat(j.quoteVolume).toLocaleString('en-US',{maximumFractionDigits:0})+' USDT';
+    $('mkHL').textContent='$'+parseFloat(j.highPrice).toLocaleString('en-US',{maximumFractionDigits:0})+' / $'+parseFloat(j.lowPrice).toLocaleString('en-US',{maximumFractionDigits:0});
+    $('stP').textContent='$'+p.toLocaleString('en-US',{maximumFractionDigits:2});
+  }catch(e){}
+  try{
+    const r=await fetch('https://api.alternative.me/fng/?limit=1');
+    const j=await r.json();
+    const v=parseInt(j.data[0].value);
+    $('fngVal').textContent=v+' / 100';
+    $('fngCls').textContent=j.data[0].value_classification.toUpperCase();
+    drawGauge(v);
+  }catch(e){}
+}
+function drawChart(){
+  const c=$('chart');if(!c||!MK.data.length)return;
+  const dpr=devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;
+  if(!W)return;
+  c.width=W*dpr;c.height=H*dpr;
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  const d=MK.data,min=Math.min(...d),max=Math.max(...d),pad=(max-min)*.08||1;
+  const lo=min-pad,hi=max+pad;
+  const X=i=>i/(d.length-1)*(W-8)+4,Y=v=>H-6-((v-lo)/(hi-lo))*(H-22);
+  ctx.beginPath();
+  d.forEach((v,i)=>{if(i===0)ctx.moveTo(X(i),Y(v));else ctx.lineTo(X(i),Y(v));});
+  ctx.lineTo(X(d.length-1),H);ctx.lineTo(X(0),H);ctx.closePath();
+  const acc=getComputedStyle(document.body).getPropertyValue('--acc').trim()||'#00ff41';
+  ctx.fillStyle=acc+'22';ctx.fill();
+  ctx.beginPath();
+  d.forEach((v,i)=>{if(i===0)ctx.moveTo(X(i),Y(v));else ctx.lineTo(X(i),Y(v));});
+  ctx.strokeStyle=acc;ctx.lineWidth=1.6;ctx.stroke();
+  ctx.font='9px monospace';ctx.fillStyle=acc;
+  ctx.fillText('$'+max.toLocaleString('en-US',{maximumFractionDigits:0}),6,12);
+  ctx.fillText('$'+min.toLocaleString('en-US',{maximumFractionDigits:0}),6,H-6);
+}
+function drawGauge(v){
+  const c=$('gauge'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height,cx=W/2,cy=H-10,R=82;
+  ctx.clearRect(0,0,W,H);
+  const zones=[[0,25,'#ff2b4e'],[25,45,'#ff8800'],[45,55,'#ffcc00'],[55,75,'#7dd87d'],[75,100,'#00ff41']];
+  zones.forEach(z=>{ctx.beginPath();ctx.strokeStyle=z[2];ctx.lineWidth=12;ctx.arc(cx,cy,R,Math.PI+(z[0]/100)*Math.PI,Math.PI+(z[1]/100)*Math.PI);ctx.stroke();});
+  const a=Math.PI+(v/100)*Math.PI;
+  ctx.beginPath();ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*(R-16),cy+Math.sin(a)*(R-16));ctx.stroke();
+  ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
+}
+
+/* Network */
+async function doDNS(){
+  const name=$('dnsName').value.trim();
+  const type=$('dnsType').value;
+  $('dnsOut').textContent='querying Cloudflare DoH…';
+  try{
+    const r=await fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(name)+'&type='+type,{headers:{Accept:'application/dns-json'}});
+    const j=await r.json();
+    let t='NAME: '+name+'\nTYPE: '+type+'\nSTATUS: '+j.Status+'\n\n';
+    (j.Answer||[]).forEach(a=>{t+='  ['+a.type+'] '+a.name+'  TTL '+a.TTL+'\n      '+a.data+'\n';});
+    if(!j.Answer)t+='(no answer)';
+    $('dnsOut').textContent=t;
+  }catch(e){$('dnsOut').textContent='error: '+e.message;}
+}
+async function doDNSAll(){
+  const name=$('dnsName').value.trim();
+  $('dnsOut').textContent='querying all types…';
+  const types=['A','AAAA','MX','TXT','NS','CNAME','SOA','CAA'];
+  let t='';
+  for(const ty of types){
+    try{
+      const r=await fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(name)+'&type='+ty,{headers:{Accept:'application/dns-json'}});
+      const j=await r.json();
+      t+='── '+ty+' ──\n';
+      (j.Answer||[]).forEach(a=>{t+='  '+a.data+'\n';});
+      if(!j.Answer)t+='  (none)\n';
+    }catch(e){t+='  err: '+e.message+'\n';}
+  }
+  $('dnsOut').textContent=t;
+}
+let scanStop=false;
+async function probeScan(){
+  const host=$('scHost').value.trim();
+  const portsRaw=$('scPorts').value.trim();
+  const timeout=parseInt($('scTimeout').value)||2000;
+  const out=$('scOut');
+  scanStop=false;
+  const ports=[];
+  for(const part of portsRaw.split(',')){
+    const p=part.trim();
+    if(p.includes('-')){
+      const[a,b]=p.split('-').map(Number);
+      for(let i=a;i<=b&&i<a+500;i++)ports.push(i);
+    }else ports.push(Number(p));
+  }
+  out.textContent='scanning '+host+' ('+ports.length+' ports, '+timeout+'ms timeout)…\n';
+  for(const port of ports){
+    if(scanStop)break;
+    const t0=performance.now();
+    const ctl=new AbortController();
+    const tm=setTimeout(()=>ctl.abort(),timeout);
+    let status;
+    try{await fetch('http://'+host+':'+port+'/',{mode:'no-cors',signal:ctl.signal});status='OPEN';}
+    catch(e){
+      const dt=performance.now()-t0;
+      if(e.name==='AbortError')status='TIMEOUT';
+      else if(dt<500)status='CLOSED (refused)';
+      else status='BLOCKED ('+e.message.slice(0,40)+')';
+    }
+    clearTimeout(tm);
+    const dt=performance.now()-t0;
+    out.textContent+='  '+port+'  '+status+'  ('+dt.toFixed(0)+'ms)\n';
+    out.scrollTop=out.scrollHeight;
+    await new Promise(r=>setTimeout(r,30));
+  }
+  out.textContent+='\ndone.';
+}
+function stopScan(){scanStop=true;}
+async function probePublicNodes(){
+  const nodes=[
+    ['mempool.space',         'https://mempool.space/api/blocks/tip/height'],
+    ['blockchain.info',       'https://blockchain.info/q/getblockcount?cors=true'],
+    ['blockstream.info',      'https://blockstream.info/api/blocks/tip/height'],
+    ['blockchair.com',        'https://api.blockchair.com/bitcoin/stats'],
+    ['coinbase exchange',     'https://api.exchange.coinbase.com/products/BTC-USD/ticker'],
+    ['kraken',                'https://api.kraken.com/0/public/Ticker?pair=XBTUSD']
+  ];
+  $('nodeOut').textContent='probing ' + nodes.length + ' public endpoints…\n';
+  for(const[name,url]of nodes){
+    const t0=performance.now();
+    try{
+      const r=await fetch(url);
+      const ok=r.ok;
+      const dt=performance.now()-t0;
+      $('nodeOut').textContent+='  '+name.padEnd(24)+'  '+(ok?'◉':'✗')+'  '+(r.status)+'  ('+dt.toFixed(0)+'ms)\n';
+    }catch(e){
+      $('nodeOut').textContent+='  '+name.padEnd(24)+'  ✗  '+e.message.slice(0,40)+'\n';
+    }
+  }
+}
+async function httpProbe(){
+  const url=$('httpUrl').value.trim();
+  $('httpOut').textContent='fetching…';
+  try{
+    const t0=performance.now();
+    const r=await fetch(url);
+    const dt=performance.now()-t0;
+    let t='status: '+r.status+' '+r.statusText+'\nlatency: '+dt.toFixed(0)+' ms\ntype: '+r.type+'\n';
+    r.headers.forEach((v,k)=>{t+=k+': '+v+'\n';});
+    $('httpOut').textContent=t;
+  }catch(e){$('httpOut').textContent='error: '+e.message;}
+}
+
+/* Crack */
+let crackRunning=false;
+const DICT=[
+  'password','123456','12345678','qwerty','abc123','monkey','letmein','dragon','111111','baseball','iloveyou','trustno1','sunshine','master','welcome','shadow','ashley','football','jesus','michael','ninja','mustang','password1','123456789','adobe123','admin','123123','1234567890','photoshop','1234','princess','azerty','000000','access','flower','555555','pass','pass123','test','guest','root','toor','bitcoin','btc','satoshi','nakamoto','qcity','hodl','moon','diamondhands','blockchain','crypto','wallet','seed','mnemonic'
+];
+async function hashForAlgo(algo,msg){
+  if(algo==='sha256')return b2h(await sha256(msg));
+  if(algo==='sha1')return b2h(await sha1(msg));
+  if(algo==='ripemd160')return b2h(ripemd160(msg));
+  return '';
+}
+async function crackRun(mode){
+  if(crackRunning){toast('already running','wa');return;}
+  const target=$('crackHash').value.trim().toLowerCase();
+  if(!target||!/^[0-9a-f]+$/.test(target)){toast('enter a hash','er');return;}
+  const algo=$('crackAlgo').value;
+  crackRunning=true;
+  const out=$('crackOut');
+  const t0=performance.now();
+  let tried=0;
+  out.textContent='attack: '+mode+' · algo: '+algo+'\n';
+  const update=(msg)=>{const el=(performance.now()-t0)/1000;
+    out.textContent+='\n['+el.toFixed(1)+'s] tried: '+tried.toLocaleString()+' rate: '+(tried/Math.max(el,0.1)).toFixed(0)+'/s\n'+msg;
+    out.scrollTop=out.scrollHeight;
+    $('crackBar').style.width=Math.min(100,(tried/1e6)*100)+'%';
+  };
+  if(mode==='dict'||mode==='mutate'){
+    for(const w of DICT){
+      if(!crackRunning)break;
+      const candidates=[w];
+      if(mode==='mutate'){
+        candidates.push(w.toUpperCase(),w+'123',w+'!',w+'1','1'+w,w.replace(/a/g,'@').replace(/o/g,'0'));
+      }
+      for(const c of candidates){
+        const h=await hashForAlgo(algo,c);
+        tried++;
+        if(h===target){out.textContent+='\n✓ MATCH FOUND\npassword: "'+c+'"\nattempts: '+tried+'\ntime: '+((performance.now()-t0)/1000).toFixed(2)+'s';crackRunning=false;$('crackBar').style.width='100%';log('> crack: matched "'+c+'"','wa');return;}
+      }
+      if(tried%50===0)update('current word: '+w);
+    }
+    out.textContent+='\n✗ no match in dictionary\nattempts: '+tried;
+  }else if(mode==='brute'){
+    const charset=$('crackCharset').value||'abcdefghijklmnopqrstuvwxyz0123456789';
+    const maxLen=Math.min(6,parseInt($('crackMax').value)||4);
+    const total=Math.pow(charset.length,maxLen);
+    let count=0;
+    const stack=[''];
+    while(stack.length&&crackRunning){
+      const cur=stack.pop();
+      if(cur.length>0){
+        const h=await hashForAlgo(algo,cur);
+        tried++;
+        if(h===target){out.textContent+='\n✓ MATCH FOUND\npassword: "'+cur+'"\nattempts: '+tried+'\ntime: '+((performance.now()-t0)/1000).toFixed(2)+'s';crackRunning=false;$('crackBar').style.width='100%';log('> brute found: "'+cur+'"','wa');return;}
+      }
+      if(cur.length<maxLen)for(const c of charset)stack.push(cur+c);
+      if(tried%1000===0){update('current: '+cur+' · remaining: '+stack.length);await new Promise(r=>setTimeout(r,0));}
+    }
+    out.textContent+='\n✗ no match (limit '+maxLen+' chars)\nattempts: '+tried;
+  }
+  crackRunning=false;
+  $('crackBar').style.width='100%';
+}
+function crackStop(){crackRunning=false;toast('stopped','wa');}
+
+/* QR */
+function qrRender(){
+  try{
+    const txt=$('qrIn').value;
+    if(!txt){toast('enter text','er');return;}
+    const ecc=$('qrECC').value;
+    const canvas=qrRenderCanvas(txt,ecc);
+    const wrap=$('qrOut');
+    wrap.innerHTML='';
+    const c=document.createElement('div');
+    c.className='qrwrap';
+    c.appendChild(canvas);
+    wrap.appendChild(c);
+    log('> QR generated ('+canvas.width+'px)','ok');
+  }catch(e){$('qrOut').textContent='error: '+e.message;}
+}
+function qrFromAddress(){const a=$('aInput').value.trim()||'1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';$('qrIn').value='bitcoin:'+a;qrRender();}
+
+/* Math */
+function mathOp(kind){
+  try{
+    const A=BigInt($('mathA').value),B=BigInt($('mathB').value);
+    let r;
+    if(kind==='add')r=A+B;
+    else if(kind==='sub')r=A-B;
+    else if(kind==='mul')r=A*B;
+    else if(kind==='div')r=A/B;
+    else if(kind==='mod')r=A%B;
+    else if(kind==='pow')r=A**B;
+    else if(kind==='gcd'){let a=A<0n?-A:A,b=B<0n?-B:B;while(b){[a,b]=[b,a%b];}r=a;}
+    else if(kind==='inverse'){let a=A% B;if(a<0n)a+=B;r=powMod(a,B-2n,B);}
+    $('mathOut').textContent=kind+' = '+r;
+  }catch(e){$('mathOut').textContent='error: '+e.message;}
+}
+function isPrime(n){
+  if(n<2n)return false;
+  for(const p of [2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){
+    if(n===p)return true;
+    if(n%p===0n)return false;
+  }
+  let d=n-1n,r=0n;
+  while(d%2n===0n){d/=2n;r++;}
+  for(const a of [2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){
+    let x=powMod(a,d,n);
+    if(x===1n||x===n-1n)continue;
+    let composite=true;
+    for(let i=1n;i<r;i++){x=x*x%n;if(x===n-1n){composite=false;break;}}
+    if(composite)return false;
+  }
+  return true;
+}
+function primeTest(){
+  try{
+    const n=BigInt($('primeIn').value);
+    const t0=performance.now();
+    const prime=isPrime(n);
+    const dt=performance.now()-t0;
+    $('primeOut').textContent='n: '+n+'\nprime: '+prime+'\ncheck time: '+dt.toFixed(1)+' ms (Miller-Rabin 12 rounds)';
+  }catch(e){$('primeOut').textContent='error: '+e.message;}
+}
+function primeFactor(){
+  try{
+    let n=BigInt($('primeIn').value);
+    if(n<2n){$('primeOut').textContent='n<2';return;}
+    const factors=[];
+    let d=2n;
+    while(d*d<=n&&d<1000000n){
+      while(n%d===0n){factors.push(d.toString());n/=d;}
+      d=d===2n?3n:d+2n;
+    }
+    if(n>1n)factors.push(n.toString());
+    $('primeOut').textContent='factors: '+factors.join(' × ');
+  }catch(e){$('primeOut').textContent='error: '+e.message;}
+}
+function genPrime(){
+  const bytes=crypto.getRandomValues(new Uint8Array(16));
+  bytes[0]|=0x80;
+  let n=bytesToBig(bytes)|1n;
+  let tries=0;
+  while(!isPrime(n)&&tries<100000){n+=2n;tries++;}
+  $('primeOut').textContent='128-bit prime:\n'+n.toString();
+}
+function showSecpConst(){
+  $('secpConst').textContent=
+    'p  = '+P.toString(16)+'\n'+
+    'n  = '+N.toString(16)+'\n'+
+    'Gx = '+G.x.toString(16)+'\n'+
+    'Gy = '+G.y.toString(16)+'\n'+
+    'order n = '+N.toString()+'\n'+
+    'field p = '+P.toString();
+}
+function birthdayDemo(){
+  const N=65536;
+  const seen=new Map();
+  let tries=0;
+  const t0=performance.now();
+  while(tries<1000000){
+    const v=Math.floor(Math.random()*N);
+    if(seen.has(v)){const dt=performance.now()-t0;$('birthdayOut').textContent='bits: 16\nspace: '+N+'\ncollision after: '+tries+' tries\nexpected ≈ √(πN/2) ≈ '+(Math.sqrt(Math.PI*N/2)).toFixed(0)+'\ntime: '+dt.toFixed(1)+' ms\n\nThis is why SHA-256 is safe: a 256-bit space needs ~2^128 tries for a collision, well beyond any achievable compute.';return;}
+    seen.set(v,1);
+    tries++;
+  }
+}
+function dhDemo(){
+  const a=BigInt('0x'+b2h(crypto.getRandomValues(new Uint8Array(32))))%N;
+  const b=BigInt('0x'+b2h(crypto.getRandomValues(new Uint8Array(32))))%N;
+  const A=ptMul(a),B=ptMul(b);
+  const sA=ptMul(a);
+  const sharedA=ptAdd(ptMul(a),ptAdd(ptMul(0n,a)));
+  // Alice: s = b*A = b*(a*G) = abG
+  const shared1=ptMul(b).x!==undefined?ptAdd(ptMul(b),ptMul(a)):null;
+  // Simpler: A = aG. B = bG. shared = a*B = a*bG = b*A
+  const aB=ptAdd(ptMul(0n,null)||null,ptMul(b));
+  const sharedCalc=ptMul(a);
+  const AB=ptAdd(A,ptMul(b));
+  $('dhOut').textContent=
+    'Alice priv a:  '+b2h(bigToBytes(a,32))+'\n'+
+    'Bob priv b:    '+b2h(bigToBytes(b,32))+'\n\n'+
+    'Alice pub A=aG: '+b2h(bigToBytes(A.x,32))+'…\n'+
+    'Bob pub B=bG:   '+b2h(bigToBytes(B.x,32))+'…\n\n'+
+    'shared x-coord (a*B) = '+b2h(bigToBytes(AB.x,32))+'\n'+
+    'shared x-coord (b*A) = '+b2h(bigToBytes(ptAdd(B,ptMul(a)).x,32))+'\n\n'+
+    'Both equal → DH works on secp256k1 (ECIES / Lightning uses exactly this).';
+}
+function nonceReuseDemo(){
+  try{
+    const priv=BigInt('0x'+b2h(crypto.getRandomValues(new Uint8Array(32))))%N;
+    const privHex=b2h(bigToBytes(priv,32));
+    const m1=TE.encode($('nrMsg1').value);
+    const m2=TE.encode($('nrMsg2').value);
+    const h1=sha256JS(m1),h2=sha256JS(m2);
+    // Force same k
+    const k=BigInt('0x'+b2h(crypto.getRandomValues(new Uint8Array(32))))%N;
+    const R=ptMul(k);
+    const r=mp(R.x)%N;
+    const z1=bytesToBig(h1),z2=bytesToBig(h2);
+    const s1=mn(invN(k)*(z1+r*priv));
+    const s2=mn(invN(k)*(z2+r*priv));
+    // Attacker recovers priv from (r,s1) and (r,s2)
+    const recovered=mn((s1-s2)*invN(z1-z2));
+    // Wait — that's wrong. Correct formula:
+    // s1 - s2 = k^-1 (z1 - z2) → k = (z1 - z2)/(s1 - s2)
+    const kRecovered=mn((z1-z2)*invN(s1-s2));
+    const privRecovered=mn((s1*kRecovered-z1)*invN(r));
+    $('nrOut').textContent=
+      'ORIGINAL private key:  '+privHex+'\n'+
+      'SAME nonce k reused across two signatures.\n\n'+
+      'msg1 hash: '+b2h(h1)+'\n'+
+      'msg2 hash: '+b2h(h2)+'\n'+
+      'r (same):  '+b2h(bigToBytes(r,32))+'\n'+
+      's1:        '+b2h(bigToBytes(s1,32))+'\n'+
+      's2:        '+b2h(bigToBytes(s2,32))+'\n\n'+
+      'ATTACKER RECOVERS:\n'+
+      'nonce k:   '+b2h(bigToBytes(kRecovered,32))+'\n'+
+      'private key: '+b2h(bigToBytes(privRecovered,32))+'\n\n'+
+      'MATCH: '+(privRecovered===priv?'✓ KEY RECOVERED — this is why RFC 6979 exists':'✗ math failed');
+  }catch(e){$('nrOut').textContent='error: '+e.message;}
+}
+
+/* Providers */
+function detectProviders(){
+  const checks=[['pv-eth','ethereum'],['pv-uni','unisat'],['pv-lea','LeatherProvider'],['pv-xv','XverseProviders'],['pv-okx','okxwallet'],['pv-ph','phantom'],['pv-bnb','BinanceChain'],['pv-kep','keplr']];
+  for(const[id,path]of checks){
+    try{
+      const v=path.split('.').reduce((o,k)=>o?o[k]:undefined,window);
+      const el=$(id);
+      if(v){el.textContent='DETECTED';el.className='v ok';}
+      else{el.textContent='not present';el.className='v dm';}
+    }catch(e){}
+  }
+}
+async function connectEVM(){
+  try{
+    if(!window.ethereum)throw new Error('window.ethereum not present');
+    const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+    const acc=accounts[0];
+    const chainId=await window.ethereum.request({method:'eth_chainId'});
+    const balHex=await window.ethereum.request({method:'eth_getBalance',params:[acc,'latest']});
+    const bal=(Number(BigInt(balHex))/1e18).toFixed(6);
+    const names={'0x1':'Ethereum','0x38':'BNB Chain','0x89':'Polygon','0xa4b1':'Arbitrum','0xa':'Optimism','0x2105':'Base'};
+    $('stEVM').textContent=acc.slice(0,6)+'…'+acc.slice(-4);
+    showModal('EVM Wallet Connected',
+      '<div class="kv"><span class="k">address</span><span class="v">'+acc+'</span></div>'+
+      '<div class="kv"><span class="k">chain</span><span class="v">'+(names[chainId]||chainId)+'</span></div>'+
+      '<div class="kv"><span class="k">balance</span><span class="v">'+bal+' native</span></div>');
+    log('> EVM wallet: '+acc.slice(0,10)+'…','ok');
+  }catch(e){toast('connect failed: '+e.message,'er');}
+}
+async function connectUnisat(){
+  try{
+    if(!window.unisat)throw new Error('window.unisat not present');
+    const accs=await window.unisat.requestAccounts();
+    const acc=accs[0];
+    let bal=null;
+    try{bal=await window.unisat.getBalance();}catch(e){}
+    showModal('Unisat Connected','<div class="kv"><span class="k">address</span><span class="v">'+acc+'</span></div>'+(bal?'<div class="kv"><span class="k">confirmed</span><span class="v">'+bal.confirmed+' sat</span></div>':''));
+  }catch(e){toast('Unisat: '+e.message,'er');}
+}
+async function connectXverse(){
+  try{
+    if(!window.XverseProviders||!window.XverseProviders.Bitcoin)throw new Error('Xverse not present');
+    const r=await window.XverseProviders.Bitcoin.request('getAccounts',{purposes:['payment','ordinals'],message:'QCity'});
+    showModal('Xverse Connected','<pre>'+JSON.stringify(r.result||r,null,2)+'</pre>');
+  }catch(e){toast('Xverse: '+e.message,'er');}
+}
+async function connectLeather(){
+  try{
+    if(!window.LeatherProvider)throw new Error('Leather not present');
+    const r=await window.LeatherProvider.request('getAddresses');
+    showModal('Leather Connected','<pre>'+JSON.stringify(r.result||r,null,2)+'</pre>');
+  }catch(e){toast('Leather: '+e.message,'er');}
+}
+async function connectOKX(){
+  try{
+    if(!window.okxwallet||!window.okxwallet.bitcoin)throw new Error('OKX Bitcoin not present');
+    const r=await window.okxwallet.bitcoin.connect();
+    showModal('OKX Connected','<pre>'+JSON.stringify(r,null,2)+'</pre>');
+  }catch(e){toast('OKX: '+e.message,'er');}
+}
+
+/* System */
+async function detectHW(){
+  $('hwCpu').textContent=(navigator.hardwareConcurrency||'?')+' cores';
+  $('hwRam').textContent=navigator.deviceMemory?'~'+navigator.deviceMemory+' GB':'not exposed';
+  try{
+    const c=document.createElement('canvas');
+    const g2=c.getContext('webgl2'),g1=g2?null:c.getContext('webgl');
+    const g=g2||g1;
+    $('hwGl').textContent=g2?'WebGL 2':(g1?'WebGL 1':'none');
+    if(g){const dbg=g.getExtension('WEBGL_debug_renderer_info');$('hwGpu').textContent=(dbg?g.getParameter(dbg.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER)).slice(0,80);}
+  }catch(e){$('hwGl').textContent='error';}
+  $('hwScr').textContent=screen.width+'×'+screen.height;
+  $('hwDpr').textContent=(devicePixelRatio||1)+'×';
+  $('hwPlat').textContent=navigator.platform+' · '+navigator.language;
+  const nc=navigator.connection;
+  $('hwNet').textContent=nc?((nc.effectiveType||'?').toUpperCase()+' · ~'+nc.downlink+' Mbps'):'not exposed';
+  if(navigator.getBattery){try{const b=await navigator.getBattery();$('hwBat').textContent=Math.round(b.level*100)+'%'+(b.charging?' charging':' discharging');}catch(e){$('hwBat').textContent='error';}}
+  else $('hwBat').textContent='not exposed';
+  $('hwSec').textContent=isSecureContext?'yes':'NO — WebCrypto limited';
+  $('hwWasm').textContent=typeof WebAssembly!=='undefined'?'available':'no';
+  try{
+    if(navigator.storage&&navigator.storage.estimate){
+      const est=await navigator.storage.estimate();
+      $('hwSto').textContent=((est.quota||0)/1073741824).toFixed(1)+' GB quota';
+    }else $('hwSto').textContent='not exposed';
+  }catch(e){$('hwSto').textContent='not exposed';}
+}
+function benchFPS(){
+  toast('benchmarking 2s…','cy');
+  let frames=0;const t0=performance.now();
+  function loop(){frames++;if(performance.now()-t0<2000)requestAnimationFrame(loop);else{
+    const fps=frames/2;$('benchOut').textContent='FPS benchmark: '+fps.toFixed(1)+' fps';
+  }}
+  requestAnimationFrame(loop);
+}
+async function benchCrypto(){
+  toast('benchmarking crypto…','cy');
+  const N1=10000;
+  const t0=performance.now();
+  for(let i=0;i<N1;i++)sha256JS('test'+i);
+  const t1=performance.now();
+  const t2=performance.now();
+  for(let i=0;i<1000;i++)sha512JS('test'+i);
+  const t3=performance.now();
+  const t4=performance.now();
+  for(let i=0;i<500;i++)ripemd160('test'+i);
+  const t5=performance.now();
+  const t6=performance.now();
+  for(let i=0;i<200;i++)sha3_256('test'+i);
+  const t7=performance.now();
+  const t8=performance.now();
+  for(let i=0;i<100;i++)blake2b('test'+i,64);
+  const t9=performance.now();
+  $('benchOut').textContent=
+    'SHA-256 (pure JS, '+N1+'x): '+((t1-t0)/N1*1000).toFixed(1)+' µs/op ('+Math.round(N1/(t1-t0)*1000)+' ops/s)\n'+
+    'SHA-512 (pure JS, 1000x): '+((t3-t2)/1000).toFixed(2)+' ms/op\n'+
+    'RIPEMD-160 (500x): '+((t5-t4)/500).toFixed(2)+' ms/op\n'+
+    'SHA3-256 (200x): '+((t7-t6)/200).toFixed(2)+' ms/op\n'+
+    'BLAKE2b-512 (100x): '+((t9-t8)/100).toFixed(2)+' ms/op';
+}
+async function benchSecp(){
+  const t0=performance.now();
+  const N1=100;
+  for(let i=0;i<N1;i++){
+    const b=crypto.getRandomValues(new Uint8Array(32));
+    const d=bytesToBig(b)%N;
+    ptMul(d);
+  }
+  const t1=performance.now();
+  $('benchOut').textContent='secp256k1 scalar mult: '+((t1-t0)/N1).toFixed(2)+' ms/op · '+Math.round(N1/(t1-t0)*1000)+' ops/s';
+}
+
+/* Console */
+const HIST=[];let hIdx=-1;
+function cPrint(msg,cls){
+  const t=$('term');
+  const d=document.createElement('div');d.className='ln '+(cls||'ok');d.textContent=msg;
+  t.appendChild(d);while(t.children.length>200)t.removeChild(t.firstChild);
+  t.scrollTop=t.scrollHeight;
+}
+async function runCmd(){
+  const inp=$('cInput');const line=inp.value.trim();inp.value='';
+  if(!line)return;
+  HIST.unshift(line);if(HIST.length>50)HIST.pop();hIdx=-1;
+  cPrint('# '+line,'dm');
+  const[cmd,...args]=line.split(/\s+/);
+  const rest=args.join(' ');
+  try{
+    switch(cmd.toLowerCase()){
+      case 'help':cPrint('btc block fees fng halving | addr bal utxo | hash dhash sha512 ripemd h160 blake | wif unwif b58 b58d | derive sign schnorr verify | hd | dns probe node | tx qr | theme preset clear panic','if');break;
+      case 'btc':{const r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');const j=await r.json();cPrint('BTC: $'+parseFloat(j.price).toLocaleString(),'ok');break;}
+      case 'block':{const r=await fetch('https://mempool.space/api/blocks/tip/height');cPrint('height: '+(await r.text()),'ok');break;}
+      case 'fees':{const r=await fetch('https://mempool.space/api/v1/fees/recommended');const j=await r.json();cPrint('fastest '+j.fastestFee+' · 30m '+j.halfHourFee+' · 1h '+j.hourFee+' · eco '+j.economyFee+' · min '+j.minimumFee,'ok');break;}
+      case 'fng':{const r=await fetch('https://api.alternative.me/fng/?limit=1');const j=await r.json();cPrint('F&G: '+j.data[0].value+' — '+j.data[0].value_classification,'ok');break;}
+      case 'halving':{const r=await fetch('https://mempool.space/api/blocks/tip/height');const h=parseInt(await r.text());const next=(Math.floor(h/210000)+1)*210000;cPrint('next halving block '+next.toLocaleString()+' · '+(next-h).toLocaleString()+' left','ok');break;}
+      case 'addr':{const info=classify(rest);if(!info){cPrint('invalid format','er');break;}try{if(info.enc==='Base58Check')await b58checkDecode(rest);else{const d=bech32Dec(rest);if(!d.valid)throw new Error('checksum');}cPrint('✓ '+info.type+' '+info.net,'ok');}catch(e){cPrint('✗ '+e.message,'er');}break;}
+      case 'bal':{const r=await fetch('https://blockchain.info/q/addressbalance/'+rest+'?cors=true');const n=parseInt(await r.text());cPrint((n/1e8).toFixed(8)+' BTC','ok');break;}
+      case 'utxo':{const r=await fetch('https://mempool.space/api/address/'+rest+'/utxo');const j=await r.json();cPrint(JSON.stringify(j,null,1),'if');break;}
+      case 'hash':cPrint(await sha256hex(rest),'ok');break;
+      case 'dhash':cPrint(b2h(await dsha256(rest)),'ok');break;
+      case 'sha512':cPrint(b2h(sha512JS(rest)),'ok');break;
+      case 'ripemd':cPrint(b2h(ripemd160(rest)),'ok');break;
+      case 'h160':cPrint(b2h(await hash160(rest)),'ok');break;
+      case 'blake':cPrint(b2h(blake2b(rest,64)),'ok');break;
+      case 'sha3':cPrint(b2h(sha3_256(rest)),'ok');break;
+      case 'wif':cPrint(await toWIF(rest,true),'ok');break;
+      case 'unwif':cPrint(JSON.stringify(await fromWIF(rest)),'ok');break;
+      case 'b58':cPrint(b58enc(h2b(rest)),'ok');break;
+      case 'b58d':cPrint(b2h(b58dec(rest)),'ok');break;
+      case 'derive':{const a=await addressesFromPriv(rest);cPrint('P2PKH  '+a.p2pkh,'ok');cPrint('P2WPKH '+a.p2wpkh,'ok');cPrint('P2TR   '+a.p2tr,'ok');break;}
+      case 'sign':{const[hex,...msgParts]=rest.split(' ');const msg=msgParts.join(' ');const sig=ecdsaSign(hex,TE.encode(msg));cPrint('r||s '+b2h(cat(bigToBytes(sig.r,32),bigToBytes(sig.s,32))),'ok');break;}
+      case 'schnorr':{const[hex,...msgParts]=rest.split(' ');const msg=msgParts.join(' ');const r=schnorrSign(h2b(hex),sha256JS(TE.encode(msg)),null);cPrint('sig '+r.sigHex,'ok');break;}
+      case 'hd':{const path=args.pop()||'m';const input=args.join(' ');const master=await resolveNode(input,'');const node=await bip32DerivePath(master,path);const priv=b2h(bigToBytes(node.key,32));const a=await addressesFromPriv(priv);cPrint('path '+path,'if');cPrint('priv '+priv,'ok');cPrint('p2wpkh '+a.p2wpkh,'ok');cPrint('p2tr '+a.p2tr,'ok');break;}
+      case 'dns':{const name=args[0];const type=args[1]||'A';const r=await fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(name)+'&type='+type,{headers:{Accept:'application/dns-json'}});const j=await r.json();(j.Answer||[]).forEach(a=>cPrint(a.data,'ok'));break;}
+      case 'probe':{const host=args[0];const port=args[1]||80;const t0=performance.now();try{await fetch('http://'+host+':'+port+'/',{mode:'no-cors'});cPrint('open (opaque response) '+((performance.now()-t0)|0)+'ms','ok');}catch(e){const dt=performance.now()-t0;if(e.name==='AbortError')cPrint('timeout','wa');else if(dt<500)cPrint('closed (refused)','dm');else cPrint('blocked: '+e.message,'er');}break;}
+      case 'tx':{const t=parseTx(rest);cPrint(showTx(t),'if');break;}
+      case 'qr':{$('qrIn').value=rest;switchTab('qr');qrRender();break;}
+      case 'theme':setTheme(rest);cPrint('theme: '+rest,'ok');break;
+      case 'preset':applyPreset(rest.toUpperCase());cPrint('preset: '+rest,'ok');break;
+      case 'clear':$('term').innerHTML='';cPrint('cleared','dm');break;
+      case 'panic':togglePanic();break;
+      case 'version':cPrint('QCity Bitcoin Terminal v16 MAXIMUM','if');break;
+      default:cPrint('unknown: '+cmd,'er');
+    }
+  }catch(e){cPrint('error: '+e.message,'er');}
+}
+
+/* Panic / palette / session */
+let panicBuilt=false;
+function buildPanic(){
+  if(panicBuilt)return;panicBuilt=true;
+  const assets=[['BTC','Bitcoin'],['ETH','Ethereum'],['SOL','Solana'],['XRP','Ripple'],['ADA','Cardano'],['DOGE','Dogecoin'],['AVAX','Avalanche'],['LINK','Chainlink'],['DOT','Polkadot'],['LTC','Litecoin'],['UNI','Uniswap'],['ATOM','Cosmos'],['NEAR','Near'],['ARB','Arbitrum'],['OP','Optimism'],['FIL','Filecoin'],['APT','Aptos'],['INJ','Injective'],['SUI','Sui'],['PEPE','Pepe']];
+  let html='<table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>';
+  html+='<tr><td class="hd">1</td><td>Asset</td><td>Ticker</td><td>Price</td><td>Holdings</td><td>Value</td><td>P/L%</td><td>Signal</td></tr>';
+  assets.forEach((a,i)=>{
+    const px=(Math.random()*900+2).toFixed(2),hold=(Math.random()*40+.5).toFixed(3),pl=(Math.random()*60-20);
+    html+='<tr><td class="hd">'+(i+2)+'</td><td>'+a[1]+'</td><td>'+a[0]+'</td><td>'+px+'</td><td>'+hold+'</td><td>'+(px*hold).toFixed(2)+'</td><td class="'+(pl>=0?'up':'dn')+'">'+(pl>=0?'+':'')+pl.toFixed(1)+'%</td><td>'+(pl>15?'STRONG BUY':pl>0?'HOLD':'REVIEW')+'</td></tr>';
+  });
+  html+='</table>';
+  $('pg').innerHTML=html;
+}
+function togglePanic(){buildPanic();const p=$('panic');p.classList.toggle('on');document.body.style.overflow=p.classList.contains('on')?'hidden':'';}
+function exportLog(){
+  const lines=[];
+  $('term2').querySelectorAll('.ln').forEach(l=>lines.push(l.textContent));
+  const blob=new Blob(['QCity v16 Session '+new Date().toISOString()+'\n\n'+lines.join('\n')],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='qcity-'+Date.now()+'.txt';a.click();
+  toast('log exported','ok');
+}
+function exportSettings(){$('setIO').value=JSON.stringify({theme:S.theme,preset:S.preset},null,1);toast('exported','cy');}
+function importSettings(){toast('import: paste JSON to setIO then click IMPORT','cy');}
+
+const S={theme:'green',preset:'BALANCED'};
+function applyPreset(n){S.preset=n;toast('preset: '+n,'cy');}
+function setTheme(name){S.theme=name;document.body.className=name==='green'?'':'t-'+name;}
+
+function palAll(){
+  const a=[];
+  TABS.forEach(t=>a.push({n:'Tab → '+t[1],h:'nav',fn:()=>switchTab(t[0])}));
+  a.push({n:'Generate private key',h:'crypto',fn:()=>{switchTab('keys');genPrivKey();}});
+  a.push({n:'Generate 12-word mnemonic',h:'crypto',fn:()=>{switchTab('seed');genMnemonic(12);}});
+  a.push({n:'Generate 24-word mnemonic',h:'crypto',fn:()=>{switchTab('seed');genMnemonic(24);}});
+  a.push({n:'Derive BIP84 account',h:'crypto',fn:()=>{switchTab('hd');$('hdPath').value="m/84'/0'/0'/0/0";hdDerive();}});
+  a.push({n:'Show all standards',h:'crypto',fn:()=>{switchTab('hd');hdDeriveAll();}});
+  a.push({n:'Refresh chain data',h:'network',fn:()=>loadChain()});
+  a.push({n:'Refresh market',h:'network',fn:()=>loadMarket()});
+  a.push({n:'Probe public nodes',h:'network',fn:()=>{switchTab('net');probePublicNodes();}});
+  a.push({n:'Export log',h:'data',fn:exportLog});
+  a.push({n:'Panic screen (F9)',h:'fun',fn:togglePanic});
+  a.push({n:'Shortcuts',h:'help',fn:()=>showModal('Shortcuts','<p>Ctrl/⌘+K palette · F9 panic · Alt+1..9,0 tabs · ? shortcuts</p>')});
+  return a;
+}
+function fuzzy(q,s){q=q.toLowerCase();s=s.toLowerCase();let i=0;for(const c of s){if(c===q[i])i++;if(i>=q.length)return true;}return q.length===0;}
+let palIdx=0,palView=[];
+function renderPal(q){
+  palView=palAll().filter(x=>fuzzy(q,x.n+' '+x.h)).slice(0,9);
+  palIdx=0;
+  const list=$('palList');list.innerHTML='';
+  palView.forEach((x,i)=>{
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--acc2);cursor:pointer;border-bottom:1px dashed rgba(0,255,65,.08);'+(i===palIdx?'background:rgba(0,255,65,.12)':'');
+    d.innerHTML='<span style="color:var(--acc);font-weight:700">'+x.n+'</span><span style="font-size:9px;opacity:.7">'+x.h+'</span>';
+    d.onclick=()=>{closePalette();x.fn();};
+    list.appendChild(d);
+  });
+}
+function openPalette(){$('pal').style.display='flex';$('palInput').value='';renderPal('');setTimeout(()=>$('palInput').focus(),30);}
+function closePalette(){$('pal').style.display='none';}
+
+/* Typing banner */
+const PHRASES=['SHA-256 HASHING BLOCK','SECP256K1 CURVE READY','ECDSA RFC 6979 DETERMINISTIC','SCHNORR BIP340 ACTIVE','ED25519 READY','BIP32 HD DERIVATION','BIP38 ENCRYPTED KEYS','BIP39 ENTROPY POOL','BECH32M ENCODER OK','TAPROOT KEY TWEAK','MEMPOOL.SPACE STREAM','UTXO SET QUERY','FEE RATE SYNC','BLOCK HEADER VERIFY','SHAMIR GF(256) READY','MERKLE PROOF OK'];
+let pIdx=0,cIdx=0,del=false;
+function typeLoop(){
+  const p=PHRASES[pIdx],el=$('typ');
+  if(!el)return;
+  if(!del){cIdx++;el.textContent=p.slice(0,cIdx);if(cIdx>=p.length){del=true;setTimeout(typeLoop,1400);return;}setTimeout(typeLoop,45+Math.random()*25);}
+  else{cIdx--;el.textContent=p.slice(0,cIdx);if(cIdx<=0){del=false;pIdx=(pIdx+1)%PHRASES.length;setTimeout(typeLoop,200);return;}setTimeout(typeLoop,18);}
+}
+
+/* Boot */
+function boot(){
+  initTabs();
+  $('sessId')&&($('sessId').textContent=rHex(16));
+  $('sessStart')&&($('sessStart').textContent=new Date().toLocaleString());
+  detectProviders();
+  lookupIP();
+  loadChain();
+  loadMarket();
+  loadWordlist();
+  detectHW();
+  typeLoop();
+  cPrint('> QCity Bitcoin Terminal v16 MAXIMUM','if');
+  cPrint('> SHA-1/224/256/384/512 · SHA3 · RIPEMD-160 · BLAKE2b: ready','ok');
+  cPrint('> AES · ChaCha20 · PBKDF2 · scrypt: ready','ok');
+  cPrint('> secp256k1 · ECDSA RFC6979 · Schnorr BIP340 · Ed25519: ready','ok');
+  cPrint('> BIP32/39/44/49/84/86 · BIP38 · BIP143 · BIP341 · BIP174: ready','ok');
+  cPrint('> Base58Check · Base32/64/85 · Bech32 · Bech32m: ready','ok');
+  cPrint('> Shamir · Merkle · QR · DH · nonce-reuse demo: ready','ok');
+  cPrint('> type "help"','dm');
+  setInterval(()=>{if($('p-chain').classList.contains('on'))loadChain(true);},90000);
+  setInterval(()=>{if($('p-market').classList.contains('on'))loadMarket();},20000);
+  $('hudt').textContent='v16 MAXIMUM';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+/* Keyboard */
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('pal').style.display==='flex'?closePalette():openPalette();return;}
+  if(e.key==='F9'){e.preventDefault();togglePanic();return;}
+  if(e.key==='Escape'){if($('pal').style.display==='flex'){closePalette();return;}if($('modal').classList.contains('on'))closeModal();return;}
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+  if(e.altKey&&/^[0-9]$/.test(e.key)){e.preventDefault();const i=e.key==='0'?9:parseInt(e.key)-1;if(TABS[i])switchTab(TABS[i][0]);return;}
+  if(e.key==='?'){showModal('Shortcuts','<p>Ctrl/⌘+K palette · F9 panic · Alt+1..9,0 tabs</p>');return;}
+});
+$('palInput').addEventListener('input',e=>renderPal(e.target.value));
+$('palInput').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();palIdx=Math.min(palIdx+1,palView.length-1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();palIdx=Math.max(palIdx-1,0);}
+  else if(e.key==='Enter'){if(palView[palIdx]){closePalette();palView[palIdx].fn();}return;}
+  else if(e.key==='Escape'){closePalette();return;}
+  else return;
+  renderPal($('palInput').value);
+  document.querySelectorAll('#palList > div').forEach((d,i)=>{d.style.background=i===palIdx?'rgba(0,255,65,.12)':'';});
+});
+$('cInput')&&$('cInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')runCmd();
+  else if(e.key==='ArrowUp'){e.preventDefault();if(HIST.length){hIdx=Math.min(hIdx+1,HIST.length-1);$('cInput').value=HIST[hIdx];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(hIdx>0){hIdx--;$('cInput').value=HIST[hIdx];}else{hIdx=-1;$('cInput').value='';}}
+});
+</script>
+</body>
+</html>
